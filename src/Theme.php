@@ -188,6 +188,9 @@ final class Theme
      */
     private static function registerCoreHooks(Container $container): void
     {
+        // Variables globales et macros WP injectées dans le moteur de templates.
+        self::bootstrapViewRenderer($container);
+
         // Enqueue hooks enregistrés directement pour satisfaire la signature
         // à 2 arguments attendue dans les tests Brain Monkey.
         add_action('wp_enqueue_scripts', static function () use ($container): void {
@@ -208,5 +211,41 @@ final class Theme
         // Modules fonctionnels.
         (new \OliTheme\I18n\I18nModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
+    }
+
+    /**
+     * Injecte les variables globales WP et enregistre les macros wpHead/wpFooter
+     * dans le ViewRenderer au démarrage du thème.
+     */
+    private static function bootstrapViewRenderer(Container $container): void
+    {
+        $renderer = $container->get(ViewRenderer::class);
+        \assert($renderer instanceof ViewRenderer);
+
+        // Variables disponibles dès le boot (fonctions WP synchrones).
+        $renderer->setDefaultVariables([
+            'siteName'    => get_bloginfo('name'),
+            'siteUrl'     => home_url(),
+            'homeUrl'     => home_url(),
+            'themeUri'    => get_template_directory_uri(),
+            'charset'     => get_bloginfo('charset'),
+            'currentYear' => date('Y'),
+        ]);
+
+        // Macros lazy : wp_head() et wp_footer() sont capturés au moment du rendu
+        // via output buffering pour garantir que tous les hooks WP sont déjà branchés.
+        $renderer->registerMacro('wpHead', static function (): string {
+            ob_start();
+            wp_head();
+
+            return (string) ob_get_clean();
+        });
+
+        $renderer->registerMacro('wpFooter', static function (): string {
+            ob_start();
+            wp_footer();
+
+            return (string) ob_get_clean();
+        });
     }
 }

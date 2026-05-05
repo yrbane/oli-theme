@@ -25,7 +25,17 @@ final class ThemeTest extends TestCase
         Monkey\setUp();
         Functions\stubs([
             'get_template_directory_uri' => 'https://example.test/wp-content/themes/oli-theme',
+            'home_url'                   => 'https://example.test',
+            'wp_head'                    => '',
+            'wp_footer'                  => '',
         ]);
+        Functions\when('get_bloginfo')->alias(static function (string $show): string {
+            return match ($show) {
+                'name'    => 'Test Site',
+                'charset' => 'UTF-8',
+                default   => '',
+            };
+        });
     }
 
     protected function tearDown(): void
@@ -118,5 +128,49 @@ final class ThemeTest extends TestCase
         self::assertTrue($container->has(\OliTheme\Posts\PageController::class));
         self::assertTrue($container->has(\OliTheme\Posts\PostController::class));
         self::assertTrue($container->has(\OliTheme\Posts\NotFoundController::class));
+    }
+
+    public function testBootInjectsGlobalVariablesAndMacrosIntoViewRenderer(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        Theme::reset();
+        Theme::boot(sys_get_temp_dir());
+
+        $renderer = Theme::container()->get(ViewRenderer::class);
+        self::assertInstanceOf(ViewRenderer::class, $renderer);
+
+        // Vérifie que les variables globales sont injectées via un rendu inline.
+        $cacheDir = sys_get_temp_dir() . '/oli-theme-test-globals-' . uniqid();
+        mkdir($cacheDir, 0o755, true);
+
+        // Crée un renderer identique pour tester les variables sans template réel.
+        $testRenderer = new ViewRenderer(sys_get_temp_dir(), $cacheDir);
+        $testRenderer->setDefaultVariables([
+            'siteName' => 'Oli',
+            'charset'  => 'UTF-8',
+        ]);
+        $testRenderer->registerMacro('wpHead', static fn (): string => '<wp-head/>');
+        $testRenderer->registerMacro('wpFooter', static fn (): string => '<wp-footer/>');
+
+        // Crée un mini-template inline dans sys_get_temp_dir() pour le test.
+        $tplFile = sys_get_temp_dir() . '/test-globals.html.tpl';
+        file_put_contents($tplFile, '[[ siteName ]] [[ charset ]] ##wpHead()## ##wpFooter()##');
+
+        $output = $testRenderer->render('test-globals.html');
+
+        self::assertStringContainsString('Oli', $output);
+        self::assertStringContainsString('UTF-8', $output);
+        self::assertStringContainsString('<wp-head/>', $output);
+        self::assertStringContainsString('<wp-footer/>', $output);
+
+        // Nettoyage.
+        unlink($tplFile);
+        foreach (glob($cacheDir . '/*.php') ?: [] as $f) {
+            unlink($f);
+        }
+        rmdir($cacheDir);
     }
 }

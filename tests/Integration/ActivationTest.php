@@ -22,7 +22,17 @@ final class ActivationTest extends TestCase
         Monkey\setUp();
         Functions\stubs([
             'get_template_directory_uri' => 'https://example.test/wp-content/themes/oli-theme',
+            'home_url'                   => 'https://example.test',
+            'wp_head'                    => '',
+            'wp_footer'                  => '',
         ]);
+        Functions\when('get_bloginfo')->alias(static function (string $show): string {
+            return match ($show) {
+                'name'    => 'Test Site',
+                'charset' => 'UTF-8',
+                default   => '',
+            };
+        });
         Functions\when('add_action')->justReturn(true);
     }
 

@@ -56,10 +56,15 @@ final class SinglePostTemplateRenderTest extends TestCase
 
         $renderer = new ViewRenderer(__DIR__ . '/../../../templates', $this->cacheDir);
         $renderer->setDefaultVariables([
-            'wpHead' => '', 'wpFooter' => '',
-            'siteName' => 'Oli', 'siteUrl' => 'https://example.com', 'homeUrl' => 'https://example.com',
-            'themeUri' => 'https://example.com', 'currentYear' => '2026', 'charset' => 'UTF-8',
+            'siteName'    => 'Oli',
+            'siteUrl'     => 'https://example.com',
+            'homeUrl'     => 'https://example.com',
+            'themeUri'    => 'https://example.com',
+            'currentYear' => '2026',
+            'charset'     => 'UTF-8',
         ]);
+        $renderer->registerMacro('wpHead', static fn (): string => '');
+        $renderer->registerMacro('wpFooter', static fn (): string => '');
 
         $html = $renderer->render('pages/single-post.html', [
             'post' => $entity,

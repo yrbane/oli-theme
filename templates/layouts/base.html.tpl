@@ -13,7 +13,7 @@
     <meta charset="[[ charset ]]">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>[[ siteName ]]</title>
-    [[! wpHead !]]
+    ##wpHead()##
     [% block head_extra %][% endblock %]
 </head>
 <body class="[[ bodyClasses ]]">
@@ -27,7 +27,7 @@
     </main>
     [% block after_main %][% endblock %]
     [% include 'partials/footer.html.tpl' %]
-    [[! wpFooter !]]
+    ##wpFooter()##
     [% block footer_extra %][% endblock %]
 </body>
 </html>

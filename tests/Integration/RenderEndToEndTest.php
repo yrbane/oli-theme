@@ -6,7 +6,6 @@ namespace OliTheme\Tests\Integration;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
-use OliTheme\Core\ViewRenderer;
 use OliTheme\Posts\PageController;
 use OliTheme\Theme;
 use PHPUnit\Framework\TestCase;
@@ -67,18 +66,6 @@ final class RenderEndToEndTest extends TestCase
         Functions\when('get_queried_object_id')->justReturn(99);
 
         Theme::boot($themePath);
-
-        // Injecte les variables globales attendues par le layout de base.
-        Theme::container()->get(ViewRenderer::class)->setDefaultVariables([
-            'wpHead'      => '',
-            'wpFooter'    => '',
-            'siteName'    => 'Oli',
-            'siteUrl'     => 'https://example.com',
-            'homeUrl'     => 'https://example.com',
-            'themeUri'    => 'https://example.com/wp-content/themes/oli-theme',
-            'currentYear' => '2026',
-            'charset'     => 'UTF-8',
-        ]);
 
         $controller = Theme::container()->get(PageController::class);
 
