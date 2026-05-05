@@ -4,6 +4,20 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.9] - 2026-05-06
+
+### Added (Plan 9 — Settings admin)
+
+- 6 DTOs immuables : `Settings\BannerSettings`, `FooterSettings`, `SocialSettings`, `LanguagesSettings` (avec constantes `FALLBACK_*`), `ContactSettings`, `SeoSettings`.
+- `Settings\SettingsBag` — agrégateur immuable avec `::default()` retournant un bag neutre (langues `['fr']`, fallback `home`, toggles à `true`).
+- `Settings\ThemeSettingsModel` (+ Interface) — `get/set/all` sur l'option WP `oli_theme_settings` (stockage atomique).
+- `Settings\ThemeSettingsPage` — page admin sous **Apparence > Identité du site**, 6 onglets (Identité, Langues, Réseaux, Footer, Contact, SEO), Settings API native + `register_setting` / `add_settings_section` / `do_settings_sections` capturé en buffer.
+- `Settings\SettingsModule` — orchestrateur, branché en tête de `Theme::registerCoreHooks()`.
+- Template `templates/admin/settings-page.html.tpl` (wrapper Lunar avec onglets).
+- `assets/css/admin.css` — styles admin minimaux.
+- Test d'intégration `SettingsResolutionTest` (boot complet + résolution + `all()` retourne SettingsBag).
+- Guide `docs/settings.md` + ADR 0010 (Settings API native vs Customizer / ACF / Carbon Fields).
+
 ## [1.0.0-alpha.8] - 2026-05-06
 
 ### Added (Plan 8 — Contact form)
