@@ -17,7 +17,7 @@ use Random\RandomException;
  *
  * @since 1.0.0
  */
-final class TranslationModel
+final class TranslationModel implements TranslationModelInterface
 {
     public const META_KEY = '_oli_translation_group';
 
