@@ -7,6 +7,8 @@ namespace OliTheme\Posts;
 use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 
 /**
  * Controller dédié au rendu 404.
@@ -21,6 +23,8 @@ final class NotFoundController
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
+        private readonly SeoControllerInterface $seo,
+        private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -34,6 +38,8 @@ final class NotFoundController
             'languageSwitcher' => $this->switcher->build(0),
             'primaryMenu'      => $this->menus->buildPrimary($current),
             'footerMenu'       => $this->menus->buildFooter($current),
+            'seo'              => $this->seo->buildFor404($current),
+            'crumbs'           => $this->breadcrumbs->buildFor404($current),
             'bodyClasses'      => 'error404 lang-' . $current->code,
         ]);
     }

@@ -12,6 +12,9 @@ use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
 use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\NotFoundController;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
+use OliTheme\Seo\SeoHeadViewModel;
 use PHPUnit\Framework\TestCase;
 
 final class NotFoundControllerTest extends TestCase
@@ -42,6 +45,13 @@ final class NotFoundControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
+        $seoVm = new SeoHeadViewModel('T', 'D', 'noindex', 'https://ex.com', [], [], [], '{}');
+        $seo = $this->createMock(SeoControllerInterface::class);
+        $seo->method('buildFor404')->willReturn($seoVm);
+
+        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
+        $breadcrumbs->method('buildFor404')->willReturn([]);
+
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
@@ -51,7 +61,7 @@ final class NotFoundControllerTest extends TestCase
             )
             ->willReturn('<html>404</html>');
 
-        $controller = new NotFoundController($resolver, $switcher, $menus, $renderer);
+        $controller = new NotFoundController($resolver, $switcher, $menus, $seo, $breadcrumbs, $renderer);
 
         self::assertSame('<html>404</html>', $controller->render());
     }

@@ -16,6 +16,9 @@ use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\PostController;
 use OliTheme\Posts\PostEntity;
 use OliTheme\Posts\PostModelInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
+use OliTheme\Seo\SeoHeadViewModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -38,6 +41,12 @@ final class PostControllerTest extends TestCase
     /** @var MockObject&MenuControllerInterface */
     private MockObject $menus;
 
+    /** @var MockObject&SeoControllerInterface */
+    private MockObject $seo;
+
+    /** @var MockObject&BreadcrumbsControllerInterface */
+    private MockObject $breadcrumbs;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -49,6 +58,8 @@ final class PostControllerTest extends TestCase
         $this->switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
         $this->menus    = $this->createMock(MenuControllerInterface::class);
         $this->renderer = $this->createMock(RendererInterface::class);
+        $this->seo      = $this->createMock(SeoControllerInterface::class);
+        $this->breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
 
         $this->resolver->method('current')->willReturn($this->french);
         $this->switcher->method('build')->willReturn(
@@ -56,6 +67,16 @@ final class PostControllerTest extends TestCase
         );
         $this->menus->method('buildPrimary')->willReturn([]);
         $this->menus->method('buildFooter')->willReturn([]);
+
+        $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');
+        $this->seo->method('buildForPost')->willReturn($seoVm);
+        $this->seo->method('buildForArchive')->willReturn($seoVm);
+        $this->seo->method('buildForSearch')->willReturn($seoVm);
+        $this->seo->method('buildFor404')->willReturn($seoVm);
+        $this->breadcrumbs->method('buildForPost')->willReturn([]);
+        $this->breadcrumbs->method('buildForArchive')->willReturn([]);
+        $this->breadcrumbs->method('buildForSearch')->willReturn([]);
+        $this->breadcrumbs->method('buildFor404')->willReturn([]);
     }
 
     protected function tearDown(): void
@@ -81,7 +102,10 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>single</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
+        $controller = new PostController(
+            $this->model, $this->resolver, $this->switcher, $this->menus,
+            $this->seo, $this->breadcrumbs, $this->renderer,
+        );
 
         self::assertSame('<html>single</html>', $controller->renderSingle());
     }
@@ -110,7 +134,10 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>archive</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
+        $controller = new PostController(
+            $this->model, $this->resolver, $this->switcher, $this->menus,
+            $this->seo, $this->breadcrumbs, $this->renderer,
+        );
 
         self::assertSame('<html>archive</html>', $controller->renderArchive());
     }
@@ -132,7 +159,10 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>search</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
+        $controller = new PostController(
+            $this->model, $this->resolver, $this->switcher, $this->menus,
+            $this->seo, $this->breadcrumbs, $this->renderer,
+        );
 
         self::assertSame('<html>search</html>', $controller->renderSearch());
     }

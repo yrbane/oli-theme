@@ -16,6 +16,9 @@ use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
 use OliTheme\Navigation\MenuControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
+use OliTheme\Seo\SeoHeadViewModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -62,6 +65,15 @@ final class EventControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
+        $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');
+        $seo = $this->createMock(SeoControllerInterface::class);
+        $seo->method('buildForEvent')->willReturn($seoVm);
+        $seo->method('buildFor404')->willReturn($seoVm);
+
+        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
+        $breadcrumbs->method('buildForEvent')->willReturn([]);
+        $breadcrumbs->method('buildFor404')->willReturn([]);
+
         $capturedTemplate = null;
         $capturedViewModel = null;
 
@@ -75,7 +87,7 @@ final class EventControllerTest extends TestCase
             },
         );
 
-        $controller = new EventController($events, $resolver, $switcher, $menus, $renderer);
+        $controller = new EventController($events, $resolver, $switcher, $menus, $seo, $breadcrumbs, $renderer);
         $html = $controller->renderSingle();
 
         self::assertSame('<html>', $html);
@@ -103,6 +115,13 @@ final class EventControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
+        $seoVm = new SeoHeadViewModel('T', 'D', 'noindex', 'https://ex.com', [], [], [], '{}');
+        $seo = $this->createMock(SeoControllerInterface::class);
+        $seo->method('buildFor404')->willReturn($seoVm);
+
+        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
+        $breadcrumbs->method('buildFor404')->willReturn([]);
+
         $capturedTemplate = null;
 
         $renderer = $this->createMock(RendererInterface::class);
@@ -114,7 +133,7 @@ final class EventControllerTest extends TestCase
             },
         );
 
-        $controller = new EventController($events, $resolver, $switcher, $menus, $renderer);
+        $controller = new EventController($events, $resolver, $switcher, $menus, $seo, $breadcrumbs, $renderer);
         $controller->renderSingle();
 
         self::assertSame('pages/404.html', $capturedTemplate);

@@ -7,6 +7,8 @@ namespace OliTheme\Events;
 use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 
 /**
  * Contrôleur pour le rendu de l'archive des événements.
@@ -22,6 +24,8 @@ final class EventArchiveController implements EventArchiveControllerInterface
      * @param LanguageResolverInterface $resolver Résolveur de langue courante.
      * @param LanguageSwitcherControllerInterface $switcher Contrôleur du sélecteur de langue.
      * @param \OliTheme\Navigation\MenuControllerInterface $menus Contrôleur des menus de navigation.
+     * @param SeoControllerInterface $seo Contrôleur SEO.
+     * @param BreadcrumbsControllerInterface $breadcrumbs Contrôleur fil d'Ariane.
      * @param RendererInterface $renderer Moteur de rendu de templates.
      */
     public function __construct(
@@ -29,6 +33,8 @@ final class EventArchiveController implements EventArchiveControllerInterface
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
+        private readonly SeoControllerInterface $seo,
+        private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -52,6 +58,8 @@ final class EventArchiveController implements EventArchiveControllerInterface
             'languageSwitcher' => $this->switcher->build(0),
             'primaryMenu' => $this->menus->buildPrimary($current),
             'footerMenu' => $this->menus->buildFooter($current),
+            'seo' => $this->seo->buildForArchive('oli_event', $current),
+            'crumbs' => $this->breadcrumbs->buildForArchive('oli_event', $current),
             'bodyClasses' => 'archive archive-event lang-' . $current->code,
         ]);
     }

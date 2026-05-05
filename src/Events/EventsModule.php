@@ -11,6 +11,8 @@ use OliTheme\I18n\LanguageRegistryInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\Navigation\MenuControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 
 /**
  * Module Events : enregistre le CPT oli_event et les services associés
@@ -67,6 +69,8 @@ final class EventsModule implements ModuleInterface
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(MenuControllerInterface::class),
+                    $c->get(SeoControllerInterface::class),
+                    $c->get(BreadcrumbsControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );
@@ -87,6 +91,8 @@ final class EventsModule implements ModuleInterface
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(MenuControllerInterface::class),
+                    $c->get(SeoControllerInterface::class),
+                    $c->get(BreadcrumbsControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );

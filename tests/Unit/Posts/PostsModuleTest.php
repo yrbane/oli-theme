@@ -16,6 +16,8 @@ use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostController;
 use OliTheme\Posts\PostModel;
 use OliTheme\Posts\PostsModule;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 use OliTheme\Slides\HomeCarouselControllerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -36,6 +38,8 @@ final class PostsModuleTest extends TestCase
         $this->container->set(LanguageSwitcherControllerInterface::class, $this->createMock(LanguageSwitcherControllerInterface::class));
         $this->container->set(MenuControllerInterface::class, $this->createMock(MenuControllerInterface::class));
         $this->container->set(HomeCarouselControllerInterface::class, $this->createMock(HomeCarouselControllerInterface::class));
+        $this->container->set(SeoControllerInterface::class, $this->createMock(SeoControllerInterface::class));
+        $this->container->set(BreadcrumbsControllerInterface::class, $this->createMock(BreadcrumbsControllerInterface::class));
     }
 
     protected function tearDown(): void

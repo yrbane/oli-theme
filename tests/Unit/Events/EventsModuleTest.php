@@ -21,6 +21,8 @@ use OliTheme\I18n\LanguageRegistryInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\Navigation\MenuControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,6 +46,8 @@ final class EventsModuleTest extends TestCase
         $this->container->set(LanguageResolverInterface::class, $this->createMock(LanguageResolverInterface::class));
         $this->container->set(LanguageSwitcherControllerInterface::class, $this->createMock(LanguageSwitcherControllerInterface::class));
         $this->container->set(MenuControllerInterface::class, $this->createMock(MenuControllerInterface::class));
+        $this->container->set(SeoControllerInterface::class, $this->createMock(SeoControllerInterface::class));
+        $this->container->set(BreadcrumbsControllerInterface::class, $this->createMock(BreadcrumbsControllerInterface::class));
         $this->container->set(RendererInterface::class, $this->createMock(RendererInterface::class));
     }
 

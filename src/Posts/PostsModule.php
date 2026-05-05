@@ -10,6 +10,8 @@ use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageRegistryInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 
 /**
  * Module Posts : enregistre le modèle générique et les controllers
@@ -40,6 +42,13 @@ final class PostsModule implements ModuleInterface
             );
         }
 
+        if (! $container->has(PostModelInterface::class)) {
+            $container->factory(
+                PostModelInterface::class,
+                static fn (Container $c): PostModelInterface => $c->get(PostModel::class),
+            );
+        }
+
         if (! $container->has(PageController::class)) {
             $container->factory(
                 PageController::class,
@@ -48,8 +57,10 @@ final class PostsModule implements ModuleInterface
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
-                    $c->get(RendererInterface::class),
                     $c->get(\OliTheme\Slides\HomeCarouselControllerInterface::class),
+                    $c->get(SeoControllerInterface::class),
+                    $c->get(BreadcrumbsControllerInterface::class),
+                    $c->get(RendererInterface::class),
                 ),
             );
         }
@@ -62,6 +73,8 @@ final class PostsModule implements ModuleInterface
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
+                    $c->get(SeoControllerInterface::class),
+                    $c->get(BreadcrumbsControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );
@@ -74,6 +87,8 @@ final class PostsModule implements ModuleInterface
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
+                    $c->get(SeoControllerInterface::class),
+                    $c->get(BreadcrumbsControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );

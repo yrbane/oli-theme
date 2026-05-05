@@ -7,6 +7,8 @@ namespace OliTheme\Posts;
 use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 use OliTheme\Slides\HomeCarouselControllerInterface;
 
 /**
@@ -23,8 +25,10 @@ final class PageController
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
-        private readonly RendererInterface $renderer,
         private readonly HomeCarouselControllerInterface $carousel,
+        private readonly SeoControllerInterface $seo,
+        private readonly BreadcrumbsControllerInterface $breadcrumbs,
+        private readonly RendererInterface $renderer,
     ) {
     }
 
@@ -37,15 +41,24 @@ final class PageController
         $entity = $id > 0 ? $this->posts->find($id) : null;
 
         if (! $entity instanceof PostEntity) {
-            return $this->renderer->render('pages/404.html', $this->buildBaseViewModel($id));
+            $current = $this->resolver->current();
+            $vm = $this->buildBaseViewModel(0);
+            $vm['seo'] = $this->seo->buildFor404($current);
+            $vm['crumbs'] = $this->breadcrumbs->buildFor404($current);
+            return $this->renderer->render('pages/404.html', $vm);
         }
 
-        $viewModel = $this->buildViewModel($entity);
+        $vm = $this->buildBaseViewModel($entity->id);
+        $vm['post'] = $entity;
+        $vm['seo'] = $this->seo->buildForPost($entity);
+        $vm['crumbs'] = $this->breadcrumbs->buildForPost($entity);
+        $vm['bodyClasses'] = \sprintf('page page-id-%d lang-%s', $entity->id, $entity->language->code);
+
         if ($this->isFrontPage($entity->id)) {
-            $viewModel['carousel'] = $this->carousel->build();
+            $vm['carousel'] = $this->carousel->build();
         }
 
-        return $this->renderer->render('pages/page.html', $viewModel);
+        return $this->renderer->render('pages/page.html', $vm);
     }
 
     /**
@@ -54,22 +67,6 @@ final class PageController
     private function isFrontPage(int $postId): bool
     {
         return (int) get_option('page_on_front', 0) === $postId;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function buildViewModel(PostEntity $entity): array
-    {
-        $base = $this->buildBaseViewModel($entity->id);
-        $base['post'] = $entity;
-        $base['bodyClasses'] = \sprintf(
-            'page page-id-%d lang-%s',
-            $entity->id,
-            $entity->language->code,
-        );
-
-        return $base;
     }
 
     /**

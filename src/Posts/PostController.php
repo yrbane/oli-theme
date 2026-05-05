@@ -7,6 +7,8 @@ namespace OliTheme\Posts;
 use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
 
 /**
  * Controller pour les posts standards (single, archive, recherche).
@@ -22,6 +24,8 @@ final class PostController
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
+        private readonly SeoControllerInterface $seo,
+        private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -35,11 +39,17 @@ final class PostController
         $entity = $id > 0 ? $this->posts->find($id) : null;
 
         if (! $entity instanceof PostEntity) {
-            return $this->renderer->render('pages/404.html', $this->buildBaseViewModel(0));
+            $current = $this->resolver->current();
+            $viewModel = $this->buildBaseViewModel(0);
+            $viewModel['seo'] = $this->seo->buildFor404($current);
+            $viewModel['crumbs'] = $this->breadcrumbs->buildFor404($current);
+            return $this->renderer->render('pages/404.html', $viewModel);
         }
 
         $viewModel = $this->buildBaseViewModel($entity->id);
         $viewModel['post'] = $entity;
+        $viewModel['seo'] = $this->seo->buildForPost($entity);
+        $viewModel['crumbs'] = $this->breadcrumbs->buildForPost($entity);
         $viewModel['bodyClasses'] = \sprintf(
             'single single-post post-id-%d lang-%s',
             $entity->id,
@@ -60,6 +70,8 @@ final class PostController
         $viewModel = $this->buildBaseViewModel(0);
         $viewModel['posts']        = $items;
         $viewModel['archiveTitle'] = '';
+        $viewModel['seo']          = $this->seo->buildForArchive('post', $current);
+        $viewModel['crumbs']       = $this->breadcrumbs->buildForArchive('post', $current);
         $viewModel['bodyClasses']  = 'archive archive-post lang-' . $current->code;
 
         return $this->renderer->render('pages/archive-post.html', $viewModel);
@@ -77,6 +89,8 @@ final class PostController
         $viewModel = $this->buildBaseViewModel(0);
         $viewModel['query']       = $query;
         $viewModel['posts']       = $items;
+        $viewModel['seo']         = $this->seo->buildForSearch($query, $current);
+        $viewModel['crumbs']      = $this->breadcrumbs->buildForSearch($query, $current);
         $viewModel['bodyClasses'] = 'search lang-' . $current->code;
 
         return $this->renderer->render('pages/search.html', $viewModel);

@@ -15,6 +15,9 @@ use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
 use OliTheme\Navigation\MenuControllerInterface;
+use OliTheme\Seo\BreadcrumbsControllerInterface;
+use OliTheme\Seo\SeoControllerInterface;
+use OliTheme\Seo\SeoHeadViewModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -62,6 +65,13 @@ final class EventArchiveControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
+        $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');
+        $seo = $this->createMock(SeoControllerInterface::class);
+        $seo->method('buildForArchive')->willReturn($seoVm);
+
+        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
+        $breadcrumbs->method('buildForArchive')->willReturn([]);
+
         $capturedTemplate = null;
         $capturedViewModel = null;
 
@@ -75,7 +85,7 @@ final class EventArchiveControllerTest extends TestCase
             },
         );
 
-        $controller = new EventArchiveController($events, $resolver, $switcher, $menus, $renderer);
+        $controller = new EventArchiveController($events, $resolver, $switcher, $menus, $seo, $breadcrumbs, $renderer);
         $html = $controller->renderArchive();
 
         self::assertSame('<html>', $html);
