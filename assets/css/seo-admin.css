@@ -1,0 +1,18 @@
+/* Métabox SEO (admin). */
+.oli-seo-metabox { display: grid; gap: 0.75rem; }
+.oli-seo-metabox p { margin: 0; }
+.oli-seo-metabox .description { display: block; margin-top: 0.25rem; color: #6c6c6c; font-size: 0.85em; }
+.oli-seo-metabox .oli-seo-counter { font-weight: 600; }
+.oli-seo-metabox .oli-seo-counter--good { color: #2e7d32; }
+.oli-seo-metabox .oli-seo-counter--warn { color: #b07a00; }
+.oli-seo-metabox .oli-seo-counter--bad { color: #b71c1c; }
+.oli-seo-metabox .oli-seo-preview { background: #fff; border: 1px solid #dcdcde; padding: 0.75rem; border-radius: 4px; }
+.oli-seo-metabox .oli-seo-preview__title { color: #1a0dab; font-size: 1.05rem; line-height: 1.3; margin: 0 0 0.2rem; }
+.oli-seo-metabox .oli-seo-preview__url { color: #006621; font-size: 0.85em; margin: 0 0 0.3rem; }
+.oli-seo-metabox .oli-seo-preview__desc { color: #4d5156; font-size: 0.9em; margin: 0; line-height: 1.4; }
+.oli-seo-metabox .oli-seo-gauge { display: inline-flex; align-items: center; gap: 0.5rem; }
+.oli-seo-metabox .oli-seo-gauge__value { font-size: 1.5rem; font-weight: 700; }
+.oli-seo-metabox .oli-seo-gauge__bar { width: 12rem; height: 0.5rem; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+.oli-seo-metabox .oli-seo-gauge__fill { height: 100%; background: #2e7d32; transition: width 200ms ease; }
+.oli-seo-metabox .oli-seo-gauge__fill--low { background: #b71c1c; }
+.oli-seo-metabox .oli-seo-gauge__fill--medium { background: #b07a00; }

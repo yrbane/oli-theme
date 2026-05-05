@@ -50,15 +50,39 @@ final class AssetManager
 
     /**
      * Enregistre les assets de l'administration WordPress.
-     * Étendu plus tard par les modules SEO / Settings.
+     *
+     * Les assets SEO (compteurs live, preview SERP, gauge) sont chargés
+     * uniquement sur les écrans d'édition de contenu et les pages SEO.
+     *
+     * @param string $hookSuffix Suffixe de hook passé par admin_enqueue_scripts.
      */
-    public function enqueueAdmin(): void
+    public function enqueueAdmin(string $hookSuffix = ''): void
     {
         wp_enqueue_style(
             'oli-theme-admin',
             $this->themeUri . '/assets/css/admin.css',
             [],
             $this->version('assets/css/admin.css'),
+        );
+
+        // Charge les assets SEO admin uniquement sur les écrans d'édition de contenu et les pages SEO.
+        $isEditScreen = \in_array($hookSuffix, ['post.php', 'post-new.php'], true);
+        $isSeoPage = \str_starts_with($hookSuffix, 'tools_page_oli-seo-');
+        if (! $isEditScreen && ! $isSeoPage) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'oli-theme-seo-admin',
+            $this->themeUri . '/assets/css/seo-admin.css',
+            [],
+            $this->version('assets/css/seo-admin.css'),
+        );
+        wp_enqueue_script_module(
+            'oli-theme-seo-admin',
+            $this->themeUri . '/assets/js/seo-metabox.js',
+            [],
+            $this->version('assets/js/seo-metabox.js'),
         );
     }
 

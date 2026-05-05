@@ -24,6 +24,7 @@ final class AssetManagerTest extends TestCase
         mkdir($this->themePath . '/assets/css', recursive: true);
         mkdir($this->themePath . '/assets/js', recursive: true);
         file_put_contents($this->themePath . '/assets/css/main.css', 'body{}');
+        file_put_contents($this->themePath . '/assets/css/admin.css', '/* admin */');
         file_put_contents($this->themePath . '/assets/js/main.js', '// js');
     }
 
@@ -106,6 +107,41 @@ final class AssetManagerTest extends TestCase
         rmdir($themePath . '/assets/css');
         rmdir($themePath . '/assets');
         rmdir($themePath);
+    }
+
+    public function testEnqueueAdminLoadsSeoAssetsOnEditScreens(): void
+    {
+        file_put_contents($this->themePath . '/assets/css/seo-admin.css', '/* css */');
+        file_put_contents($this->themePath . '/assets/js/seo-metabox.js', '/* js */');
+
+        $captured = [];
+        Functions\when('wp_enqueue_style')->alias(static function (...$args) use (&$captured): void {
+            $captured['style'][] = $args;
+        });
+        Functions\when('wp_enqueue_script_module')->alias(static function (...$args) use (&$captured): void {
+            $captured['script'] = $args;
+        });
+
+        $manager = new AssetManager($this->themePath, 'https://example.test/oli');
+        $manager->enqueueAdmin('post.php');
+
+        // Recherche le handle SEO parmi tous les appels wp_enqueue_style.
+        $styleHandles = array_column($captured['style'] ?? [], 0);
+        self::assertContains('oli-theme-seo-admin', $styleHandles);
+        self::assertSame('oli-theme-seo-admin', $captured['script'][0] ?? null);
+    }
+
+    public function testEnqueueAdminSkipsUnrelatedScreens(): void
+    {
+        Functions\when('wp_enqueue_style')->alias(static function (...$args): void {
+            // Seul admin.css est autorisé, pas seo-admin.css.
+        });
+        Functions\expect('wp_enqueue_script_module')->never();
+
+        $manager = new AssetManager($this->themePath, 'https://example.test/oli');
+        $manager->enqueueAdmin('options-general.php');
+
+        $this->addToAssertionCount(1);
     }
 
     private function rrmdir(string $dir): void
