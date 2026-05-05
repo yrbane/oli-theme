@@ -18,11 +18,14 @@ final class RedirectModel implements RedirectModelInterface
 {
     /**
      * @param \wpdb $wpdb Instance de la base de données WordPress.
+     * @param RedirectInstaller|null $installer Installateur du schéma (optionnel — si absent,
+     *                                          aucun fail-safe n'est appliqué).
      *
      * @phpstan-param \wpdb $wpdb
      */
     public function __construct(
         private readonly object $wpdb,
+        private readonly ?RedirectInstaller $installer = null,
     ) {
     }
 
@@ -31,6 +34,10 @@ final class RedirectModel implements RedirectModelInterface
      */
     public function findBySource(string $source): ?RedirectEntity
     {
+        if ($this->installer !== null && !$this->installer->tableExists()) {
+            return null;
+        }
+
         /** @var \stdClass|null $row */
         $row = $this->wpdb->get_row(
             $this->wpdb->prepare(\sprintf('SELECT * FROM `%s` WHERE source = %%s LIMIT 1', $this->table()), $source),
@@ -44,6 +51,10 @@ final class RedirectModel implements RedirectModelInterface
      */
     public function findAll(int $limit = 100, int $offset = 0): array
     {
+        if ($this->installer !== null && !$this->installer->tableExists()) {
+            return [];
+        }
+
         $rows = $this->wpdb->get_results(
             $this->wpdb->prepare(\sprintf('SELECT * FROM `%s` ORDER BY id DESC LIMIT %%d OFFSET %%d', $this->table()), $limit, $offset),
         );

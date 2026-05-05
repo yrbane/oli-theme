@@ -186,6 +186,7 @@ final class ThemeTest extends TestCase
             });
 
         Functions\when('flush_rewrite_rules')->justReturn();
+        Functions\when('update_option')->justReturn(true);
 
         // Stub wpdb avec prefix et get_charset_collate.
         $wpdb = new \stdClass();

@@ -36,7 +36,7 @@ final class InternalLinkSuggester
                 continue;
             }
             // Ignore les articles déjà liés dans le contenu courant.
-            if (\str_contains($current->content, $candidate->permalink)) {
+            if (str_contains($current->content, $candidate->permalink)) {
                 continue;
             }
             $suggestions[] = $candidate;

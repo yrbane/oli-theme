@@ -95,13 +95,24 @@ final class SeoModule implements ModuleInterface
             );
         }
 
+        if (! $container->has(RedirectInstaller::class)) {
+            $container->factory(
+                RedirectInstaller::class,
+                static function (): RedirectInstaller {
+                    /** @var \wpdb $wpdb */
+                    $wpdb = \is_object($GLOBALS['wpdb'] ?? null) ? $GLOBALS['wpdb'] : new \stdClass();
+                    return new RedirectInstaller($wpdb);
+                },
+            );
+        }
+
         if (! $container->has(RedirectModel::class)) {
             $container->factory(
                 RedirectModel::class,
-                static function (): RedirectModel {
+                static function (Container $c): RedirectModel {
                     /** @var \wpdb $wpdb */
                     $wpdb = \is_object($GLOBALS['wpdb'] ?? null) ? $GLOBALS['wpdb'] : new \stdClass();
-                    return new RedirectModel($wpdb);
+                    return new RedirectModel($wpdb, $c->get(RedirectInstaller::class));
                 },
             );
         }
@@ -275,6 +286,14 @@ final class SeoModule implements ModuleInterface
         }
 
         // --- Hooks WordPress ---
+
+        // Migration idempotente du schéma à chaque démarrage : couvre les déploiements
+        // par `git pull` où `after_switch_theme` ne s'exécute pas (issue #3).
+        add_action('init', function (): void {
+            $installer = $this->container->get(RedirectInstaller::class);
+            \assert($installer instanceof RedirectInstaller);
+            $installer->ensureInstalled();
+        }, 5);
 
         add_action('template_redirect', function (): void {
             $controller = $this->container->get(RedirectController::class);
