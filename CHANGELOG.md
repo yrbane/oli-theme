@@ -4,6 +4,25 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.6] - 2026-05-05
+
+### Added (Plan 6 — Events CPT)
+
+- `Events\EventEntity` — DTO immuable d'un événement (16 propriétés dont `isPast`/`isOngoing` calculés).
+- `Events\EventCpt` — CPT `oli_event` (public, archive `evenements`, supports complet).
+- `Events\EventModel` (+ `EventModelInterface`) — `findUpcoming`, `findPast`, `findById`, `findBySlug`.
+- `Events\EventController` (+ interface) — `renderSingle`.
+- `Events\EventArchiveController` (+ interface) — `renderArchive` séparant à venir / passés.
+- `Events\EventMetabox` — métabox admin avec nonce + sanitization des 7 champs custom.
+- `Events\EventsModule` — orchestrateur, branché dans `Theme::boot()`.
+- Templates `pages/single-event.html.tpl`, `pages/archive-event.html.tpl`, `partials/event-card.html.tpl`, `admin/event-metabox.html.tpl`.
+- Theme-bridge `theme-bridge/single-oli_event.php` + `archive-oli_event.php`.
+- `assets/css/event.css` — styles BEM avec états `--past`/`--ongoing`/`--card`/`--single`, archive en grille responsive.
+- `I18n\LanguageTaxonomy` étendue au CPT `oli_event`.
+- Microdonnées `schema.org/Event` natives dans `single-event.html.tpl` (itemprop name/startDate/endDate/location/url/description).
+- Test d'intégration `EventResolutionTest` (résolution des controllers via container après boot).
+- Guide `docs/events.md` + ADR 0007 (CPT dédié vs posts taggés vs plugins tiers).
+
 ## [1.0.0-alpha.5] - 2026-05-05
 
 ### Added (Plan 5 — Slides & Home Carousel)
