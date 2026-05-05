@@ -64,6 +64,12 @@
     "cs:fix": "php-cs-fixer fix",
     "docs": "echo 'Documentation API désactivée temporairement (phpdocumentor incompatible PHP 8.5). Voir docs/decisions/0003-phpdoc-deferred.md.'",
     "qa": ["@cs", "@analyse", "@test"],
-    "ci": ["@cs", "@analyse", "@test:all"]
+    "ci": ["@cs", "@analyse", "@test:all"],
+    "normalize-perms": [
+      "find vendor -type f -exec chmod a+r {} +",
+      "find vendor -type d -exec chmod a+rx {} +"
+    ],
+    "post-install-cmd": ["@normalize-perms"],
+    "post-update-cmd": ["@normalize-perms"]
   }
 }
