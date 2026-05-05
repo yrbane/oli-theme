@@ -4,6 +4,20 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+### Fixed
+
+- **#1** — `mkdir() Permission denied` sur l'activation. Nouveau `Core\CacheDirectoryEnsurer` (TDD, 5 tests) qui crée le dossier et le valide sans lever d'exception ; fallback sur `sys_get_temp_dir()` si `.cache/templates` n'est pas writable, avec admin_notice (`oli_theme_cache_error`) au lieu d'un fatal Lunar. `.cache/templates/.gitkeep` versionné + contenu ignoré dans `.gitignore`.
+- **#4** — `template_include` manquant. Tous les fichiers `theme-bridge/*.php` étaient ignorés par WP (qui ne descend pas dans les sous-dossiers) → seul `index.php` à la racine était utilisé, donnant l'archive des posts pour toutes les URL. Nouveau `Core\TemplateRouter` (TDD, 10 tests) hooké via `template_include` qui aiguille vers le bon shim selon `is_front_page`, `is_singular('oli_event')`, `is_post_type_archive`, `is_page`, `is_single`, `is_search`, `is_archive`, `is_404`.
+- **#5** — `MenuController::buildFor()` passait une `theme_location` (string) à `wp_get_nav_menu_items()`, qui attend un menu ID, ce qui faisait retourner `false` et laissait les menus vides en permanence. Résolution préalable via `get_nav_menu_locations()[$location]` + 2 nouveaux tests de régression.
+
+### Added
+
+- `composer.json` : scripts `normalize-perms` + `post-install-cmd` / `post-update-cmd` qui forcent les permissions `a+r` / `a+rx` sur `vendor/` après chaque install/update (issue #2 — workaround pour les setups Docker avec `umask 027`).
+
+### Changed
+
+- `yrbane/lunar-template` : `2bb1925` → `0963257`.
+
 ## [1.0.0-rc.1] - 2026-05-06
 
 ### Plan 10 — QA & finalisation cycle 1
