@@ -52,10 +52,11 @@ final class ViewRendererBaseLayoutTest extends TestCase
 
         $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
 
-        // Le moteur Lunar convertit la notation pointée en accès tableau :
-        // [[ lang.code ]] devient $lang['code']. On passe donc lang comme tableau.
+        // Lunar 2de89f0+ supporte l'accès hybride array/objet via
+        // Lunar\Template\Runtime\Access::get (issue #14). On passe directement
+        // l'objet Language : [[ lang.code ]] résout à $lang->code.
         $html = $renderer->render('layouts/base.html', [
-            'lang' => ['code' => $french->code, 'direction' => $french->direction],
+            'lang' => $french,
             'bodyClasses' => 'home',
             'languageSwitcher' => new LanguageSwitcherViewModel($french, []),
         ]);

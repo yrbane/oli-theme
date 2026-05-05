@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9b1ff38d90a6b271e3c801891f00639",
+    "content-hash": "24040001367b0226ed8708edb03dd0f6",
     "packages": [
         {
             "name": "psr/simple-cache",
@@ -164,12 +164,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yrbane/lunar-template.git",
-                "reference": "95282861be4c6b0426c59867f9d2436d939d105a"
+                "reference": "2de89f04da091e2bbeb1aad1b86ebb8246ff89b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yrbane/lunar-template/zipball/95282861be4c6b0426c59867f9d2436d939d105a",
-                "reference": "95282861be4c6b0426c59867f9d2436d939d105a",
+                "url": "https://api.github.com/repos/yrbane/lunar-template/zipball/2de89f04da091e2bbeb1aad1b86ebb8246ff89b5",
+                "reference": "2de89f04da091e2bbeb1aad1b86ebb8246ff89b5",
                 "shasum": ""
             },
             "require": {
@@ -264,7 +264,7 @@
                 "source": "https://github.com/yrbane/lunar-template/tree/main",
                 "issues": "https://github.com/yrbane/lunar-template/issues"
             },
-            "time": "2026-01-12T13:38:27+00:00"
+            "time": "2026-05-05T19:24:53+00:00"
         }
     ],
     "packages-dev": [
