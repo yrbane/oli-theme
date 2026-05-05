@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OliTheme\Tests\Integration;
+
+use Brain\Monkey;
+use Brain\Monkey\Functions;
+use OliTheme\Theme;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Test d'intégration : vérifie que le bootstrap du thème ne lève aucune
+ * exception et que les hooks d'activation/désactivation tournent
+ * sans erreur fatale (mocks Brain Monkey).
+ */
+final class ActivationTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Monkey\setUp();
+        Functions\stubs([
+            'get_template_directory_uri' => 'https://example.test/wp-content/themes/oli-theme',
+        ]);
+        Functions\when('add_action')->justReturn(true);
+    }
+
+    protected function tearDown(): void
+    {
+        Theme::reset();
+        Monkey\tearDown();
+        parent::tearDown();
+    }
+
+    public function test_boot_runs_without_throwing(): void
+    {
+        Theme::boot(\dirname(__DIR__, 2));
+        self::assertNotNull(Theme::container());
+    }
+
+    public function test_activation_hook_calls_flush_rewrite_rules(): void
+    {
+        Functions\expect('flush_rewrite_rules')->once();
+        Theme::onActivation();
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_deactivation_hook_calls_flush_rewrite_rules(): void
+    {
+        Functions\expect('flush_rewrite_rules')->once();
+        Theme::onDeactivation();
+        $this->addToAssertionCount(1);
+    }
+}
