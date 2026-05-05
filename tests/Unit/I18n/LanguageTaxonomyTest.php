@@ -29,7 +29,7 @@ final class LanguageTaxonomyTest extends TestCase
     {
         Functions\expect('register_taxonomy')
             ->once()
-            ->with('language', \Mockery::on(static fn ($v) => \is_array($v) && \in_array('post', $v, true) && \in_array('page', $v, true) && \in_array('oli_slide', $v, true) && \in_array('oli_event', $v, true)), \Mockery::any());
+            ->with('language', \Mockery::on(static fn ($v) => \is_array($v) && \in_array('post', $v, true) && \in_array('page', $v, true) && \in_array('oli_slide', $v, true) && \in_array('oli_event', $v, true) && \in_array('oli_contact_log', $v, true)), \Mockery::any());
 
         Functions\when('term_exists')->justReturn(false);
         Functions\when('wp_insert_term')->justReturn(['term_id' => 1, 'term_taxonomy_id' => 1]);
