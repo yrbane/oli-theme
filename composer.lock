@@ -164,12 +164,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yrbane/lunar-template.git",
-                "reference": "2bb192506e708902d1868558a3eac208bfbeabc0"
+                "reference": "0963257beda56533b660529d8d7c0a8b64cfbe16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yrbane/lunar-template/zipball/2bb192506e708902d1868558a3eac208bfbeabc0",
-                "reference": "2bb192506e708902d1868558a3eac208bfbeabc0",
+                "url": "https://api.github.com/repos/yrbane/lunar-template/zipball/0963257beda56533b660529d8d7c0a8b64cfbe16",
+                "reference": "0963257beda56533b660529d8d7c0a8b64cfbe16",
                 "shasum": ""
             },
             "require": {
@@ -264,7 +264,7 @@
                 "source": "https://github.com/yrbane/lunar-template/tree/main",
                 "issues": "https://github.com/yrbane/lunar-template/issues"
             },
-            "time": "2026-05-05T22:18:22+00:00"
+            "time": "2026-05-05T22:53:10+00:00"
         }
     ],
     "packages-dev": [
