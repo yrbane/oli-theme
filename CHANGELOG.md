@@ -4,6 +4,33 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] - 2026-05-05
+
+### Added (Plan 3 — Templates & Posts/Pages)
+
+- `Posts\PostEntity` — DTO immuable du contenu WP.
+- `Posts\PostModel` — modèle générique (`find`, `findBySlug`, `findByLanguage`, `getMeta`).
+- `Posts\PageController` — rendu singulier des pages.
+- `Posts\PostController` — rendu single, archive et recherche des posts.
+- `Posts\NotFoundController` — rendu 404.
+- `Posts\PostsModule` — enregistrement des services posts dans le container, branché dans `Theme::boot()`.
+- Layout racine Lunar `templates/layouts/base.html.tpl` + partials (`header`, `banner`, `footer`, `breadcrumbs` placeholder).
+- Templates de pages : `page`, `single-post`, `archive-post`, `search`, `404`, `front-page`.
+- Pontages WordPress : `theme-bridge/{page,single,archive,search,404,front-page,index}.php`.
+- `Theme::container()` exposé pour les pontages.
+- `Theme::bootstrapViewRenderer()` câble les variables globales (`siteName`, `siteUrl`, `homeUrl`, `themeUri`, `charset`, `currentYear`) et les macros lazy `wpHead` / `wpFooter`.
+- `AssetManager::enqueueFront` câble `main.css` avec versioning `filemtime` (test ajouté).
+- Couche CSS de base : `tokens`, `reset`, `base`, `main` (vanilla, BEM, sans build).
+- Interfaces extraites pour le mocking PHPUnit 11 : `PostModelInterface`, `LanguageRegistryInterface`, `LanguageResolverInterface`, `LanguageSwitcherControllerInterface`.
+- Test d'intégration end-to-end (`tests/Integration/RenderEndToEndTest.php`) — boot complet + rendu HTML d'une page.
+- ADR 0004 — layout Lunar unique, bridge minimal, macros lazy.
+- Guide développeur `docs/templates.md`.
+
+### Changed
+
+- Mise à jour `yrbane/lunar-template` à `2de89f0` — accès hybride array/objet via `Runtime\Access::get` (issue [#14](https://github.com/yrbane/lunar-template/issues/14)). Permet de passer directement les DTO immuables aux templates sans conversion.
+- Métadonnées thème (`style.css`) et package (`composer.json`) — bascule `sinceandco/oli-theme` → `yrbane/oli-theme`, auteur `yrbane <yrbane@nethttp.net>`. Historique git réécrit pour cohérence.
+
 ## [1.0.0-alpha.2] - 2026-05-05
 
 ### Added (Plan 2 — I18n)
