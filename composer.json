@@ -1,0 +1,66 @@
+{
+  "name": "yrbane/oli-theme",
+  "description": "Thème WordPress custom OOP/MVC multilingue, réutilisable multi-sites.",
+  "type": "wordpress-theme",
+  "license": "MIT",
+  "authors": [
+    { "name": "yrbane", "email": "yrbane@nethttp.net" }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/yrbane/lunar-template"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/yrbane/lunar-cli"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/yrbane/lunar-config"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "yrbane/lunar-template": "dev-main"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "brain/monkey": "^2.6",
+    "phpstan/phpstan": "^1.11",
+    "phpstan/extension-installer": "^1.4",
+    "php-stubs/wordpress-stubs": "^6.9",
+    "friendsofphp/php-cs-fixer": "^3.50",
+    "captainhook/captainhook": "^5.20"
+  },
+  "autoload": {
+    "psr-4": {
+      "OliTheme\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OliTheme\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "test": "phpunit --testsuite=unit",
+    "test:integration": "phpunit --testsuite=integration",
+    "test:all": "phpunit",
+    "test:coverage": "XDEBUG_MODE=coverage phpunit --coverage-html coverage/",
+    "analyse": "phpstan analyse --memory-limit=512M",
+    "cs": "php-cs-fixer fix --dry-run --diff",
+    "cs:fix": "php-cs-fixer fix",
+    "docs": "echo 'Documentation API désactivée temporairement (phpdocumentor incompatible PHP 8.5). Voir docs/decisions/0003-phpdoc-deferred.md.'",
+    "qa": ["@cs", "@analyse", "@test"],
+    "ci": ["@cs", "@analyse", "@test:all"]
+  }
+}
