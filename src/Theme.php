@@ -65,10 +65,33 @@ final class Theme
 
     /**
      * Hook 'after_switch_theme' : initialisation à l'activation du thème.
+     *
+     * Crée (ou met à jour) la table `oli_redirects` via dbDelta.
      */
     public static function onActivation(): void
     {
         flush_rewrite_rules();
+
+        global $wpdb;
+
+        if (! \function_exists('dbDelta')) {
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        }
+
+        /** @phpstan-var \wpdb $wpdb */
+        $charset = $wpdb->get_charset_collate();
+        $table = $wpdb->prefix . 'oli_redirects';
+        $sql = "CREATE TABLE {$table} (
+            id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            source varchar(2048) NOT NULL,
+            target varchar(2048) NOT NULL,
+            code smallint(3) NOT NULL DEFAULT 301,
+            hits bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY source_idx (source(191))
+        ) {$charset};";
+        dbDelta($sql);
     }
 
     /**

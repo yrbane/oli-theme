@@ -173,6 +173,42 @@ final class ThemeTest extends TestCase
         self::assertTrue($container->has(\OliTheme\Events\EventArchiveControllerInterface::class));
     }
 
+    public function testOnActivationCallsDbDelta(): void
+    {
+        // Brain Monkey définit dbDelta comme fonction stubée : function_exists('dbDelta') retourne true.
+        Functions\expect('dbDelta')
+            ->once()
+            ->andReturnUsing(static function (string $sql): array {
+                // On vérifie que le SQL contient bien CREATE TABLE et oli_redirects.
+                self::assertStringContainsString('CREATE TABLE', $sql);
+                self::assertStringContainsString('oli_redirects', $sql);
+                return [];
+            });
+
+        Functions\when('flush_rewrite_rules')->justReturn();
+
+        // Stub wpdb avec prefix et get_charset_collate.
+        $wpdb = new \stdClass();
+        $wpdb->prefix = 'wp_';
+        Functions\when('get_charset_collate')->justReturn('DEFAULT CHARACTER SET utf8mb4');
+        // On simule get_charset_collate comme méthode objet en le définissant directement.
+        $wpdb->get_charset_collate = static fn (): string => 'DEFAULT CHARACTER SET utf8mb4';
+        // Réassigner via closure pour simuler l'appel $wpdb->get_charset_collate().
+        // wpdb::get_charset_collate est une méthode PHP — on crée un objet anonyme.
+        $GLOBALS['wpdb'] = new class {
+            public string $prefix = 'wp_';
+
+            public function get_charset_collate(): string
+            {
+                return 'DEFAULT CHARACTER SET utf8mb4';
+            }
+        };
+
+        Theme::onActivation();
+
+        unset($GLOBALS['wpdb']);
+    }
+
     public function testBootRegistersSeoModule(): void
     {
         Functions\when('add_action')->justReturn(true);
