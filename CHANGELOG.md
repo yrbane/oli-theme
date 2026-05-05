@@ -4,6 +4,27 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.8] - 2026-05-06
+
+### Added (Plan 8 — Contact form)
+
+- `Contact\ContactSubmission` + `Contact\ContactValidationResult` — DTOs immuables.
+- `Contact\ContactFormModel` (+ Interface) — validation 8 règles + sanitization (text/email/textarea), clock injectable pour le time-trap.
+- `Contact\ContactRateLimiter` (+ Interface) — 3 envois par IP / 15 min via transients WP.
+- `Contact\ContactMailer` (+ Interface) — `wp_mail` avec `Reply-To` correct + auto-réponse optionnelle.
+- `Contact\ContactLogCpt` — CPT `oli_contact_log` non-public, archivage des soumissions.
+- `Contact\ContactLogModel` (+ Interface) — `wp_insert_post` + meta `_oli_contact_*`.
+- `Contact\ContactFormController` (+ Interface) — pipeline sécurisé : nonce → honeypot → time-trap → rate-limit → validate → sanitize → send → autoReply (opt) → log (opt) → redirect.
+- `Contact\ContactShortcode` — `[oli_contact_form]` rend le partial Lunar.
+- `Contact\ContactModule` — services + hooks `init` (CPT + shortcode) + `admin_post_oli_contact` (priv & nopriv).
+- Wire dans `Theme::boot()` (entre `EventsModule` et `PostsModule`).
+- `I18n\LanguageTaxonomy` étendue au CPT `oli_contact_log`.
+- Template `templates/partials/contact-form.html.tpl` (accessible, honeypot caché, errors par champ).
+- `assets/css/contact.css` — styles BEM (focus visible, états error/success).
+- `assets/js/contact-form.js` — progressive enhancement (auto-focus erreur, désactivation submit).
+- Auto-init dans `assets/js/main.js`.
+- Guide `docs/contact.md` + ADR 0009 (custom vs CF7 / Gravity Forms / WPForms / Ninja Forms).
+
 ## [1.0.0-alpha.7] - 2026-05-06
 
 ### Added (Plan 7 — SEO complet)
