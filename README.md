@@ -14,9 +14,9 @@ Thème WordPress custom OOP / MVC, multilingue, réutilisable sur plusieurs site
 - Qualité : **PHPStan niveau 8**, **PHP-CS-Fixer** (PSR-12 + PHP 8.3 migration)
 - **PHP `^8.3`**, **WordPress 6.9+**
 
-## État du projet (cycle 1)
+## État du projet — **Cycle 1 livré** ✅
 
-Le développement suit 10 plans séquentiels. Chaque release ajoute des fonctionnalités sans casser les précédentes.
+Tag courant : **`v1.0.0-rc.1`** (Cycle 1 complet, en attente des audits manuels).
 
 | Plan | Tag | Tests | Périmètre |
 |------|-----|-------|-----------|
@@ -27,8 +27,11 @@ Le développement suit 10 plans séquentiels. Chaque release ajoute des fonction
 | 5 — Slides & Carousel | `v1.0.0-alpha.5-slides` | 125 | CPT `oli_slide`, carousel accessible, ADR 0006 |
 | 6 — Events | `v1.0.0-alpha.6-events` | 144 | CPT `oli_event`, archive, métabox, ADR 0007 |
 | 7 — SEO complet | `v1.0.0-alpha.7-seo` | 242 | 8 schemas JSON-LD, sitemap multilingue, redirects, score 0-100, ADR 0008 |
+| 8 — Contact | `v1.0.0-alpha.8-contact` | 271 | Formulaire OOP/TDD sécurisé (CSRF + honeypot + time-trap + rate-limit), ADR 0009 |
+| 9 — Settings | `v1.0.0-alpha.9-settings` | 298 | Page admin `Apparence > Identité du site` (6 onglets), ADR 0010 |
+| 10 — QA & finalisation | `v1.0.0-rc.1` | 298 | Doc unifiée, checklist QA, prêt pour audits |
 
-**À venir** : Plan 8 (Contact form), Plan 9 (Settings admin), Plan 10 (QA / finalisation).
+Le cycle 1 livre **9 modules fonctionnels**, **~298 tests** (~1038 assertions), **10 ADR**, **8 guides utilisateur**, et couvre intégralement la spec d'origine. Voir [`docs/qa-cycle1.md`](docs/qa-cycle1.md) pour la checklist d'audit.
 
 ## Installation
 

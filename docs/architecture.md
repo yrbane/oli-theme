@@ -174,6 +174,8 @@ Le développement suit 10 plans séquentiels (cf. [`docs/superpowers/plans/`](su
 5. ✅ **Slides & Carousel** — CPT `oli_slide` + carousel JS
 6. ✅ **Events** — CPT `oli_event` avec archive
 7. ✅ **SEO complet** — head, sitemap, schemas, redirects, score
-8. ⏳ **Contact** — formulaire OOP TDD sécurisé
-9. ⏳ **Settings** — page d'options (bannière, footer, réseaux)
-10. ⏳ **QA / finalisation** — Lighthouse, axe-core, validation W3C, doc utilisateur finale
+8. ✅ **Contact** — formulaire OOP TDD sécurisé
+9. ✅ **Settings** — page d'options (bannière, footer, réseaux, langues, contact, SEO global)
+10. ✅ **QA / finalisation** — doc utilisateur unifiée, checklist QA, RC 1.0.0-rc.1
+
+**Cycle 1 livré.** Spec utilisateur d'origine couverte intégralement (cf. `docs/qa-cycle1.md`).
