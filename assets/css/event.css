@@ -1,0 +1,171 @@
+/* Styles BEM pour le module Events.
+   Dépend des tokens définis dans tokens.css. */
+
+/* ─── Bloc .event ─────────────────────────────────────────────── */
+.event {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+}
+
+/* ─── Éléments ────────────────────────────────────────────────── */
+.event__header {
+    margin-bottom: var(--space-5);
+}
+
+.event__title {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    margin: 0 0 var(--space-3);
+}
+
+.event__title a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.event__title a:hover {
+    color: var(--color-link-hover);
+    text-decoration: underline;
+}
+
+.event__date {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin: 0 0 var(--space-2);
+}
+
+.event__date-sep {
+    margin: 0 var(--space-1);
+}
+
+.event__location {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin: 0 0 var(--space-2);
+}
+
+.event__address {
+    display: block;
+    font-size: 0.85rem;
+}
+
+.event__price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+}
+
+.event__content {
+    line-height: var(--line-height-base);
+    margin-bottom: var(--space-6);
+}
+
+.event__excerpt {
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    line-height: var(--line-height-base);
+    margin-top: var(--space-2);
+}
+
+.event__cta-wrapper {
+    margin-top: var(--space-6);
+}
+
+.event__cta {
+    display: inline-block;
+    padding: var(--space-3) var(--space-5);
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+    text-decoration: none;
+    border-radius: 0.25rem;
+    transition: opacity var(--transition-fast);
+}
+
+.event__cta:hover {
+    opacity: 0.85;
+}
+
+.event__flyer {
+    margin-bottom: var(--space-5);
+}
+
+.event__flyer-link {
+    color: var(--color-link);
+    text-decoration: underline;
+}
+
+/* ─── Modificateurs ───────────────────────────────────────────── */
+
+/* Événement singulier */
+.event--single {
+    max-width: var(--container-narrow);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-4);
+}
+
+/* Carte en liste */
+.event--card {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-bg);
+    transition: box-shadow var(--transition-base);
+}
+
+.event--card:hover {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+}
+
+/* Événement passé */
+.event--past .event__title,
+.event--past .event__title a {
+    color: var(--color-muted);
+}
+
+.event--past {
+    opacity: 0.75;
+}
+
+/* Événement en cours */
+.event--ongoing {
+    border-left: 4px solid var(--color-accent);
+}
+
+/* ─── Archive événements ──────────────────────────────────────── */
+.archive--event {
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-4);
+}
+
+.archive__section {
+    margin-bottom: var(--space-7);
+}
+
+.archive__section-title {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.archive__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: var(--space-5);
+}
+
+/* ─── Responsive : colonne unique sous 48 rem ─────────────────── */
+@media (max-width: 48rem) {
+    .event--single {
+        padding: var(--space-4) var(--space-3);
+    }
+
+    .archive--event {
+        padding: var(--space-4) var(--space-3);
+    }
+
+    .archive__grid {
+        grid-template-columns: 1fr;
+    }
+}
