@@ -173,6 +173,24 @@ final class ThemeTest extends TestCase
         self::assertTrue($container->has(\OliTheme\Events\EventArchiveControllerInterface::class));
     }
 
+    public function testBootRegistersSeoModule(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        $GLOBALS['wpdb'] = new \stdClass();
+
+        \OliTheme\Theme::reset();
+        \OliTheme\Theme::boot(__DIR__);
+        $container = \OliTheme\Theme::container();
+
+        self::assertTrue($container->has(\OliTheme\Seo\SeoControllerInterface::class));
+        self::assertTrue($container->has(\OliTheme\Seo\BreadcrumbsControllerInterface::class));
+
+        unset($GLOBALS['wpdb']);
+    }
+
     public function testBootInjectsGlobalVariablesAndMacrosIntoViewRenderer(): void
     {
         Functions\when('add_action')->justReturn(true);

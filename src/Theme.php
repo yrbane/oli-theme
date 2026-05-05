@@ -179,6 +179,10 @@ final class Theme
             \OliTheme\I18n\LanguageSwitcherControllerInterface::class,
             static fn (Container $c): \OliTheme\I18n\LanguageSwitcherControllerInterface => $c->get(\OliTheme\I18n\LanguageSwitcherController::class),
         );
+        $container->factory(
+            \OliTheme\I18n\TranslationModelInterface::class,
+            static fn (Container $c): \OliTheme\I18n\TranslationModelInterface => $c->get(\OliTheme\I18n\TranslationModel::class),
+        );
 
         return $container;
     }
@@ -212,6 +216,7 @@ final class Theme
         (new \OliTheme\I18n\I18nModule($container))->register();
         (new \OliTheme\Navigation\NavigationModule($container))->register();
         (new \OliTheme\Slides\SlidesModule($container))->register();
+        (new \OliTheme\Seo\SeoModule($container))->register();
         (new \OliTheme\Events\EventsModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
     }
