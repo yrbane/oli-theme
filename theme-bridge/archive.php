@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Pontage WordPress générique (fallback).
- *
- * Délègue à `PostController::renderArchive()` afin d'éviter une page vide
- * lorsque WordPress ne trouve pas de template plus spécifique.
+ * Pontage WordPress → PostController pour les archives.
  *
  * @package OliTheme
  */
