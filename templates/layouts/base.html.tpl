@@ -12,7 +12,11 @@
 <head>
     <meta charset="[[ charset ]]">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>[[ siteName ]]</title>
+    [% if seo %]
+        [% include 'partials/seo-head.html.tpl' %]
+    [% else %]
+        <title>[[ siteName ]]</title>
+    [% endif %]
     ##wpHead()##
     [% block head_extra %][% endblock %]
 </head>
