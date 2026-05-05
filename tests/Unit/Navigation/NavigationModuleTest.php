@@ -51,5 +51,7 @@ final class NavigationModuleTest extends TestCase
         Actions\expectAdded('after_setup_theme')->once();
 
         (new NavigationModule($this->container))->register();
+
+        $this->addToAssertionCount(1);
     }
 }
