@@ -102,4 +102,21 @@ final class ThemeTest extends TestCase
         Theme::boot(sys_get_temp_dir());
         self::assertInstanceOf(Container::class, Theme::container());
     }
+
+    public function testBootRegistersPostsModule(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        \OliTheme\Theme::reset();
+        \OliTheme\Theme::boot(__DIR__);
+
+        $container = \OliTheme\Theme::container();
+
+        self::assertTrue($container->has(\OliTheme\Posts\PostModel::class));
+        self::assertTrue($container->has(\OliTheme\Posts\PageController::class));
+        self::assertTrue($container->has(\OliTheme\Posts\PostController::class));
+        self::assertTrue($container->has(\OliTheme\Posts\NotFoundController::class));
+    }
 }

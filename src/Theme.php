@@ -162,6 +162,24 @@ final class Theme
             ),
         );
 
+        // Alias interfaces → implémentations concrètes (requis par PostsModule et futurs modules).
+        $container->factory(
+            \OliTheme\Core\RendererInterface::class,
+            static fn (Container $c): \OliTheme\Core\RendererInterface => $c->get(ViewRenderer::class),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageRegistryInterface::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageRegistryInterface => $c->get(\OliTheme\I18n\LanguageRegistry::class),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageResolverInterface::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageResolverInterface => $c->get(\OliTheme\I18n\LanguageResolver::class),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageSwitcherControllerInterface::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageSwitcherControllerInterface => $c->get(\OliTheme\I18n\LanguageSwitcherController::class),
+        );
+
         return $container;
     }
 
@@ -189,5 +207,6 @@ final class Theme
 
         // Modules fonctionnels.
         (new \OliTheme\I18n\I18nModule($container))->register();
+        (new \OliTheme\Posts\PostsModule($container))->register();
     }
 }
