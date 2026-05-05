@@ -1,0 +1,8 @@
+/* Styles admin oli-theme — page Settings + métaboxes. */
+.oli-settings { max-width: 60rem; }
+.oli-settings__form { margin-top: 1rem; }
+.oli-settings .form-table th { width: 14rem; }
+.oli-settings .description { color: #6c6c6c; font-size: 0.9em; }
+
+/* Onglets : reprend les classes natives WP (.nav-tab) sans surcharge. */
+.oli-settings .nav-tab-wrapper { margin-bottom: 1rem; }
