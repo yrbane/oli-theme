@@ -1,0 +1,32 @@
+/* Design tokens du thème oli-theme.
+   Valeurs neutres par défaut, à customiser par site via le module Settings
+   (couleurs, typographies, identité visuelle) dans un plan ultérieur. */
+:root {
+    --color-text: #1a1a1a;
+    --color-bg: #ffffff;
+    --color-muted: #666666;
+    --color-border: #e5e5e5;
+    --color-link: #1a1a1a;
+    --color-link-hover: #000000;
+    --color-accent: #1a1a1a;
+    --color-accent-contrast: #ffffff;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-serif: Georgia, "Times New Roman", serif;
+    --font-size-base: 1rem;
+    --line-height-base: 1.6;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+
+    --container-max: 80rem;
+    --container-narrow: 48rem;
+
+    --transition-fast: 120ms ease;
+    --transition-base: 220ms ease;
+}

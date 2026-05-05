@@ -1,0 +1,4 @@
+/* Point d'entrée CSS du thème. Importe tous les modules vanilla. */
+@import url('./tokens.css');
+@import url('./reset.css');
+@import url('./base.css');
