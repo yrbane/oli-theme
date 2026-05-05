@@ -4,6 +4,32 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-05-06
+
+### Plan 10 — QA & finalisation cycle 1
+
+Release candidate du cycle 1. Aucune nouvelle fonctionnalité — consolidation, doc et préparation aux audits.
+
+### Added
+- `docs/user-guide/README.md` — index unifié des guides éditeur.
+- `docs/user-guide/getting-started.md` — guide pédagogique (10 minutes pour publier sa première page multilingue + événement + SEO + contact).
+- `docs/qa-cycle1.md` — checklist QA cycle 1 (Lighthouse, axe-core, W3C, JSON-LD, responsive, multilingue, contact, sitemap).
+- `docs/superpowers/plans/2026-05-06-qa-finalization.md` — plan 10 documenté.
+
+### Changed
+- `style.css` Version : `1.0.0-alpha` → `1.0.0-rc.1`.
+- `README.md` : table des 9 releases livrées + statut RC.
+- `docs/architecture.md` : Plans 8 / 9 / 10 marqués livrés ✅.
+
+### Cycle 1 — bilan
+
+- 10 plans livrés : Foundation, I18n, Templates & Posts/Pages, Navigation, Slides & Carousel, Events, SEO complet, Contact, Settings, QA & finalisation.
+- 9 modules fonctionnels : `I18n`, `Posts`, `Navigation`, `Slides`, `Events`, `Seo`, `Contact`, `Settings` + `Core`.
+- ~298 tests, ~1038 assertions, PHPStan niveau 8 clean, PHP-CS-Fixer clean.
+- 10 ADR documentés.
+- 8 guides utilisateur (multilingue, navigation, slides, events, seo, contact, settings + getting-started).
+- Spec d'origine couverte intégralement.
+
 ## [1.0.0-alpha.9] - 2026-05-06
 
 ### Added (Plan 9 — Settings admin)
