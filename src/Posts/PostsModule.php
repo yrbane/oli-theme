@@ -49,6 +49,7 @@ final class PostsModule implements ModuleInterface
                     $c->get(LanguageSwitcherControllerInterface::class),
                     $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
                     $c->get(RendererInterface::class),
+                    $c->get(\OliTheme\Slides\HomeCarouselControllerInterface::class),
                 ),
             );
         }

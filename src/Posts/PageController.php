@@ -7,6 +7,7 @@ namespace OliTheme\Posts;
 use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Slides\HomeCarouselControllerInterface;
 
 /**
  * Controller pour le rendu d'une page WordPress (singular `page`).
@@ -23,6 +24,7 @@ final class PageController
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
         private readonly RendererInterface $renderer,
+        private readonly HomeCarouselControllerInterface $carousel,
     ) {
     }
 
@@ -38,7 +40,20 @@ final class PageController
             return $this->renderer->render('pages/404.html', $this->buildBaseViewModel($id));
         }
 
-        return $this->renderer->render('pages/page.html', $this->buildViewModel($entity));
+        $viewModel = $this->buildViewModel($entity);
+        if ($this->isFrontPage($entity->id)) {
+            $viewModel['carousel'] = $this->carousel->build();
+        }
+
+        return $this->renderer->render('pages/page.html', $viewModel);
+    }
+
+    /**
+     * Indique si le post courant est la page d'accueil statique.
+     */
+    private function isFrontPage(int $postId): bool
+    {
+        return (int) get_option('page_on_front', 0) === $postId;
     }
 
     /**

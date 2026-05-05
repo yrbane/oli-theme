@@ -16,6 +16,7 @@ use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostController;
 use OliTheme\Posts\PostModel;
 use OliTheme\Posts\PostsModule;
+use OliTheme\Slides\HomeCarouselControllerInterface;
 use PHPUnit\Framework\TestCase;
 
 final class PostsModuleTest extends TestCase
@@ -34,6 +35,7 @@ final class PostsModuleTest extends TestCase
         $this->container->set(LanguageRegistryInterface::class, $this->createMock(LanguageRegistryInterface::class));
         $this->container->set(LanguageSwitcherControllerInterface::class, $this->createMock(LanguageSwitcherControllerInterface::class));
         $this->container->set(MenuControllerInterface::class, $this->createMock(MenuControllerInterface::class));
+        $this->container->set(HomeCarouselControllerInterface::class, $this->createMock(HomeCarouselControllerInterface::class));
     }
 
     protected function tearDown(): void

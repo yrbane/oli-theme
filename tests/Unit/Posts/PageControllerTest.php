@@ -17,6 +17,8 @@ use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostEntity;
 use OliTheme\Posts\PostModelInterface;
+use OliTheme\Slides\HomeCarouselControllerInterface;
+use OliTheme\Slides\HomeCarouselViewModel;
 use PHPUnit\Framework\TestCase;
 
 final class PageControllerTest extends TestCase
@@ -79,8 +81,12 @@ final class PageControllerTest extends TestCase
             ->willReturn('<html>page</html>');
 
         Functions\when('get_queried_object_id')->justReturn(7);
+        Functions\when('get_option')->justReturn(0);
 
-        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer);
+        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
+        $carousel->expects(self::never())->method('build');
+
+        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer, $carousel);
 
         self::assertSame('<html>page</html>', $controller->renderSingular());
     }
@@ -109,9 +115,69 @@ final class PageControllerTest extends TestCase
             ->willReturn('<html>404</html>');
 
         Functions\when('get_queried_object_id')->justReturn(0);
+        Functions\when('get_option')->justReturn(0);
 
-        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer);
+        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
+
+        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer, $carousel);
 
         self::assertSame('<html>404</html>', $controller->renderSingular());
+    }
+
+    public function testRenderSingularInjectsCarouselWhenFrontPage(): void
+    {
+        $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
+
+        $entity = new PostEntity(
+            id: 7,
+            type: 'page',
+            title: 'Accueil',
+            content: '<p>Welcome</p>',
+            excerpt: null,
+            slug: 'accueil',
+            language: $french,
+            featuredImageUrl: null,
+            featuredImageAlt: null,
+            permalink: 'https://example.com/fr/',
+            publishedAt: new DateTimeImmutable('2026-01-01', new DateTimeZone('UTC')),
+            updatedAt: null,
+            author: null,
+        );
+
+        $model = $this->createMock(PostModelInterface::class);
+        $model->method('find')->with(7)->willReturn($entity);
+
+        $resolver = $this->createMock(LanguageResolverInterface::class);
+        $resolver->method('current')->willReturn($french);
+
+        $switcherVm = new LanguageSwitcherViewModel(current: $french, items: []);
+        $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
+        $switcher->method('build')->with(7)->willReturn($switcherVm);
+
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
+        $carouselVm = new HomeCarouselViewModel(slides: [], autoplay: true, intervalMs: 5000, loop: true);
+        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
+        $carousel->expects(self::once())->method('build')->willReturn($carouselVm);
+
+        $renderer = $this->createMock(RendererInterface::class);
+        $renderer->expects(self::once())
+            ->method('render')
+            ->with(
+                'pages/page.html',
+                self::callback(fn (array $vm): bool => $vm['post'] === $entity
+                    && isset($vm['carousel'])
+                    && $vm['carousel'] === $carouselVm),
+            )
+            ->willReturn('<html>home</html>');
+
+        Functions\when('get_queried_object_id')->justReturn(7);
+        Functions\when('get_option')->justReturn(7);
+
+        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer, $carousel);
+
+        self::assertSame('<html>home</html>', $controller->renderSingular());
     }
 }
