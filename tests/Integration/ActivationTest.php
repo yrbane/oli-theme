@@ -54,6 +54,8 @@ final class ActivationTest extends TestCase
         Functions\expect('flush_rewrite_rules')->once();
         Functions\expect('dbDelta')->once()->andReturn([]);
         Functions\when('update_option')->justReturn(true);
+        Functions\when('delete_option')->justReturn(true);
+        Functions\when('get_template_directory')->justReturn(sys_get_temp_dir() . '/oli-theme-activation-int-' . uniqid());
 
         $GLOBALS['wpdb'] = new class () {
             public string $prefix = 'wp_';

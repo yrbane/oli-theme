@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace OliTheme;
 
 use OliTheme\Core\AssetManager;
+use OliTheme\Core\CacheDirectoryEnsurer;
 use OliTheme\Core\HookRegistrar;
 use OliTheme\Core\RequestContext;
+use OliTheme\Core\TemplateRouter;
 use OliTheme\Core\ViewRenderer;
 
 /**
@@ -22,6 +24,11 @@ use OliTheme\Core\ViewRenderer;
  */
 final class Theme
 {
+    /**
+     * Clé d'option WP qui mémorise l'erreur cache éventuelle pour admin_notice.
+     */
+    public const CACHE_ERROR_OPTION = 'oli_theme_cache_error';
+
     private static ?Container $container = null;
 
     /**
@@ -72,6 +79,16 @@ final class Theme
     {
         flush_rewrite_rules();
 
+        // Pré-création du cache compilé : on échoue silencieusement avec un
+        // admin_notice plutôt qu'avec un fatal au premier rendu.
+        $ensurer   = new CacheDirectoryEnsurer();
+        $cachePath = self::resolveThemePath() . '/.cache/templates';
+        if (!$ensurer->ensure($cachePath)) {
+            self::recordCacheError((string) $ensurer->getError());
+        } else {
+            delete_option(self::CACHE_ERROR_OPTION);
+        }
+
         global $wpdb;
 
         /** @phpstan-var \wpdb $wpdb */
@@ -81,11 +98,56 @@ final class Theme
     }
 
     /**
+     * Affiche un admin_notice si une erreur cache a été enregistrée.
+     *
+     * Branché sur 'admin_notices'. Public pour permettre aux tests de l'invoquer.
+     */
+    public static function renderCacheAdminNotice(): void
+    {
+        $error = get_option(self::CACHE_ERROR_OPTION, '');
+        if (!\is_string($error) || $error === '') {
+            return;
+        }
+
+        printf(
+            '<div class="notice notice-error"><p><strong>%s</strong> %s</p></div>',
+            esc_html__('oli-theme — cache compilé indisponible :', 'oli-theme'),
+            esc_html($error),
+        );
+    }
+
+    /**
      * Hook 'switch_theme' : nettoyage à la désactivation du thème.
      */
     public static function onDeactivation(): void
     {
         flush_rewrite_rules();
+    }
+
+    /**
+     * Mémorise l'erreur de cache pour qu'un admin_notice la remonte plus tard.
+     */
+    private static function recordCacheError(string $message): void
+    {
+        if (!\function_exists('update_option')) {
+            return;
+        }
+        update_option(self::CACHE_ERROR_OPTION, $message);
+    }
+
+    /**
+     * Retourne le chemin du thème (best-effort hors WP pour les tests).
+     */
+    private static function resolveThemePath(): string
+    {
+        if (\function_exists('get_template_directory')) {
+            $path = (string) get_template_directory();
+            if ($path !== '') {
+                return $path;
+            }
+        }
+
+        return \dirname(__DIR__);
     }
 
     /**
@@ -98,17 +160,25 @@ final class Theme
 
         $container->set(RequestContext::class, RequestContext::fromGlobals());
         $container->set(HookRegistrar::class, new HookRegistrar());
+        $container->set(CacheDirectoryEnsurer::class, new CacheDirectoryEnsurer());
         $container->factory(
             ViewRenderer::class,
-            static function () use ($themePath): ViewRenderer {
-                // Crée les répertoires requis s'ils n'existent pas encore.
+            static function (Container $c) use ($themePath): ViewRenderer {
                 $tplPath   = $themePath . '/templates';
                 $cachePath = $themePath . '/.cache/templates';
-                if (!is_dir($tplPath)) {
-                    mkdir($tplPath, 0o755, true);
-                }
-                if (!is_dir($cachePath)) {
-                    mkdir($cachePath, 0o755, true);
+
+                $ensurer = $c->get(CacheDirectoryEnsurer::class);
+                \assert($ensurer instanceof CacheDirectoryEnsurer);
+
+                if (!$ensurer->ensure($cachePath)) {
+                    self::recordCacheError((string) $ensurer->getError());
+                    // Fallback : on essaie le tmpdir système, qui est presque
+                    // toujours writable. Le cache sera moins efficace mais le
+                    // site répondra (au lieu d'un fatal Lunar).
+                    $fallback = sys_get_temp_dir() . '/oli-theme-cache';
+                    if ($ensurer->ensure($fallback)) {
+                        $cachePath = $fallback;
+                    }
                 }
 
                 return new ViewRenderer($tplPath, $cachePath);
@@ -118,6 +188,7 @@ final class Theme
             AssetManager::class,
             static fn (): AssetManager => new AssetManager($themePath, $themeUri),
         );
+        $container->set(TemplateRouter::class, new TemplateRouter($themePath . '/theme-bridge'));
 
         // Module I18n : services et orchestration.
         $container->factory(
@@ -220,6 +291,18 @@ final class Theme
 
         add_action('after_switch_theme', [self::class, 'onActivation']);
         add_action('switch_theme', [self::class, 'onDeactivation']);
+        add_action('admin_notices', [self::class, 'renderCacheAdminNotice']);
+
+        // Aiguillage `template_include` vers theme-bridge/ (issue #4).
+        add_filter(
+            'template_include',
+            static function (string $original) use ($container): string {
+                $router = $container->get(TemplateRouter::class);
+                \assert($router instanceof TemplateRouter);
+
+                return $router->resolve($original);
+            },
+        );
 
         // Modules fonctionnels.
         (new \OliTheme\Settings\SettingsModule($container))->register();

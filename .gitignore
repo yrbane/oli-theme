@@ -21,3 +21,7 @@ Thumbs.db
 # Misc
 *.log
 *.tmp
+
+# Cache compilé Lunar — on garde le dossier (.gitkeep) mais on ignore son contenu
+/.cache/templates/*
+!/.cache/templates/.gitkeep

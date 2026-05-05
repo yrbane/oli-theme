@@ -213,6 +213,8 @@ final class ThemeTest extends TestCase
 
         Functions\when('flush_rewrite_rules')->justReturn();
         Functions\when('update_option')->justReturn(true);
+        Functions\when('delete_option')->justReturn(true);
+        Functions\when('get_template_directory')->justReturn(sys_get_temp_dir() . '/oli-theme-activation-' . uniqid());
 
         // Stub wpdb avec prefix et get_charset_collate.
         $wpdb = new \stdClass();
