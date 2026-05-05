@@ -4,6 +4,26 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.5] - 2026-05-05
+
+### Added (Plan 5 — Slides & Home Carousel)
+
+- `Slides\SlideEntity` — DTO immuable d'un slide.
+- `Slides\SlideCpt` — CPT `oli_slide` (titre, image à la une, extrait, langue, ordre).
+- `Slides\SlideModel` (+ `SlideModelInterface`) — `findActive(Language)` et `findById(int)`.
+- `Slides\HomeCarouselViewModel` — DTO du view-model carousel (slides + autoplay + intervalMs + loop).
+- `Slides\HomeCarouselController` (+ `HomeCarouselControllerInterface`) — `build(): HomeCarouselViewModel`.
+- `Slides\SlidesModule` — orchestrateur, branché dans `Theme::boot()`.
+- `templates/partials/carousel.html.tpl` — partial accessible (aria-roledescription, aria-label, lazy-loading).
+- `templates/pages/front-page.html.tpl` inclut le carousel.
+- `assets/css/carousel.css` — styles BEM, scroll-snap natif sans JS, transform avec JS.
+- `assets/js/carousel.js` — autoplay (5s), swipe, clavier, prefers-reduced-motion, pause hover/focus/visibility.
+- `assets/js/main.js` charge `initCarousel` quand `[data-carousel]` est présent.
+- `Posts\PageController` détecte `is_front_page()` et injecte le carousel uniquement dans le view-model d'accueil.
+- `I18n\LanguageTaxonomy` étendue au CPT `oli_slide`.
+- Test d'intégration `CarouselFrontPageTest` (résolution via container après boot).
+- Guide `docs/slides.md` + ADR 0006 (CPT dédié vs blocs/ACF/options).
+
 ## [1.0.0-alpha.4] - 2026-05-05
 
 ### Added (Plan 4 — Navigation)
