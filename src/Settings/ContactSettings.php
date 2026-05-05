@@ -17,15 +17,16 @@ namespace OliTheme\Settings;
 final readonly class ContactSettings
 {
     /**
-     * @param string|null $email            Adresse e-mail de réception des messages.
-     * @param string|null $autoreplyBody    Corps du message de réponse automatique.
-     * @param bool        $autoreplyEnabled Activer l'envoi de la réponse automatique.
-     * @param bool        $loggingEnabled   Enregistrer les messages en base de données.
+     * @param string|null $email Adresse e-mail de réception des messages.
+     * @param string|null $autoreplyBody Corps du message de réponse automatique.
+     * @param bool $autoreplyEnabled Activer l'envoi de la réponse automatique.
+     * @param bool $loggingEnabled Enregistrer les messages en base de données.
      */
     public function __construct(
         public ?string $email,
         public ?string $autoreplyBody,
         public bool $autoreplyEnabled,
         public bool $loggingEnabled,
-    ) {}
+    ) {
+    }
 }

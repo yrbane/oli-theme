@@ -17,12 +17,12 @@ namespace OliTheme\Settings;
 final readonly class SettingsBag
 {
     /**
-     * @param BannerSettings    $banner    Paramètres de la bannière et du logo.
-     * @param FooterSettings    $footer    Paramètres du pied de page.
-     * @param SocialSettings    $social    Paramètres des réseaux sociaux.
+     * @param BannerSettings $banner Paramètres de la bannière et du logo.
+     * @param FooterSettings $footer Paramètres du pied de page.
+     * @param SocialSettings $social Paramètres des réseaux sociaux.
      * @param LanguagesSettings $languages Paramètres multilingues.
-     * @param ContactSettings   $contact   Paramètres du formulaire de contact.
-     * @param SeoSettings       $seo       Paramètres SEO globaux.
+     * @param ContactSettings $contact Paramètres du formulaire de contact.
+     * @param SeoSettings $seo Paramètres SEO globaux.
      */
     public function __construct(
         public BannerSettings $banner,
@@ -31,7 +31,8 @@ final readonly class SettingsBag
         public LanguagesSettings $languages,
         public ContactSettings $contact,
         public SeoSettings $seo,
-    ) {}
+    ) {
+    }
 
     /**
      * Construit un SettingsBag avec des valeurs par défaut neutres

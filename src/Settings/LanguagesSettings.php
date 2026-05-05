@@ -26,13 +26,14 @@ final readonly class LanguagesSettings
     public const FALLBACK_MESSAGE = 'message';
 
     /**
-     * @param string[] $enabled          Codes ISO des langues activées.
-     * @param string   $default          Code ISO de la langue par défaut.
-     * @param string   $fallbackBehavior Comportement de repli (voir constantes FALLBACK_*).
+     * @param string[] $enabled Codes ISO des langues activées.
+     * @param string $default Code ISO de la langue par défaut.
+     * @param string $fallbackBehavior Comportement de repli (voir constantes FALLBACK_*).
      */
     public function __construct(
         public array $enabled,
         public string $default,
         public string $fallbackBehavior,
-    ) {}
+    ) {
+    }
 }

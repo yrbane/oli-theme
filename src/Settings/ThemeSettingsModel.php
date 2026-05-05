@@ -22,8 +22,8 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
     /**
      * Retourne la valeur d'une clé de premier niveau des settings.
      *
-     * @param string $key     Clé de premier niveau (ex. 'banner', 'social').
-     * @param mixed  $default Valeur par défaut si la clé est absente.
+     * @param string $key Clé de premier niveau (ex. 'banner', 'social').
+     * @param mixed $default Valeur par défaut si la clé est absente.
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -35,8 +35,8 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
     /**
      * Persiste la valeur d'une clé de premier niveau des settings.
      *
-     * @param string $key   Clé de premier niveau.
-     * @param mixed  $value Valeur à enregistrer.
+     * @param string $key Clé de premier niveau.
+     * @param mixed $value Valeur à enregistrer.
      *
      * @return bool Vrai si la mise à jour a réussi.
      */
@@ -127,7 +127,7 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
      * Retourne la valeur de la clé sous forme de chaîne non vide, ou null.
      *
      * @param array<string, mixed> $data Tableau source.
-     * @param string               $key  Clé à lire.
+     * @param string $key Clé à lire.
      */
     private function stringOrNull(array $data, string $key): ?string
     {

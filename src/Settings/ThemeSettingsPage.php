@@ -19,13 +19,14 @@ use OliTheme\Core\RendererInterface;
 final class ThemeSettingsPage
 {
     /**
-     * @param RendererInterface          $renderer Moteur de rendu des templates.
-     * @param ThemeSettingsModelInterface $settings Modèle de lecture des settings.
+     * @param RendererInterface $renderer Moteur de rendu des templates.
+     * @param ThemeSettingsModelInterface $settings Modèle de lecture des settings (utilisé dans les futures méthodes de rendu partiel).
      */
     public function __construct(
         private readonly RendererInterface $renderer,
         private readonly ThemeSettingsModelInterface $settings,
-    ) {}
+    ) {
+    }
 
     /**
      * Enregistre la page sous Apparence > Identité du site.
@@ -73,11 +74,11 @@ final class ThemeSettingsPage
         $activeTab = isset($_GET['tab']) && \is_string($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : 'banner';
 
         // Capture la sortie HTML générée par les fonctions WP Settings API.
-        \ob_start();
+        ob_start();
         settings_fields('oli_theme_settings_group');
         do_settings_sections('oli-theme-settings');
         submit_button();
-        $form = (string) \ob_get_clean();
+        $form = (string) ob_get_clean();
 
         echo $this->renderer->render('admin/settings-page.html', [
             'title' => __('Identité du site', 'oli-theme'),
@@ -97,7 +98,7 @@ final class ThemeSettingsPage
     {
         $existing = (array) get_option('oli_theme_settings', []);
 
-        return \array_merge($existing, $input);
+        return array_merge($existing, $input);
     }
 
     /**
@@ -135,7 +136,7 @@ final class ThemeSettingsPage
             ['id' => 'seo',       'label' => __('SEO', 'oli-theme')],
         ];
 
-        return \array_map(
+        return array_map(
             static fn (array $tab): array => [
                 'id'       => $tab['id'],
                 'label'    => $tab['label'],

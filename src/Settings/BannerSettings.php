@@ -17,15 +17,16 @@ namespace OliTheme\Settings;
 final readonly class BannerSettings
 {
     /**
-     * @param int|null              $logoId           Identifiant de l'image du logo.
-     * @param int|null              $bannerDesktopId  Identifiant de la bannière desktop.
-     * @param int|null              $bannerMobileId   Identifiant de la bannière mobile.
-     * @param array<string, string> $altByLanguage    Map code langue → alt text.
+     * @param int|null $logoId Identifiant de l'image du logo.
+     * @param int|null $bannerDesktopId Identifiant de la bannière desktop.
+     * @param int|null $bannerMobileId Identifiant de la bannière mobile.
+     * @param array<string, string> $altByLanguage Map code langue → alt text.
      */
     public function __construct(
         public ?int $logoId,
         public ?int $bannerDesktopId,
         public ?int $bannerMobileId,
         public array $altByLanguage,
-    ) {}
+    ) {
+    }
 }

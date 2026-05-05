@@ -17,11 +17,11 @@ namespace OliTheme\Settings;
 final readonly class SocialSettings
 {
     /**
-     * @param string|null $facebook  URL du profil Facebook.
+     * @param string|null $facebook URL du profil Facebook.
      * @param string|null $instagram URL du profil Instagram.
-     * @param string|null $youtube   URL de la chaîne YouTube.
-     * @param string|null $linkedin  URL du profil LinkedIn.
-     * @param string|null $twitter   URL du profil Twitter/X.
+     * @param string|null $youtube URL de la chaîne YouTube.
+     * @param string|null $linkedin URL du profil LinkedIn.
+     * @param string|null $twitter URL du profil Twitter/X.
      */
     public function __construct(
         public ?string $facebook,
@@ -29,5 +29,6 @@ final readonly class SocialSettings
         public ?string $youtube,
         public ?string $linkedin,
         public ?string $twitter,
-    ) {}
+    ) {
+    }
 }

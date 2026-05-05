@@ -17,11 +17,11 @@ namespace OliTheme\Settings;
 final readonly class FooterSettings
 {
     /**
-     * @param array<string, string> $legalByLanguage   HTML des mentions légales par langue.
-     * @param string                $copyrightTemplate Modèle de copyright (ex. "© {year} {site}").
-     * @param bool                  $showLegal         Afficher le bloc mentions légales.
-     * @param bool                  $showSocial        Afficher le bloc réseaux sociaux.
-     * @param bool                  $showMenu          Afficher le menu footer.
+     * @param array<string, string> $legalByLanguage HTML des mentions légales par langue.
+     * @param string $copyrightTemplate Modèle de copyright (ex. "© {year} {site}").
+     * @param bool $showLegal Afficher le bloc mentions légales.
+     * @param bool $showSocial Afficher le bloc réseaux sociaux.
+     * @param bool $showMenu Afficher le menu footer.
      */
     public function __construct(
         public array $legalByLanguage,
@@ -29,5 +29,6 @@ final readonly class FooterSettings
         public bool $showLegal,
         public bool $showSocial,
         public bool $showMenu,
-    ) {}
+    ) {
+    }
 }

@@ -19,16 +19,16 @@ interface ThemeSettingsModelInterface
     /**
      * Retourne la valeur d'une clé de premier niveau des settings.
      *
-     * @param string $key     Clé de premier niveau (ex. 'banner', 'social').
-     * @param mixed  $default Valeur par défaut si la clé est absente.
+     * @param string $key Clé de premier niveau (ex. 'banner', 'social').
+     * @param mixed $default Valeur par défaut si la clé est absente.
      */
     public function get(string $key, mixed $default = null): mixed;
 
     /**
      * Persiste la valeur d'une clé de premier niveau des settings.
      *
-     * @param string $key   Clé de premier niveau.
-     * @param mixed  $value Valeur à enregistrer.
+     * @param string $key Clé de premier niveau.
+     * @param mixed $value Valeur à enregistrer.
      *
      * @return bool Vrai si la mise à jour a réussi.
      */

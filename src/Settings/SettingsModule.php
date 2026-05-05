@@ -20,7 +20,9 @@ final class SettingsModule implements ModuleInterface
     /**
      * @param Container $container Container de services du thème.
      */
-    public function __construct(private readonly Container $container) {}
+    public function __construct(private readonly Container $container)
+    {
+    }
 
     /**
      * Enregistre les services Settings et branche les hooks admin_menu / admin_init.
