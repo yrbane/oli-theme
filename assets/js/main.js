@@ -3,6 +3,7 @@
  */
 import { initMobileMenu } from './menu-mobile.js';
 import { initCarousel } from './carousel.js';
+import { initContactForm } from './contact-form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('[data-nav-toggle]')) {
@@ -10,5 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (document.querySelector('[data-carousel]')) {
         initCarousel();
+    }
+    if (document.querySelector('[data-contact-form]')) {
+        initContactForm();
     }
 });
