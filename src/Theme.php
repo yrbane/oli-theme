@@ -222,6 +222,7 @@ final class Theme
         add_action('switch_theme', [self::class, 'onDeactivation']);
 
         // Modules fonctionnels.
+        (new \OliTheme\Settings\SettingsModule($container))->register();
         (new \OliTheme\I18n\I18nModule($container))->register();
         (new \OliTheme\Navigation\NavigationModule($container))->register();
         (new \OliTheme\Slides\SlidesModule($container))->register();

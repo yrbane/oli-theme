@@ -173,6 +173,19 @@ final class ThemeTest extends TestCase
         self::assertTrue($container->has(\OliTheme\Events\EventArchiveControllerInterface::class));
     }
 
+    public function testBootRegistersSettingsModule(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        \OliTheme\Theme::reset();
+        \OliTheme\Theme::boot(__DIR__);
+        $container = \OliTheme\Theme::container();
+        self::assertTrue($container->has(\OliTheme\Settings\ThemeSettingsModelInterface::class));
+        self::assertTrue($container->has(\OliTheme\Settings\ThemeSettingsPage::class));
+    }
+
     public function testBootRegistersContactModule(): void
     {
         Functions\when('add_action')->justReturn(true);
