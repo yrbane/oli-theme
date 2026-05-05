@@ -19,17 +19,18 @@ namespace OliTheme\Contact;
 final class ContactFormController implements ContactFormControllerInterface
 {
     /**
-     * @param ContactFormModelInterface    $model       Modèle de validation/sanitisation.
-     * @param ContactRateLimiterInterface  $rateLimiter Limiteur de débit par IP.
-     * @param ContactMailerInterface       $mailer      Expéditeur d'e-mails.
-     * @param ContactLogModelInterface     $log         Journaliseur de soumissions.
+     * @param ContactFormModelInterface $model Modèle de validation/sanitisation.
+     * @param ContactRateLimiterInterface $rateLimiter Limiteur de débit par IP.
+     * @param ContactMailerInterface $mailer Expéditeur d'e-mails.
+     * @param ContactLogModelInterface $log Journaliseur de soumissions.
      */
     public function __construct(
         private readonly ContactFormModelInterface $model,
         private readonly ContactRateLimiterInterface $rateLimiter,
         private readonly ContactMailerInterface $mailer,
         private readonly ContactLogModelInterface $log,
-    ) {}
+    ) {
+    }
 
     /**
      * Traite la soumission du formulaire de contact.
@@ -42,7 +43,7 @@ final class ContactFormController implements ContactFormControllerInterface
 
         if (! wp_verify_nonce($nonce, 'oli_contact')) {
             wp_die(esc_html__('Vérification de sécurité échouée.', 'oli-theme'), 403);
-
+            // @phpstan-ignore-next-line deadCode.unreachable (wp_die est never selon les stubs, mais Brain Monkey le stub en null dans les tests)
             return;
         }
 
@@ -67,7 +68,7 @@ final class ContactFormController implements ContactFormControllerInterface
         $validation = $this->model->validate($submission);
 
         if (! $validation->valid) {
-            $this->redirect($redirect, ['errors' => \implode(',', \array_keys($validation->errors))]);
+            $this->redirect($redirect, ['errors' => implode(',', array_keys($validation->errors))]);
 
             return;
         }
@@ -94,13 +95,13 @@ final class ContactFormController implements ContactFormControllerInterface
     /**
      * Redirige vers l'URL avec les paramètres de statut ajoutés.
      *
-     * @param string               $url    URL de redirection.
+     * @param string $url URL de redirection.
      * @param array<string, string> $params Paramètres à ajouter.
      */
     private function redirect(string $url, array $params): void
     {
-        $sep = \str_contains($url, '?') ? '&' : '?';
-        $query = \http_build_query($params);
+        $sep = str_contains($url, '?') ? '&' : '?';
+        $query = http_build_query($params);
         wp_safe_redirect($url . $sep . $query);
     }
 }

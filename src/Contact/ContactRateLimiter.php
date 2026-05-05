@@ -29,7 +29,7 @@ final class ContactRateLimiter implements ContactRateLimiterInterface
      */
     public function attempt(string $ip): bool
     {
-        $key = 'oli_contact_rate_' . \md5($ip);
+        $key = 'oli_contact_rate_' . md5($ip);
         $count = (int) get_transient($key);
 
         if ($count >= self::MAX_ATTEMPTS) {

@@ -51,7 +51,7 @@ final class ContactRateLimiterTest extends TestCase
 
         self::assertTrue($result);
         self::assertCount(1, $captured);
-        self::assertSame(1, \array_values($captured)[0]);
+        self::assertSame(1, array_values($captured)[0]);
     }
 
     /**
@@ -91,7 +91,7 @@ final class ContactRateLimiterTest extends TestCase
         self::assertTrue($r2);
         self::assertCount(2, $captured);
 
-        $keys = \array_keys($captured);
+        $keys = array_keys($captured);
         self::assertNotSame($keys[0], $keys[1]);
     }
 }

@@ -17,7 +17,7 @@ interface ContactMailerInterface
      * Envoie le message de contact à l'adresse de destination.
      *
      * @param ContactSubmission $submission Données de la soumission.
-     * @param string            $to         Adresse e-mail du destinataire.
+     * @param string $to Adresse e-mail du destinataire.
      */
     public function send(ContactSubmission $submission, string $to): bool;
 
@@ -25,7 +25,7 @@ interface ContactMailerInterface
      * Envoie une réponse automatique à l'expéditeur.
      *
      * @param ContactSubmission $submission Données de la soumission.
-     * @param string            $body       Corps du message de confirmation.
+     * @param string $body Corps du message de confirmation.
      */
     public function sendAutoReply(ContactSubmission $submission, string $body): bool;
 }

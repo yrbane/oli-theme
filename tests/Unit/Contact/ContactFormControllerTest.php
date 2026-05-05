@@ -37,42 +37,6 @@ final class ContactFormControllerTest extends TestCase
     }
 
     /**
-     * Construit les données POST de base pour les tests.
-     *
-     * @return array<string, mixed>
-     */
-    private function makePostData(array $overrides = []): array
-    {
-        return \array_merge([
-            '_oli_nonce' => 'valid-nonce',
-            'name' => 'Alice Dupont',
-            'email' => 'alice@example.com',
-            'subject' => 'Question',
-            'message' => 'Mon message de test suffisamment long.',
-            'honeypot' => '',
-            '_oli_timestamp' => 1699999997,
-            '_oli_redirect' => 'https://example.com/contact',
-        ], $overrides);
-    }
-
-    /**
-     * Construit un contrôleur avec des mocks pour tous ses collaborateurs.
-     */
-    private function makeController(
-        ?ContactFormModelInterface $model = null,
-        ?ContactRateLimiterInterface $rateLimiter = null,
-        ?ContactMailerInterface $mailer = null,
-        ?ContactLogModelInterface $log = null,
-    ): ContactFormController {
-        return new ContactFormController(
-            model: $model ?? $this->createMock(ContactFormModelInterface::class),
-            rateLimiter: $rateLimiter ?? $this->createMock(ContactRateLimiterInterface::class),
-            mailer: $mailer ?? $this->createMock(ContactMailerInterface::class),
-            log: $log ?? $this->createMock(ContactLogModelInterface::class),
-        );
-    }
-
-    /**
      * Vérifie que handle() appelle wp_die si le nonce est invalide.
      */
     public function testRejectsInvalidNonce(): void
@@ -261,5 +225,43 @@ final class ContactFormControllerTest extends TestCase
 
         $controller = $this->makeController(model: $model, rateLimiter: $rateLimiter, mailer: $mailer, log: $log);
         $controller->handle($this->makePostData());
+    }
+
+    /**
+     * Construit les données POST de base pour les tests.
+     *
+     * @param array<string, mixed> $overrides Valeurs à surcharger.
+     *
+     * @return array<string, mixed>
+     */
+    private function makePostData(array $overrides = []): array
+    {
+        return array_merge([
+            '_oli_nonce' => 'valid-nonce',
+            'name' => 'Alice Dupont',
+            'email' => 'alice@example.com',
+            'subject' => 'Question',
+            'message' => 'Mon message de test suffisamment long.',
+            'honeypot' => '',
+            '_oli_timestamp' => 1699999997,
+            '_oli_redirect' => 'https://example.com/contact',
+        ], $overrides);
+    }
+
+    /**
+     * Construit un contrôleur avec des mocks pour tous ses collaborateurs.
+     */
+    private function makeController(
+        ?ContactFormModelInterface $model = null,
+        ?ContactRateLimiterInterface $rateLimiter = null,
+        ?ContactMailerInterface $mailer = null,
+        ?ContactLogModelInterface $log = null,
+    ): ContactFormController {
+        return new ContactFormController(
+            model: $model ?? $this->createMock(ContactFormModelInterface::class),
+            rateLimiter: $rateLimiter ?? $this->createMock(ContactRateLimiterInterface::class),
+            mailer: $mailer ?? $this->createMock(ContactMailerInterface::class),
+            log: $log ?? $this->createMock(ContactLogModelInterface::class),
+        );
     }
 }

@@ -21,7 +21,7 @@ final class ContactMailer implements ContactMailerInterface
      * Envoie le message de contact à l'adresse de destination.
      *
      * @param ContactSubmission $submission Données de la soumission.
-     * @param string            $to         Adresse e-mail du destinataire.
+     * @param string $to Adresse e-mail du destinataire.
      */
     public function send(ContactSubmission $submission, string $to): bool
     {
@@ -31,7 +31,7 @@ final class ContactMailer implements ContactMailerInterface
             $submission->name,
             $submission->email,
             $submission->ip,
-            \gmdate('Y-m-d H:i:s', $submission->timestamp),
+            gmdate('Y-m-d H:i:s', $submission->timestamp),
             $submission->message,
         );
         $headers = [
@@ -46,7 +46,7 @@ final class ContactMailer implements ContactMailerInterface
      * Envoie une réponse automatique à l'expéditeur.
      *
      * @param ContactSubmission $submission Données de la soumission.
-     * @param string            $body       Corps du message de confirmation.
+     * @param string $body Corps du message de confirmation.
      */
     public function sendAutoReply(ContactSubmission $submission, string $body): bool
     {

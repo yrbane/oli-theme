@@ -32,30 +32,6 @@ final class ContactFormModelTest extends TestCase
     }
 
     /**
-     * Construit une soumission valide pour les tests.
-     */
-    private function makeSubmission(array $overrides = []): ContactSubmission
-    {
-        return new ContactSubmission(
-            name: $overrides['name'] ?? 'Alice Dupont',
-            email: $overrides['email'] ?? 'alice@example.com',
-            subject: $overrides['subject'] ?? 'Bonjour',
-            message: $overrides['message'] ?? 'Ceci est un message suffisamment long.',
-            honeypot: $overrides['honeypot'] ?? '',
-            timestamp: $overrides['timestamp'] ?? 1699999997,
-            ip: $overrides['ip'] ?? '127.0.0.1',
-        );
-    }
-
-    /**
-     * Construit un modèle avec une horloge fixe à 1700000000.
-     */
-    private function makeModel(): ContactFormModel
-    {
-        return new ContactFormModel(clock: static fn (): int => 1700000000);
-    }
-
-    /**
      * Vérifie qu'une soumission valide passe sans erreur.
      */
     public function testValidatesValidSubmission(): void
@@ -144,5 +120,31 @@ final class ContactFormModelTest extends TestCase
         self::assertSame($original->ip, $sanitized->ip);
         self::assertSame($original->name, $sanitized->name);
         self::assertSame($original->email, $sanitized->email);
+    }
+
+    /**
+     * Construit une soumission valide pour les tests.
+     *
+     * @param array<string, mixed> $overrides Valeurs à surcharger.
+     */
+    private function makeSubmission(array $overrides = []): ContactSubmission
+    {
+        return new ContactSubmission(
+            name: $overrides['name'] ?? 'Alice Dupont',
+            email: $overrides['email'] ?? 'alice@example.com',
+            subject: $overrides['subject'] ?? 'Bonjour',
+            message: $overrides['message'] ?? 'Ceci est un message suffisamment long.',
+            honeypot: $overrides['honeypot'] ?? '',
+            timestamp: $overrides['timestamp'] ?? 1699999997,
+            ip: $overrides['ip'] ?? '127.0.0.1',
+        );
+    }
+
+    /**
+     * Construit un modèle avec une horloge fixe à 1700000000.
+     */
+    private function makeModel(): ContactFormModel
+    {
+        return new ContactFormModel(clock: static fn (): int => 1700000000);
     }
 }

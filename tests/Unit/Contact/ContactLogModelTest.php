@@ -32,22 +32,6 @@ final class ContactLogModelTest extends TestCase
     }
 
     /**
-     * Construit une soumission de test.
-     */
-    private function makeSubmission(): ContactSubmission
-    {
-        return new ContactSubmission(
-            name: 'Alice Dupont',
-            email: 'alice@example.com',
-            subject: 'Question',
-            message: 'Mon message de test.',
-            honeypot: '',
-            timestamp: 1700000000,
-            ip: '127.0.0.1',
-        );
-    }
-
-    /**
      * Vérifie que log() retourne l'ID du post créé.
      */
     public function testLogReturnsPostId(): void
@@ -72,5 +56,21 @@ final class ContactLogModelTest extends TestCase
         $result = $model->log($this->makeSubmission());
 
         self::assertSame(0, $result);
+    }
+
+    /**
+     * Construit une soumission de test.
+     */
+    private function makeSubmission(): ContactSubmission
+    {
+        return new ContactSubmission(
+            name: 'Alice Dupont',
+            email: 'alice@example.com',
+            subject: 'Question',
+            message: 'Mon message de test.',
+            honeypot: '',
+            timestamp: 1700000000,
+            ip: '127.0.0.1',
+        );
     }
 }

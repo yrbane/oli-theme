@@ -32,22 +32,6 @@ final class ContactMailerTest extends TestCase
     }
 
     /**
-     * Construit une soumission de test.
-     */
-    private function makeSubmission(): ContactSubmission
-    {
-        return new ContactSubmission(
-            name: 'Alice Dupont',
-            email: 'alice@example.com',
-            subject: null,
-            message: 'Ceci est un message de test.',
-            honeypot: '',
-            timestamp: 1700000000,
-            ip: '127.0.0.1',
-        );
-    }
-
-    /**
      * Vérifie que send() appelle wp_mail avec les bons headers (Reply-To).
      */
     public function testSendCallsWpMailWithExpectedHeaders(): void
@@ -68,7 +52,7 @@ final class ContactMailerTest extends TestCase
         $mailer->send($this->makeSubmission(), 'admin@example.com');
 
         self::assertNotNull($capturedHeaders);
-        $replyTo = \implode("\n", $capturedHeaders);
+        $replyTo = implode("\n", $capturedHeaders);
         self::assertStringContainsString('Reply-To: Alice Dupont <alice@example.com>', $replyTo);
     }
 
@@ -126,5 +110,21 @@ final class ContactMailerTest extends TestCase
         $mailer->sendAutoReply($this->makeSubmission(), 'Merci pour votre message.');
 
         self::assertSame('alice@example.com', $capturedTo);
+    }
+
+    /**
+     * Construit une soumission de test.
+     */
+    private function makeSubmission(): ContactSubmission
+    {
+        return new ContactSubmission(
+            name: 'Alice Dupont',
+            email: 'alice@example.com',
+            subject: null,
+            message: 'Ceci est un message de test.',
+            honeypot: '',
+            timestamp: 1700000000,
+            ip: '127.0.0.1',
+        );
     }
 }

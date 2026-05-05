@@ -22,7 +22,8 @@ final class ContactFormModel implements ContactFormModelInterface
      */
     public function __construct(
         private $clock = 'time',
-    ) {}
+    ) {
+    }
 
     /**
      * Valide une soumission et retourne le résultat de validation.
@@ -42,7 +43,7 @@ final class ContactFormModel implements ContactFormModelInterface
         $errors = [];
 
         $name = trim($submission->name);
-        if (\mb_strlen($name) < 2 || \mb_strlen($name) > 100) {
+        if (mb_strlen($name) < 2 || mb_strlen($name) > 100) {
             $errors['name'] = 'name_invalid';
         }
 
@@ -51,13 +52,13 @@ final class ContactFormModel implements ContactFormModelInterface
         }
 
         if ($submission->subject !== null) {
-            $sLen = \mb_strlen($submission->subject);
+            $sLen = mb_strlen($submission->subject);
             if ($sLen < 1 || $sLen > 150) {
                 $errors['subject'] = 'subject_too_long';
             }
         }
 
-        $mLen = \mb_strlen(trim($submission->message));
+        $mLen = mb_strlen(trim($submission->message));
         if ($mLen < 10 || $mLen > 5000) {
             $errors['message'] = 'message_invalid';
         }

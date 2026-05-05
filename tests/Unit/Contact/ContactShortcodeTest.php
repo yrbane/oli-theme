@@ -34,31 +34,6 @@ final class ContactShortcodeTest extends TestCase
     }
 
     /**
-     * Construit un shortcode avec des mocks par défaut.
-     *
-     * @param array<string, mixed>|null $capturedVm Référence pour capturer les variables du template.
-     */
-    private function makeShortcode(?array &$capturedVm = null): ContactShortcode
-    {
-        $renderer = $this->createMock(RendererInterface::class);
-        $renderer->method('render')
-            ->willReturnCallback(
-                static function (string $tpl, array $vm) use (&$capturedVm): string {
-                    $capturedVm = $vm;
-
-                    return '<form>';
-                },
-            );
-
-        $lang = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
-
-        $resolver = $this->createMock(LanguageResolverInterface::class);
-        $resolver->method('current')->willReturn($lang);
-
-        return new ContactShortcode($renderer, $resolver);
-    }
-
-    /**
      * Vérifie que render() retourne le HTML produit par le renderer.
      */
     public function testRendersFormHtml(): void
@@ -90,5 +65,30 @@ final class ContactShortcodeTest extends TestCase
         self::assertIsString($vm['nonce']);
         self::assertNotEmpty($vm['nonce']);
         self::assertIsInt($vm['timestamp']);
+    }
+
+    /**
+     * Construit un shortcode avec des mocks par défaut.
+     *
+     * @param array<string, mixed>|null $capturedVm Référence pour capturer les variables du template.
+     */
+    private function makeShortcode(?array &$capturedVm = null): ContactShortcode
+    {
+        $renderer = $this->createMock(RendererInterface::class);
+        $renderer->method('render')
+            ->willReturnCallback(
+                static function (string $tpl, array $vm) use (&$capturedVm): string {
+                    $capturedVm = $vm;
+
+                    return '<form>';
+                },
+            );
+
+        $lang = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
+
+        $resolver = $this->createMock(LanguageResolverInterface::class);
+        $resolver->method('current')->willReturn($lang);
+
+        return new ContactShortcode($renderer, $resolver);
     }
 }

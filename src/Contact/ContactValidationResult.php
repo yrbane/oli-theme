@@ -18,13 +18,14 @@ namespace OliTheme\Contact;
 final readonly class ContactValidationResult
 {
     /**
-     * @param bool                  $valid  Indique si la soumission est valide.
+     * @param bool $valid Indique si la soumission est valide.
      * @param array<string, string> $errors Carte champ → clé d'erreur.
      */
     public function __construct(
         public bool $valid,
         public array $errors,
-    ) {}
+    ) {
+    }
 
     /**
      * Construit un résultat de validation réussie.

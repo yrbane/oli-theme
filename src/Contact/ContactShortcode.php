@@ -20,13 +20,14 @@ use OliTheme\I18n\LanguageResolverInterface;
 final class ContactShortcode
 {
     /**
-     * @param RendererInterface         $renderer Moteur de rendu de templates.
+     * @param RendererInterface $renderer Moteur de rendu de templates.
      * @param LanguageResolverInterface $resolver Résolveur de langue courante.
      */
     public function __construct(
         private readonly RendererInterface $renderer,
         private readonly LanguageResolverInterface $resolver,
-    ) {}
+    ) {
+    }
 
     /**
      * Rend le formulaire de contact et retourne le HTML produit.
@@ -38,7 +39,7 @@ final class ContactShortcode
         $errors = [];
 
         if (isset($_GET['errors']) && \is_string($_GET['errors'])) {
-            foreach (\explode(',', sanitize_text_field((string) $_GET['errors'])) as $key) {
+            foreach (explode(',', sanitize_text_field((string) $_GET['errors'])) as $key) {
                 $key = trim($key);
 
                 if ($key !== '') {

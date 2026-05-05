@@ -54,6 +54,7 @@ final class ContactLogCptTest extends TestCase
 
         self::assertSame('oli_contact_log', $capturedSlug);
         self::assertSame('oli_contact_log', $cpt->slug());
+        self::assertIsArray($capturedArgs);
         self::assertFalse($capturedArgs['public']);
         self::assertTrue($capturedArgs['show_ui']);
         self::assertSame('tools.php', $capturedArgs['show_in_menu']);
