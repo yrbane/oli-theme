@@ -103,8 +103,13 @@ final class PostControllerTest extends TestCase
             ->willReturn('<html>single</html>');
 
         $controller = new PostController(
-            $this->model, $this->resolver, $this->switcher, $this->menus,
-            $this->seo, $this->breadcrumbs, $this->renderer,
+            $this->model,
+            $this->resolver,
+            $this->switcher,
+            $this->menus,
+            $this->seo,
+            $this->breadcrumbs,
+            $this->renderer,
         );
 
         self::assertSame('<html>single</html>', $controller->renderSingle());
@@ -135,8 +140,13 @@ final class PostControllerTest extends TestCase
             ->willReturn('<html>archive</html>');
 
         $controller = new PostController(
-            $this->model, $this->resolver, $this->switcher, $this->menus,
-            $this->seo, $this->breadcrumbs, $this->renderer,
+            $this->model,
+            $this->resolver,
+            $this->switcher,
+            $this->menus,
+            $this->seo,
+            $this->breadcrumbs,
+            $this->renderer,
         );
 
         self::assertSame('<html>archive</html>', $controller->renderArchive());
@@ -160,8 +170,13 @@ final class PostControllerTest extends TestCase
             ->willReturn('<html>search</html>');
 
         $controller = new PostController(
-            $this->model, $this->resolver, $this->switcher, $this->menus,
-            $this->seo, $this->breadcrumbs, $this->renderer,
+            $this->model,
+            $this->resolver,
+            $this->switcher,
+            $this->menus,
+            $this->seo,
+            $this->breadcrumbs,
+            $this->renderer,
         );
 
         self::assertSame('<html>search</html>', $controller->renderSearch());

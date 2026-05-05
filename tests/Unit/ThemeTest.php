@@ -195,7 +195,7 @@ final class ThemeTest extends TestCase
         $wpdb->get_charset_collate = static fn (): string => 'DEFAULT CHARACTER SET utf8mb4';
         // Réassigner via closure pour simuler l'appel $wpdb->get_charset_collate().
         // wpdb::get_charset_collate est une méthode PHP — on crée un objet anonyme.
-        $GLOBALS['wpdb'] = new class {
+        $GLOBALS['wpdb'] = new class () {
             public string $prefix = 'wp_';
 
             public function get_charset_collate(): string

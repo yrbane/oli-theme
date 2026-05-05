@@ -38,23 +38,6 @@ final class PageControllerTest extends TestCase
         parent::tearDown();
     }
 
-    private function buildSeoMock(): SeoControllerInterface
-    {
-        $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');
-        $seo = $this->createMock(SeoControllerInterface::class);
-        $seo->method('buildForPost')->willReturn($seoVm);
-        $seo->method('buildFor404')->willReturn($seoVm);
-        return $seo;
-    }
-
-    private function buildBreadcrumbsMock(): BreadcrumbsControllerInterface
-    {
-        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
-        $breadcrumbs->method('buildForPost')->willReturn([]);
-        $breadcrumbs->method('buildFor404')->willReturn([]);
-        return $breadcrumbs;
-    }
-
     public function testItRendersPageTemplateWithEntity(): void
     {
         $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
@@ -107,8 +90,14 @@ final class PageControllerTest extends TestCase
         $carousel->expects(self::never())->method('build');
 
         $controller = new PageController(
-            $model, $resolver, $switcher, $menus, $carousel,
-            $this->buildSeoMock(), $this->buildBreadcrumbsMock(), $renderer,
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $carousel,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
         );
 
         self::assertSame('<html>page</html>', $controller->renderSingular());
@@ -143,8 +132,14 @@ final class PageControllerTest extends TestCase
         $carousel = $this->createMock(HomeCarouselControllerInterface::class);
 
         $controller = new PageController(
-            $model, $resolver, $switcher, $menus, $carousel,
-            $this->buildSeoMock(), $this->buildBreadcrumbsMock(), $renderer,
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $carousel,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
         );
 
         self::assertSame('<html>404</html>', $controller->renderSingular());
@@ -203,10 +198,33 @@ final class PageControllerTest extends TestCase
         Functions\when('get_option')->justReturn(7);
 
         $controller = new PageController(
-            $model, $resolver, $switcher, $menus, $carousel,
-            $this->buildSeoMock(), $this->buildBreadcrumbsMock(), $renderer,
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $carousel,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
         );
 
         self::assertSame('<html>home</html>', $controller->renderSingular());
+    }
+
+    private function buildSeoMock(): SeoControllerInterface
+    {
+        $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');
+        $seo = $this->createMock(SeoControllerInterface::class);
+        $seo->method('buildForPost')->willReturn($seoVm);
+        $seo->method('buildFor404')->willReturn($seoVm);
+        return $seo;
+    }
+
+    private function buildBreadcrumbsMock(): BreadcrumbsControllerInterface
+    {
+        $breadcrumbs = $this->createMock(BreadcrumbsControllerInterface::class);
+        $breadcrumbs->method('buildForPost')->willReturn([]);
+        $breadcrumbs->method('buildFor404')->willReturn([]);
+        return $breadcrumbs;
     }
 }

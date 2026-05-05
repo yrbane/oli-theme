@@ -52,7 +52,20 @@ final class ActivationTest extends TestCase
     public function test_activation_hook_calls_flush_rewrite_rules(): void
     {
         Functions\expect('flush_rewrite_rules')->once();
+        Functions\expect('dbDelta')->once()->andReturn([]);
+
+        $GLOBALS['wpdb'] = new class () {
+            public string $prefix = 'wp_';
+
+            public function get_charset_collate(): string
+            {
+                return 'DEFAULT CHARACTER SET utf8mb4';
+            }
+        };
+
         Theme::onActivation();
+
+        unset($GLOBALS['wpdb']);
         $this->addToAssertionCount(1);
     }
 

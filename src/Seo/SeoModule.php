@@ -98,9 +98,11 @@ final class SeoModule implements ModuleInterface
         if (! $container->has(RedirectModel::class)) {
             $container->factory(
                 RedirectModel::class,
-                static fn (): RedirectModel => new RedirectModel(
-                    \is_object($GLOBALS['wpdb'] ?? null) ? $GLOBALS['wpdb'] : new \stdClass(),
-                ),
+                static function (): RedirectModel {
+                    /** @var \wpdb $wpdb */
+                    $wpdb = \is_object($GLOBALS['wpdb'] ?? null) ? $GLOBALS['wpdb'] : new \stdClass();
+                    return new RedirectModel($wpdb);
+                },
             );
         }
 

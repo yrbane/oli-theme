@@ -65,14 +65,12 @@ final class SeoMetaboxTest extends TestCase
             ->method('save')
             ->with(
                 42,
-                self::callback(static function (SeoMeta $meta): bool {
-                    return $meta->title === 'Mon titre SEO'
+                self::callback(static fn (SeoMeta $meta): bool => $meta->title === 'Mon titre SEO'
                         && $meta->description === 'Ma description'
                         && $meta->focusKeyword === 'yoga'
                         && $meta->noindex === true
                         && $meta->nofollow === false
-                        && $meta->twitterCardType === 'summary';
-                }),
+                        && $meta->twitterCardType === 'summary'),
             );
 
         $renderer = $this->createMock(RendererInterface::class);
