@@ -30,7 +30,7 @@ final class LanguageTaxonomy
     {
         register_taxonomy(
             self::NAME,
-            ['post', 'page', 'oli_slide'],
+            ['post', 'page', 'oli_slide', 'oli_event'],
             [
                 'label' => 'Langues',
                 'public' => false,
