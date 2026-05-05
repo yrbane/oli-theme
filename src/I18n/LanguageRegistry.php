@@ -16,7 +16,7 @@ use RuntimeException;
  *
  * @since 1.0.0
  */
-final class LanguageRegistry
+final class LanguageRegistry implements LanguageRegistryInterface
 {
     private const OPTION_KEY = 'oli_languages';
 

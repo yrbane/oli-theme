@@ -16,7 +16,7 @@ use OliTheme\Core\RequestContext;
  *
  * @since 1.0.0
  */
-final class LanguageResolver
+final class LanguageResolver implements LanguageResolverInterface
 {
     public const COOKIE_NAME = 'oli_lang';
     public const QUERY_VAR = 'oli_lang';
