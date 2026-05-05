@@ -110,6 +110,58 @@ final class Theme
             static fn (): AssetManager => new AssetManager($themePath, $themeUri),
         );
 
+        // Module I18n : services et orchestration.
+        $container->factory(
+            \OliTheme\I18n\LanguageRegistry::class,
+            static fn (): \OliTheme\I18n\LanguageRegistry => new \OliTheme\I18n\LanguageRegistry(),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageResolver::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageResolver => new \OliTheme\I18n\LanguageResolver(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+                $c->get(RequestContext::class),
+            ),
+        );
+        $container->factory(
+            \OliTheme\I18n\TranslationModel::class,
+            static fn (): \OliTheme\I18n\TranslationModel => new \OliTheme\I18n\TranslationModel(),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageTaxonomy::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageTaxonomy => new \OliTheme\I18n\LanguageTaxonomy(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+            ),
+        );
+        $container->factory(
+            \OliTheme\I18n\RewriteRules::class,
+            static fn (Container $c): \OliTheme\I18n\RewriteRules => new \OliTheme\I18n\RewriteRules(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+            ),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageUrlFilter::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageUrlFilter => new \OliTheme\I18n\LanguageUrlFilter(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+                $c->get(\OliTheme\I18n\LanguageResolver::class),
+            ),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageSwitcherController::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageSwitcherController => new \OliTheme\I18n\LanguageSwitcherController(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+                $c->get(\OliTheme\I18n\LanguageResolver::class),
+                $c->get(\OliTheme\I18n\TranslationModel::class),
+            ),
+        );
+        $container->factory(
+            \OliTheme\I18n\LanguageMetabox::class,
+            static fn (Container $c): \OliTheme\I18n\LanguageMetabox => new \OliTheme\I18n\LanguageMetabox(
+                $c->get(\OliTheme\I18n\LanguageRegistry::class),
+                $c->get(\OliTheme\I18n\TranslationModel::class),
+                $c->get(ViewRenderer::class),
+            ),
+        );
+
         return $container;
     }
 
@@ -134,5 +186,8 @@ final class Theme
 
         add_action('after_switch_theme', [self::class, 'onActivation']);
         add_action('switch_theme', [self::class, 'onDeactivation']);
+
+        // Modules fonctionnels.
+        (new \OliTheme\I18n\I18nModule($container))->register();
     }
 }

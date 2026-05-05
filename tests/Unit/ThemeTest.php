@@ -72,4 +72,18 @@ final class ThemeTest extends TestCase
 
         self::assertSame($first, $second);
     }
+
+    public function test_it_should_resolve_i18n_services_from_container(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        Theme::boot(\sys_get_temp_dir());
+        $container = Theme::container();
+
+        self::assertInstanceOf(\OliTheme\I18n\LanguageRegistry::class, $container->get(\OliTheme\I18n\LanguageRegistry::class));
+        self::assertInstanceOf(\OliTheme\I18n\LanguageResolver::class, $container->get(\OliTheme\I18n\LanguageResolver::class));
+        self::assertInstanceOf(\OliTheme\I18n\TranslationModel::class, $container->get(\OliTheme\I18n\TranslationModel::class));
+    }
 }
