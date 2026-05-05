@@ -86,4 +86,20 @@ final class ThemeTest extends TestCase
         self::assertInstanceOf(\OliTheme\I18n\LanguageResolver::class, $container->get(\OliTheme\I18n\LanguageResolver::class));
         self::assertInstanceOf(\OliTheme\I18n\TranslationModel::class, $container->get(\OliTheme\I18n\TranslationModel::class));
     }
+
+    public function testContainerThrowsWhenNotBooted(): void
+    {
+        Theme::reset();
+        $this->expectException(\LogicException::class);
+        Theme::container();
+    }
+
+    public function testContainerReturnsBootedContainer(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+
+        Theme::reset();
+        Theme::boot(sys_get_temp_dir());
+        self::assertInstanceOf(Container::class, Theme::container());
+    }
 }
