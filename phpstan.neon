@@ -1,0 +1,15 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    bootstrapFiles:
+        - tests/bootstrap-phpstan.php
+    excludePaths:
+        - vendor
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+    treatPhpDocTypesAsCertain: true
+    reportUnmatchedIgnoredErrors: true
+    scanFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
