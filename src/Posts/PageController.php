@@ -21,6 +21,7 @@ final class PageController
         private readonly PostModelInterface $posts,
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
+        private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -61,10 +62,14 @@ final class PageController
      */
     private function buildBaseViewModel(int $currentPostId = 0): array
     {
+        $current = $this->resolver->current();
+
         return [
-            'lang' => $this->resolver->current(),
+            'lang'             => $current,
             'languageSwitcher' => $this->switcher->build($currentPostId),
-            'bodyClasses' => 'lang-' . $this->resolver->current()->code,
+            'primaryMenu'      => $this->menus->buildPrimary($current),
+            'footerMenu'       => $this->menus->buildFooter($current),
+            'bodyClasses'      => 'lang-' . $current->code,
         ];
     }
 }

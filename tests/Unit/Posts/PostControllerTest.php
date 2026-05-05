@@ -12,6 +12,7 @@ use OliTheme\I18n\Language;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
+use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\PostController;
 use OliTheme\Posts\PostEntity;
 use OliTheme\Posts\PostModelInterface;
@@ -34,6 +35,9 @@ final class PostControllerTest extends TestCase
     /** @var MockObject&RendererInterface */
     private MockObject $renderer;
 
+    /** @var MockObject&MenuControllerInterface */
+    private MockObject $menus;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,12 +47,15 @@ final class PostControllerTest extends TestCase
         $this->model    = $this->createMock(PostModelInterface::class);
         $this->resolver = $this->createMock(LanguageResolverInterface::class);
         $this->switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
+        $this->menus    = $this->createMock(MenuControllerInterface::class);
         $this->renderer = $this->createMock(RendererInterface::class);
 
         $this->resolver->method('current')->willReturn($this->french);
         $this->switcher->method('build')->willReturn(
             new LanguageSwitcherViewModel(current: $this->french, items: []),
         );
+        $this->menus->method('buildPrimary')->willReturn([]);
+        $this->menus->method('buildFooter')->willReturn([]);
     }
 
     protected function tearDown(): void
@@ -74,7 +81,7 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>single</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->renderer);
+        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
 
         self::assertSame('<html>single</html>', $controller->renderSingle());
     }
@@ -103,7 +110,7 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>archive</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->renderer);
+        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
 
         self::assertSame('<html>archive</html>', $controller->renderArchive());
     }
@@ -125,7 +132,7 @@ final class PostControllerTest extends TestCase
             )
             ->willReturn('<html>search</html>');
 
-        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->renderer);
+        $controller = new PostController($this->model, $this->resolver, $this->switcher, $this->menus, $this->renderer);
 
         self::assertSame('<html>search</html>', $controller->renderSearch());
     }

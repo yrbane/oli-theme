@@ -20,6 +20,7 @@ final class NotFoundController
     public function __construct(
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
+        private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -29,9 +30,11 @@ final class NotFoundController
         $current = $this->resolver->current();
 
         return $this->renderer->render('pages/404.html', [
-            'lang' => $current,
+            'lang'             => $current,
             'languageSwitcher' => $this->switcher->build(0),
-            'bodyClasses' => 'error404 lang-' . $current->code,
+            'primaryMenu'      => $this->menus->buildPrimary($current),
+            'footerMenu'       => $this->menus->buildFooter($current),
+            'bodyClasses'      => 'error404 lang-' . $current->code,
         ]);
     }
 }

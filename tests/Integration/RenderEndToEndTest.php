@@ -49,6 +49,8 @@ final class RenderEndToEndTest extends TestCase
         Functions\when('get_the_author_meta')->justReturn('');
         Functions\when('mysql2date')->returnArg(2);
         Functions\when('wp_get_object_terms')->justReturn([(object) ['slug' => 'fr']]);
+        Functions\when('has_nav_menu')->justReturn(false);
+        Functions\when('wp_get_nav_menu_items')->justReturn([]);
 
         $post = new stdClass();
         $post->ID = 99;

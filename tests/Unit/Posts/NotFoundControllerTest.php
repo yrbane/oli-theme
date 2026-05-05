@@ -10,6 +10,7 @@ use OliTheme\I18n\Language;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
+use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\NotFoundController;
 use PHPUnit\Framework\TestCase;
 
@@ -37,6 +38,10 @@ final class NotFoundControllerTest extends TestCase
         $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
         $switcher->method('build')->willReturn(new LanguageSwitcherViewModel(current: $french, items: []));
 
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
@@ -46,7 +51,7 @@ final class NotFoundControllerTest extends TestCase
             )
             ->willReturn('<html>404</html>');
 
-        $controller = new NotFoundController($resolver, $switcher, $renderer);
+        $controller = new NotFoundController($resolver, $switcher, $menus, $renderer);
 
         self::assertSame('<html>404</html>', $controller->render());
     }

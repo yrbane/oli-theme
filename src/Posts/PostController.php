@@ -21,6 +21,7 @@ final class PostController
         private readonly PostModelInterface $posts,
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
+        private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
         private readonly RendererInterface $renderer,
     ) {
     }
@@ -91,6 +92,8 @@ final class PostController
         return [
             'lang'             => $current,
             'languageSwitcher' => $this->switcher->build($currentPostId),
+            'primaryMenu'      => $this->menus->buildPrimary($current),
+            'footerMenu'       => $this->menus->buildFooter($current),
             'bodyClasses'      => 'lang-' . $current->code,
         ];
     }

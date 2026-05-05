@@ -13,6 +13,7 @@ use OliTheme\I18n\Language;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
+use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostEntity;
 use OliTheme\Posts\PostModelInterface;
@@ -62,6 +63,10 @@ final class PageControllerTest extends TestCase
         $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
         $switcher->method('build')->with(7)->willReturn($switcherVm);
 
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
@@ -75,7 +80,7 @@ final class PageControllerTest extends TestCase
 
         Functions\when('get_queried_object_id')->justReturn(7);
 
-        $controller = new PageController($model, $resolver, $switcher, $renderer);
+        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer);
 
         self::assertSame('<html>page</html>', $controller->renderSingular());
     }
@@ -93,6 +98,10 @@ final class PageControllerTest extends TestCase
         $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
         $switcher->method('build')->with(0)->willReturn(new LanguageSwitcherViewModel(current: $french, items: []));
 
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
@@ -101,7 +110,7 @@ final class PageControllerTest extends TestCase
 
         Functions\when('get_queried_object_id')->justReturn(0);
 
-        $controller = new PageController($model, $resolver, $switcher, $renderer);
+        $controller = new PageController($model, $resolver, $switcher, $menus, $renderer);
 
         self::assertSame('<html>404</html>', $controller->renderSingular());
     }

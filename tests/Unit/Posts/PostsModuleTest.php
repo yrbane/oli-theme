@@ -10,6 +10,7 @@ use OliTheme\Core\RendererInterface;
 use OliTheme\I18n\LanguageRegistryInterface;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\NotFoundController;
 use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostController;
@@ -32,6 +33,7 @@ final class PostsModuleTest extends TestCase
         $this->container->set(LanguageResolverInterface::class, $this->createMock(LanguageResolverInterface::class));
         $this->container->set(LanguageRegistryInterface::class, $this->createMock(LanguageRegistryInterface::class));
         $this->container->set(LanguageSwitcherControllerInterface::class, $this->createMock(LanguageSwitcherControllerInterface::class));
+        $this->container->set(MenuControllerInterface::class, $this->createMock(MenuControllerInterface::class));
     }
 
     protected function tearDown(): void

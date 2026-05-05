@@ -47,6 +47,7 @@ final class PostsModule implements ModuleInterface
                     $c->get(PostModel::class),
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
+                    $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );
@@ -59,6 +60,7 @@ final class PostsModule implements ModuleInterface
                     $c->get(PostModel::class),
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
+                    $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );
@@ -70,6 +72,7 @@ final class PostsModule implements ModuleInterface
                 static fn (Container $c): NotFoundController => new NotFoundController(
                     $c->get(LanguageResolverInterface::class),
                     $c->get(LanguageSwitcherControllerInterface::class),
+                    $c->get(\OliTheme\Navigation\MenuControllerInterface::class),
                     $c->get(RendererInterface::class),
                 ),
             );
