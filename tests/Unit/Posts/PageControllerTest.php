@@ -66,7 +66,7 @@ final class PageControllerTest extends TestCase
         $renderer->expects(self::once())
             ->method('render')
             ->with(
-                'pages/page',
+                'pages/page.html',
                 self::callback(fn (array $vm): bool => $vm['post'] === $entity
                         && $vm['languageSwitcher'] === $switcherVm
                         && $vm['bodyClasses'] === 'page page-id-7 lang-fr'),
@@ -96,7 +96,7 @@ final class PageControllerTest extends TestCase
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
-            ->with('pages/404', self::isType('array'))
+            ->with('pages/404.html', self::isType('array'))
             ->willReturn('<html>404</html>');
 
         Functions\when('get_queried_object_id')->justReturn(0);

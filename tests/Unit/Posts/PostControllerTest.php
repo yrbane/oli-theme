@@ -67,7 +67,7 @@ final class PostControllerTest extends TestCase
         $this->renderer->expects(self::once())
             ->method('render')
             ->with(
-                'pages/single-post',
+                'pages/single-post.html',
                 self::callback(
                     static fn (array $vm): bool => $vm['post'] instanceof PostEntity && $vm['post']->id === 11,
                 ),
@@ -92,7 +92,7 @@ final class PostControllerTest extends TestCase
         $this->renderer->expects(self::once())
             ->method('render')
             ->with(
-                'pages/archive-post',
+                'pages/archive-post.html',
                 self::callback(static function (array $vm): bool {
                     if (! \is_array($vm['posts'])) {
                         return false;
@@ -118,7 +118,7 @@ final class PostControllerTest extends TestCase
         $this->renderer->expects(self::once())
             ->method('render')
             ->with(
-                'pages/search',
+                'pages/search.html',
                 self::callback(
                     static fn (array $vm): bool => $vm['query'] === 'yoga' && $vm['posts'] === [],
                 ),

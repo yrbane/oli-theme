@@ -41,7 +41,7 @@ final class NotFoundControllerTest extends TestCase
         $renderer->expects(self::once())
             ->method('render')
             ->with(
-                'pages/404',
+                'pages/404.html',
                 self::callback(static fn (array $vm): bool => $vm['bodyClasses'] === 'error404 lang-fr'),
             )
             ->willReturn('<html>404</html>');

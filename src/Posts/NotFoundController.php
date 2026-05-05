@@ -28,7 +28,7 @@ final class NotFoundController
     {
         $current = $this->resolver->current();
 
-        return $this->renderer->render('pages/404', [
+        return $this->renderer->render('pages/404.html', [
             'lang' => $current,
             'languageSwitcher' => $this->switcher->build(0),
             'bodyClasses' => 'error404 lang-' . $current->code,

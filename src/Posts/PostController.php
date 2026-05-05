@@ -34,7 +34,7 @@ final class PostController
         $entity = $id > 0 ? $this->posts->find($id) : null;
 
         if (! $entity instanceof PostEntity) {
-            return $this->renderer->render('pages/404', $this->buildBaseViewModel(0));
+            return $this->renderer->render('pages/404.html', $this->buildBaseViewModel(0));
         }
 
         $viewModel = $this->buildBaseViewModel($entity->id);
@@ -45,7 +45,7 @@ final class PostController
             $entity->language->code,
         );
 
-        return $this->renderer->render('pages/single-post', $viewModel);
+        return $this->renderer->render('pages/single-post.html', $viewModel);
     }
 
     /**
@@ -61,7 +61,7 @@ final class PostController
         $viewModel['archiveTitle'] = '';
         $viewModel['bodyClasses']  = 'archive archive-post lang-' . $current->code;
 
-        return $this->renderer->render('pages/archive-post', $viewModel);
+        return $this->renderer->render('pages/archive-post.html', $viewModel);
     }
 
     /**
@@ -78,7 +78,7 @@ final class PostController
         $viewModel['posts']       = $items;
         $viewModel['bodyClasses'] = 'search lang-' . $current->code;
 
-        return $this->renderer->render('pages/search', $viewModel);
+        return $this->renderer->render('pages/search.html', $viewModel);
     }
 
     /**

@@ -34,10 +34,10 @@ final class PageController
         $entity = $id > 0 ? $this->posts->find($id) : null;
 
         if (! $entity instanceof PostEntity) {
-            return $this->renderer->render('pages/404', $this->buildBaseViewModel($id));
+            return $this->renderer->render('pages/404.html', $this->buildBaseViewModel($id));
         }
 
-        return $this->renderer->render('pages/page', $this->buildViewModel($entity));
+        return $this->renderer->render('pages/page.html', $this->buildViewModel($entity));
     }
 
     /**
