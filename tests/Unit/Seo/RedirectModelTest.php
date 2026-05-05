@@ -17,28 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class RedirectModelTest extends TestCase
 {
-    /**
-     * Crée une ligne stdClass représentant une redirection en base.
-     */
-    private function makeRow(
-        int $id = 1,
-        string $source = '/old',
-        string $target = 'https://example.com/new',
-        int $code = 301,
-        int $hits = 0,
-        string $createdAt = '2026-01-01 00:00:00',
-    ): \stdClass {
-        $row = new \stdClass();
-        $row->id = $id;
-        $row->source = $source;
-        $row->target = $target;
-        $row->code = $code;
-        $row->hits = $hits;
-        $row->created_at = $createdAt;
-
-        return $row;
-    }
-
     public function testFindBySourceReturnsNullWhenAbsent(): void
     {
         $wpdb = $this->makeWpdb(rowToReturn: null);
@@ -183,14 +161,35 @@ final class RedirectModelTest extends TestCase
         self::assertStringContainsString('hits = hits + 1', $queryCalls[0]);
         self::assertStringContainsString('42', $queryCalls[0]);
     }
+    /**
+     * Crée une ligne stdClass représentant une redirection en base.
+     */
+    private function makeRow(
+        int $id = 1,
+        string $source = '/old',
+        string $target = 'https://example.com/new',
+        int $code = 301,
+        int $hits = 0,
+        string $createdAt = '2026-01-01 00:00:00',
+    ): \stdClass {
+        $row = new \stdClass();
+        $row->id = $id;
+        $row->source = $source;
+        $row->target = $target;
+        $row->code = $code;
+        $row->hits = $hits;
+        $row->created_at = $createdAt;
+
+        return $row;
+    }
 
     /**
      * Construit un stub wpdb minimal pour les tests.
      *
-     * @param \stdClass|null             $rowToReturn  Ligne retournée par get_row().
-     * @param \stdClass[]                $rowsToReturn Lignes retournées par get_results().
+     * @param \stdClass|null $rowToReturn Ligne retournée par get_row().
+     * @param \stdClass[] $rowsToReturn Lignes retournées par get_results().
      * @param array<array<string,mixed>> &$insertCalls Tableau capturant les appels insert().
-     * @param string[]                   &$queryCalls  Tableau capturant les appels query().
+     * @param string[] &$queryCalls Tableau capturant les appels query().
      */
     private function makeWpdb(
         ?\stdClass $rowToReturn = null,
@@ -211,9 +210,9 @@ final class RedirectModelTest extends TestCase
             private array $queryCalls;
 
             /**
-             * @param \stdClass[]                $rowsToReturn
+             * @param \stdClass[] $rowsToReturn
              * @param array<array<string,mixed>> &$insertCalls
-             * @param string[]                   &$queryCalls
+             * @param string[] &$queryCalls
              */
             public function __construct(
                 private ?\stdClass $rowToReturn,
