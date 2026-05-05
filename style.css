@@ -1,0 +1,18 @@
+/*
+Theme Name: Oli Theme
+Theme URI: https://github.com/yrbane/oli-theme
+Author: yrbane
+Author URI: https://nethttp.net
+Description: Thème WordPress custom OOP/MVC multilingue, réutilisable multi-sites. Architecture stricte avec Lunar Template Engine, système multilingue custom, sans dépendance à un builder visuel.
+Version: 1.0.0-alpha
+Requires at least: 6.9
+Tested up to: 6.9
+Requires PHP: 8.3
+License: MIT
+License URI: https://opensource.org/licenses/MIT
+Text Domain: oli-theme
+Domain Path: /languages
+Tags: custom-theme, mvc, multilingual, accessibility-ready, translation-ready
+*/
+
+/* Le CSS réel est chargé depuis assets/css/main.css via wp_enqueue_style. */
