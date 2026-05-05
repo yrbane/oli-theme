@@ -20,7 +20,7 @@ use Lunar\Template\Renderer\TemplateRenderer;
  *
  * @since 1.0.0
  */
-final class ViewRenderer
+final class ViewRenderer implements RendererInterface
 {
     private TemplateRenderer $engine;
 
