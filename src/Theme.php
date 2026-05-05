@@ -210,6 +210,7 @@ final class Theme
 
         // Modules fonctionnels.
         (new \OliTheme\I18n\I18nModule($container))->register();
+        (new \OliTheme\Navigation\NavigationModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
     }
 
