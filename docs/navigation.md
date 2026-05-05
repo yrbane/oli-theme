@@ -43,3 +43,4 @@ Le drawer mobile sans JavaScript reste fermé (`hidden`). Le menu desktop reste 
 - `OliTheme\Navigation\MenuModelInterface::toTree(array $items, int $currentObjectId): array` — convertit la liste plate WP en arbre.
 - `OliTheme\Navigation\MenuControllerInterface::buildPrimary/buildFooter(Language $lang): array` — point d'extension.
 - Les controllers `Posts\PageController`/`PostController`/`NotFoundController` injectent les menus dans les view-models sous les clés `primaryMenu` et `footerMenu`.
+- **Résolution location → menu ID** (issue #5) : `MenuController::buildFor()` traduit la `theme_location` en identifiant de menu via `get_nav_menu_locations()` avant d'appeler `wp_get_nav_menu_items()`. Sans cette traduction, `wp_get_nav_menu_items()` retourne `false` et le menu reste vide même avec une assignation correcte.

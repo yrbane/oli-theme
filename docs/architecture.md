@@ -22,6 +22,8 @@ Le thème suit un pattern **MVC strict** appliqué à WordPress :
 | `OliTheme\Core\ModuleInterface` | Contrat des modules fonctionnels (`register(): void`) |
 | `OliTheme\Core\PostTypeInterface` | Contrat des classes enregistrant un CPT |
 | `OliTheme\Core\RendererInterface` | Contrat narrow du rendu de templates (mockable) |
+| `OliTheme\Core\CacheDirectoryEnsurer` | Crée et valide `.cache/templates/` sans lever d'exception (issue #1) |
+| `OliTheme\Core\TemplateRouter` | Aiguille `template_include` vers `theme-bridge/*.php` (issue #4) |
 
 ## Modules livrés (cycle 1)
 
@@ -136,21 +138,22 @@ require __DIR__ . '/vendor/autoload.php';
 `Theme::boot()` (idempotent) :
 
 1. Crée le `Container`.
-2. Enregistre les services Core (`ViewRenderer`, `AssetManager`, `RequestContext`, `HookRegistrar`).
+2. Enregistre les services Core (`ViewRenderer`, `AssetManager`, `RequestContext`, `HookRegistrar`, `CacheDirectoryEnsurer`, `TemplateRouter`).
 3. Enregistre les alias d'interfaces (Renderer, Language*).
-4. Hooke `wp_enqueue_scripts`, `admin_enqueue_scripts`, `after_switch_theme`, `switch_theme`.
+4. Hooke `wp_enqueue_scripts`, `admin_enqueue_scripts`, `after_switch_theme`, `switch_theme`, `admin_notices` (cache fail-safe), `template_include` (aiguillage vers `theme-bridge/`).
 5. Branche `bootstrapViewRenderer()` (variables globales + macros `wpHead` / `wpFooter`).
 6. Instancie tous les modules dans l'ordre :
    ```
-   I18nModule → NavigationModule → SlidesModule → SeoModule → EventsModule → PostsModule
+   SettingsModule → I18nModule → NavigationModule → SlidesModule → SeoModule → EventsModule → ContactModule → PostsModule
    ```
 
 `Theme::onActivation()` (hook `after_switch_theme`) :
 
 - Flush rewrite rules.
+- `CacheDirectoryEnsurer::ensure(.cache/templates)` — crée le dossier ou enregistre l'erreur dans l'option `oli_theme_cache_error` pour admin_notice (issue #1).
 - Délègue à `RedirectInstaller::install()` + persiste `oli_theme_db_version` (table `{prefix}oli_redirects`).
 
-L'installer est aussi appelé via `init` priorité 5 par `SeoModule`, ce qui garantit la création de la table même sur les déploiements `git pull` où `after_switch_theme` ne se déclenche pas (cf. issue #3).
+L'installer est aussi appelé via `init` priorité 5 par `SeoModule`, ce qui garantit la création de la table même sur les déploiements `git pull` où `after_switch_theme` ne se déclenche pas (cf. issue #3). De même, la factory `ViewRenderer` du conteneur tente le `ensure()` à chaque résolution avec un fallback sur `sys_get_temp_dir()/oli-theme-cache` si `.cache/templates` n'est pas writable, plutôt qu'un fatal Lunar.
 
 ## Conventions
 

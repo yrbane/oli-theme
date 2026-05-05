@@ -109,6 +109,24 @@ Chaque template de la hiérarchie WP a un fichier de pontage minimal dans `theme
 
 Chaque pontage tient en une ligne logique : `echo Theme::container()->get(<Controller>::class)->render*();`.
 
+### Aiguillage `template_include` (issue #4)
+
+WordPress ne descend pas dans les sous-dossiers : par défaut, il ne trouve que `index.php` à la racine du thème, et tous les pontages dans `theme-bridge/` sont ignorés. `Core\TemplateRouter` (branché via le filtre `template_include` dans `Theme::registerCoreHooks()`) recolle les deux mondes :
+
+| Condition WP                                              | Fichier bridge retourné        |
+|-----------------------------------------------------------|---------------------------------|
+| `is_front_page()` + `page_on_front > 0`                   | `theme-bridge/front-page.php`   |
+| `is_singular('oli_event')`                                | `theme-bridge/single-oli_event.php` |
+| `is_post_type_archive('oli_event')`                       | `theme-bridge/archive-oli_event.php` |
+| `is_page()`                                               | `theme-bridge/page.php`         |
+| `is_single()`                                             | `theme-bridge/single.php`       |
+| `is_search()`                                             | `theme-bridge/search.php`       |
+| `is_archive()`                                            | `theme-bridge/archive.php`      |
+| `is_404()`                                                | `theme-bridge/404.php`          |
+| (aucune)                                                  | template original (laissé à WP) |
+
+Le router est défensif : si le fichier bridge attendu n'existe pas, il retourne le template original plutôt que de provoquer un fatal include.
+
 ## Ajouter un nouveau template
 
 1. Créer `templates/pages/mon-template.html.tpl` qui `extends` `layouts/base.html.tpl`.

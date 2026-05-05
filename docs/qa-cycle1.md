@@ -1,6 +1,6 @@
 # Checklist QA — Cycle 1
 
-État : `1.0.0-rc.1` (cycle 1 livré, 9 plans + finalisation).
+État : `1.0.0-rc.1` (cycle 1 livré, 9 plans + finalisation) + 4 fixes runtime post-RC (issues #1, #2, #4, #5).
 
 ## Critères automatisés
 
@@ -11,7 +11,7 @@
 | `composer ci` vert sur PHP 8.5 | ✅ vérifié en CI GitHub Actions |
 | PHPStan niveau 8 sans erreur | ✅ |
 | PHP-CS-Fixer (PSR-12 + PHP 8.3 migration) | ✅ |
-| Tests unitaires + intégration | ✅ ~298 tests / ~1038 assertions |
+| Tests unitaires + intégration | ✅ 315 tests / 1063 assertions |
 | Couverture globale | 🔘 à mesurer (cible ≥ 90 %) — `composer test:coverage` |
 
 ## Critères manuels (à exécuter sur staging)
@@ -75,6 +75,9 @@
 
 - 🔘 **Fresh install** : activer le thème → table `oli_redirects` créée, options par défaut initialisées.
 - 🔘 **Upgrade `git pull`** : `oli_theme_db_version` détecte la nouvelle version → migration jouée au premier `init`.
+- 🔘 **Cache compilé** (issue #1) : sur un setup où `.cache/templates` n'est pas writable, vérifier qu'aucun fatal Lunar n'apparaît côté front et qu'un admin_notice rouge remonte le détail côté admin.
+- 🔘 **Aiguillage `template_include`** (issue #4) : vérifier `/`, `/<slug-page>/`, `/<slug-post>/`, `/evenements/`, `/evenements/<slug>/`, `/?s=...`, `/404-inexistant/` — chaque URL doit rendre le bon template, pas l'archive des posts.
+- 🔘 **Menus** (issue #5) : assigner un menu à `primary_fr` et vérifier qu'il s'affiche bien dans le header (et pas un header vide).
 
 ## Documentation
 

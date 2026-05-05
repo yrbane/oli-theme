@@ -102,6 +102,9 @@ Voir [`CHANGELOG.md`](../CHANGELOG.md) pour la liste détaillée. Tags Git :
 - `v1.0.0-alpha.5-slides` — Plan 5
 - `v1.0.0-alpha.6-events` — Plan 6
 - `v1.0.0-alpha.7-seo` — Plan 7
+- `v1.0.0-alpha.8-contact` — Plan 8
+- `v1.0.0-alpha.9-settings` — Plan 9
+- `v1.0.0-rc.1` — Plan 10 (cycle 1 livré)
 
 ## Problèmes courants
 
@@ -109,6 +112,9 @@ Voir [`CHANGELOG.md`](../CHANGELOG.md) pour la liste détaillée. Tags Git :
 |----------|----------------|----------|
 | Page blanche après activation | `vendor/` absent | Lancer `composer install` |
 | 404 sur `/fr/...` | Rewrite rules pas vidées | Aller dans `Réglages > Permaliens > Enregistrer` |
-| `Class \OliTheme\Theme not found` | PSR-4 mal configuré | Vérifier `composer dump-autoload` |
+| `Class \OliTheme\Theme not found` côté web mais OK en CLI | `umask 027` côté host → `vendor/` non lisible par Apache (issue #2) | Lancer `composer install` (les hooks `post-install-cmd`/`post-update-cmd` rejouent `chmod a+r/a+rx` sur `vendor/`). Pour un setup déjà cassé : `find vendor -type f -exec chmod a+r {} + && find vendor -type d -exec chmod a+rx {} +` |
 | Notice `Table 'wp_oli_redirects' doesn't exist` | Plan 7 déployé sans réactivation | Visiter une page front une fois — `init` priorité 5 crée la table automatiquement (issue #3 fixée) |
+| Bandeau admin « cache compilé indisponible » | `.cache/templates` non writable par PHP (issue #1) | `chown -R www-data:www-data .cache && chmod -R 775 .cache`. Le thème continue de servir le front via un fallback sur `sys_get_temp_dir()` |
+| Toutes les URL retombent sur l'archive des posts | Anciennement issue #4 | Corrigée par le filtre `template_include` câblé sur `Core\TemplateRouter` |
+| Menus toujours vides malgré une assignation correcte | Anciennement issue #5 | Corrigée — `MenuController` résout désormais la `theme_location` en menu ID via `get_nav_menu_locations()` |
 | `composer docs` retourne un message désactivation | `phpdocumentor` incompatible PHP 8.5 (dépendance `json-path 0.2.1`) | Réintroduit dès que l'amont supportera PHP 8.5 |

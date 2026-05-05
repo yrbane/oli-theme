@@ -30,8 +30,9 @@ Tag courant : **`v1.0.0-rc.1`** (Cycle 1 complet, en attente des audits manuels)
 | 8 — Contact | `v1.0.0-alpha.8-contact` | 271 | Formulaire OOP/TDD sécurisé (CSRF + honeypot + time-trap + rate-limit), ADR 0009 |
 | 9 — Settings | `v1.0.0-alpha.9-settings` | 298 | Page admin `Apparence > Identité du site` (6 onglets), ADR 0010 |
 | 10 — QA & finalisation | `v1.0.0-rc.1` | 298 | Doc unifiée, checklist QA, prêt pour audits |
+| Hotfixes post-RC | `main` | 315 | Issues #1 (cache fail-safe), #2 (perms vendor), #4 (template_include), #5 (menu location → ID) |
 
-Le cycle 1 livre **9 modules fonctionnels**, **~298 tests** (~1038 assertions), **10 ADR**, **8 guides utilisateur**, et couvre intégralement la spec d'origine. Voir [`docs/qa-cycle1.md`](docs/qa-cycle1.md) pour la checklist d'audit.
+Le cycle 1 livre **9 modules fonctionnels**, **315 tests** (1063 assertions), **10 ADR**, **8 guides utilisateur**, et couvre intégralement la spec d'origine. Voir [`docs/qa-cycle1.md`](docs/qa-cycle1.md) pour la checklist d'audit.
 
 ## Installation
 
