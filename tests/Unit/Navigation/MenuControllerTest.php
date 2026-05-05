@@ -56,6 +56,7 @@ final class MenuControllerTest extends TestCase
         $entity = new MenuItemEntity(1, 'A', '/', '', false, false, 0, []);
 
         Functions\when('has_nav_menu')->justReturn(true);
+        Functions\when('get_nav_menu_locations')->justReturn(['primary_fr' => 7]);
         Functions\when('wp_get_nav_menu_items')->justReturn($items);
         Functions\when('get_queried_object_id')->justReturn(42);
 
@@ -73,6 +74,7 @@ final class MenuControllerTest extends TestCase
     public function testBuildFooterUsesFooterLocation(): void
     {
         Functions\when('has_nav_menu')->justReturn(true);
+        Functions\when('get_nav_menu_locations')->justReturn(['footer_fr' => 8]);
         Functions\when('wp_get_nav_menu_items')->justReturn([]);
         Functions\when('get_queried_object_id')->justReturn(0);
 
@@ -81,5 +83,50 @@ final class MenuControllerTest extends TestCase
         $controller = new MenuController($this->locations, $this->model);
 
         self::assertSame([], $controller->buildFooter($this->french));
+    }
+
+    /**
+     * Régression #5 : `wp_get_nav_menu_items()` attend un identifiant de menu,
+     * pas une `theme_location`. Si le controller passe directement la location,
+     * la fonction WP retourne `false` et le menu reste vide même quand un menu
+     * est correctement assigné.
+     */
+    public function testBuildPrimaryResolvesLocationToMenuIdBeforeFetching(): void
+    {
+        $items   = [new stdClass()];
+        $entity  = new MenuItemEntity(1, 'A', '/', '', false, false, 0, []);
+        $menuId  = 42;
+        $passedArgument = null;
+
+        Functions\when('has_nav_menu')->justReturn(true);
+        Functions\when('get_nav_menu_locations')->justReturn(['primary_fr' => $menuId]);
+        Functions\when('wp_get_nav_menu_items')->alias(
+            static function (mixed $argument) use (&$passedArgument, $items): array {
+                $passedArgument = $argument;
+
+                return $items;
+            },
+        );
+        Functions\when('get_queried_object_id')->justReturn(0);
+
+        $this->model->method('toTree')->willReturn([$entity]);
+
+        $controller = new MenuController($this->locations, $this->model);
+        $result     = $controller->buildPrimary($this->french);
+
+        self::assertSame([$entity], $result);
+        self::assertSame($menuId, $passedArgument, 'Le controller doit transmettre un menu ID, pas la location.');
+    }
+
+    public function testBuildPrimaryReturnsEmptyWhenLocationNotMappedToMenu(): void
+    {
+        Functions\when('has_nav_menu')->justReturn(true);
+        Functions\when('get_nav_menu_locations')->justReturn([]);
+        Functions\when('wp_get_nav_menu_items')->justReturn(false);
+        Functions\when('get_queried_object_id')->justReturn(0);
+
+        $controller = new MenuController($this->locations, $this->model);
+
+        self::assertSame([], $controller->buildPrimary($this->french));
     }
 }

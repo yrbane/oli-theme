@@ -52,7 +52,10 @@ final class MenuController implements MenuControllerInterface
     /**
      * Récupère et convertit les items d'une location de menu.
      *
-     * Retourne un tableau vide si aucun menu n'est assigné à la location.
+     * Résout d'abord la location en menu ID via `get_nav_menu_locations()` :
+     * `wp_get_nav_menu_items()` attend un identifiant de menu (ID, slug, name
+     * ou WP_Term), pas une `theme_location` (issue #5). Retourne un tableau
+     * vide si aucun menu n'est assigné à la location.
      *
      * @param string $location Clé de location WordPress
      *
@@ -64,7 +67,12 @@ final class MenuController implements MenuControllerInterface
             return [];
         }
 
-        $items = wp_get_nav_menu_items($location);
+        $menuLocations = get_nav_menu_locations();
+        if (! \is_array($menuLocations) || ! isset($menuLocations[$location])) {
+            return [];
+        }
+
+        $items = wp_get_nav_menu_items((int) $menuLocations[$location]);
         if (! \is_array($items)) {
             return [];
         }
