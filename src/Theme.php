@@ -227,6 +227,7 @@ final class Theme
         (new \OliTheme\Slides\SlidesModule($container))->register();
         (new \OliTheme\Seo\SeoModule($container))->register();
         (new \OliTheme\Events\EventsModule($container))->register();
+        (new \OliTheme\Contact\ContactModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
     }
 
