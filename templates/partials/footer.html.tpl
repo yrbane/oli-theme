@@ -1,9 +1,21 @@
-[# Pied de page minimal (la version pleine — mentions/réseaux/mini-menu —
-   sera produite par le module Settings dans un plan ultérieur).
+[# Pied de page.
+   Variables attendues:
+     - footerMenu  (MenuItemEntity[])  optionnel
    Variables globales: siteName, currentYear.
 #]
 <footer class="site-footer" role="contentinfo">
     <div class="site-footer__inner">
+        [% if footerMenu %]
+            <nav class="site-footer__nav" aria-label="Menu pied de page">
+                <ul class="site-footer__list">
+                    [% for item in footerMenu %]
+                        <li class="site-footer__item">
+                            <a href="[[ item.url ]]">[[ item.label ]]</a>
+                        </li>
+                    [% endfor %]
+                </ul>
+            </nav>
+        [% endif %]
         <p class="site-footer__copy">© [[ currentYear ]] [[ siteName ]]. Tous droits réservés.</p>
     </div>
 </footer>
