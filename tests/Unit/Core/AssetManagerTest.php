@@ -81,6 +81,33 @@ final class AssetManagerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testEnqueueFrontEnqueuesMainCssWithFilemtimeVersion(): void
+    {
+        $themePath = sys_get_temp_dir() . '/oli-theme-' . uniqid();
+        mkdir($themePath . '/assets/css', 0o777, true);
+        file_put_contents($themePath . '/assets/css/main.css', '/* test */');
+        $expectedVersion = (string) filemtime($themePath . '/assets/css/main.css');
+
+        $captured = [];
+        Functions\when('wp_enqueue_style')->alias(static function (string $handle, string $src, array $deps, string $ver) use (&$captured): void {
+            $captured = [$handle, $src, $deps, $ver];
+        });
+        Functions\when('wp_enqueue_script_module')->justReturn();
+
+        $manager = new AssetManager($themePath, 'https://example.com/wp-content/themes/oli-theme');
+        $manager->enqueueFront();
+
+        self::assertSame('oli-theme', $captured[0]);
+        self::assertSame('https://example.com/wp-content/themes/oli-theme/assets/css/main.css', $captured[1]);
+        self::assertSame([], $captured[2]);
+        self::assertSame($expectedVersion, $captured[3]);
+
+        unlink($themePath . '/assets/css/main.css');
+        rmdir($themePath . '/assets/css');
+        rmdir($themePath . '/assets');
+        rmdir($themePath);
+    }
+
     private function rrmdir(string $dir): void
     {
         if (!is_dir($dir)) {
