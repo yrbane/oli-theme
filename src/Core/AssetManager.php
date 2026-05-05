@@ -67,7 +67,7 @@ final class AssetManager
 
         // Charge les assets SEO admin uniquement sur les écrans d'édition de contenu et les pages SEO.
         $isEditScreen = \in_array($hookSuffix, ['post.php', 'post-new.php'], true);
-        $isSeoPage = \str_starts_with($hookSuffix, 'tools_page_oli-seo-');
+        $isSeoPage = str_starts_with($hookSuffix, 'tools_page_oli-seo-');
         if (! $isEditScreen && ! $isSeoPage) {
             return;
         }
