@@ -79,7 +79,7 @@ final class ThemeTest extends TestCase
         Functions\when('add_filter')->justReturn(true);
         Functions\when('get_option')->justReturn(false);
 
-        Theme::boot(\sys_get_temp_dir());
+        Theme::boot(sys_get_temp_dir());
         $container = Theme::container();
 
         self::assertInstanceOf(\OliTheme\I18n\LanguageRegistry::class, $container->get(\OliTheme\I18n\LanguageRegistry::class));
