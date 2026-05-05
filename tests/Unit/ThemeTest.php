@@ -145,6 +145,19 @@ final class ThemeTest extends TestCase
         self::assertTrue($container->has(\OliTheme\Navigation\MenuControllerInterface::class));
     }
 
+    public function testBootRegistersSlidesModule(): void
+    {
+        Functions\when('add_action')->justReturn(true);
+        Functions\when('add_filter')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
+
+        \OliTheme\Theme::reset();
+        \OliTheme\Theme::boot(__DIR__);
+        $container = \OliTheme\Theme::container();
+        self::assertTrue($container->has(\OliTheme\Slides\HomeCarouselController::class));
+        self::assertTrue($container->has(\OliTheme\Slides\HomeCarouselControllerInterface::class));
+    }
+
     public function testBootInjectsGlobalVariablesAndMacrosIntoViewRenderer(): void
     {
         Functions\when('add_action')->justReturn(true);
