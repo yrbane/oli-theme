@@ -25,11 +25,9 @@
             <directory>src</directory>
         </include>
     </source>
-    <coverage>
-        <report>
-            <html outputDirectory="coverage/html"/>
-            <text outputFile="coverage/coverage.txt"/>
-            <clover outputFile="coverage/clover.xml"/>
-        </report>
-    </coverage>
+    <!--
+        La configuration de couverture est passee en CLI via composer test:coverage
+        (XDEBUG_MODE=coverage phpunit coverage-html coverage/) afin d eviter
+        le warning XDEBUG_MODE=coverage has to be set lors des runs sans couverture.
+    -->
 </phpunit>
