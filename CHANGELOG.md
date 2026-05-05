@@ -4,6 +4,37 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.7] - 2026-05-06
+
+### Added (Plan 7 — SEO complet)
+
+- `Seo\SeoMeta` — DTO immuable des meta SEO (13 champs).
+- `Seo\SeoMetaModel` (+ Interface) — accès aux meta `_oli_seo_*`.
+- `Seo\CanonicalBuilder`, `RobotsBuilder`, `OpenGraphBuilder`, `TwitterCardBuilder` — builders du `<head>`.
+- `Seo\HreflangBuilder` — alternates multilingues exploitant `TranslationModel`.
+- `Seo\Schema\SchemaInterface` + `SchemaContext` (agrégateur `@graph`) + 8 schémas : `WebSiteSchema`, `OrganizationSchema`, `PersonSchema`, `ImageObjectSchema`, `BreadcrumbListSchema`, `ArticleSchema`, `EventSchema`, `LocalBusinessSchema`.
+- `Seo\BreadcrumbsController` (+ Interface) + `BreadcrumbItemEntity` — fil d'Ariane multilingue.
+- `Seo\SitemapController` (+ Interface) + `SitemapEntryBuilder` + `SitemapIndexBuilder` — sitemap XML multilingue (index + sous-sitemaps par CPT × langue).
+- `Seo\ReadabilityAnalyzer` — score Flesch adapté au français (coefficients Kandel & Moles 1958).
+- `Seo\KeywordAnalyzer` — densité, présence dans title/H1/slug/premier paragraphe.
+- `Seo\InternalLinkSuggester` — suggestions de maillage interne.
+- `Seo\ImageAuditor` — détection des `alt` manquants/vides.
+- `Seo\ScoreCalculator` — score SEO 0-100, pondération configurable via filtre `oli_seo_score_rules`.
+- `Seo\RedirectEntity` + `RedirectModel` (+ Interface) + `RedirectController` — gestion des 301/410 avec table `oli_redirects`.
+- `Seo\SeoController` (+ Interface) + `SeoHeadViewModel` — orchestrateur central (`buildForPost/Event/Archive/Search/404`).
+- `Seo\Admin\SeoMetabox` — métabox per-post (post/page/oli_event) avec nonce + sanitization + preview SERP live.
+- `Seo\Admin\SeoOverviewPage` — dashboard MVP sous `Outils > SEO Dashboard`.
+- `Seo\Admin\RedirectsPage` — UI MVP des redirections sous `Outils > Redirections`.
+- `Seo\SeoModule` — orchestrateur services + hooks WP (template_redirect, save_post, admin_menu, add_meta_boxes).
+- Wire dans `Theme::boot()` + injection `SeoControllerInterface` + `BreadcrumbsControllerInterface` dans 5 controllers (Posts + Events).
+- Templates `partials/seo-head.html.tpl` (intégré dans `layouts/base.html.tpl`), `admin/seo-metabox.html.tpl`, `admin/seo-overview.html.tpl`, `admin/redirects.html.tpl`.
+- `assets/css/seo-admin.css` + `assets/js/seo-metabox.js` (compteurs live, preview SERP, gauge approx.).
+- `AssetManager::enqueueAdmin($hookSuffix)` câble les assets SEO sur `post.php`/`post-new.php`/pages SEO.
+- Migration `oli_redirects` via `dbDelta` dans `Theme::onActivation` (hook `after_switch_theme`).
+- `TranslationModelInterface` extrait pour le mocking PHPUnit.
+- Test d'intégration `SeoE2ETest` (boot + assertions JSON-LD `@graph`).
+- Guide `docs/seo.md` + ADR 0008 (SEO custom vs plugins tiers).
+
 ## [1.0.0-alpha.6] - 2026-05-05
 
 ### Added (Plan 6 — Events CPT)
