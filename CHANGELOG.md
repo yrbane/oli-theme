@@ -4,6 +4,24 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.2] - 2026-05-05
+
+### Added (Plan 2 — I18n)
+
+- Value object `Language` immuable.
+- `LanguageRegistry` — catalogue + langues activées + langue par défaut.
+- `LanguageTaxonomy` — taxonomie `language` enregistrée sur posts/pages.
+- `LanguageResolver` — détection URL > cookie > Accept-Language > défaut.
+- `TranslationModel` — groupes de traduction UUID, link/unlink.
+- `RewriteRules` — URLs `/fr/`, `/en/`, `/it/`, `/es/`.
+- `LanguageUrlFilter` — préfixage auto de `home_url`.
+- `LanguageSwitcherController` + `LanguageSwitcherViewModel` — switcher de langue.
+- `LanguageMetabox` — UI admin "Traductions" (template Lunar à venir).
+- `I18nModule` — orchestrateur, branché dans `Theme::boot()`.
+- `Core\RendererInterface` — extrait pour permettre le mock du moteur de templates.
+- ADR 0003 — choix custom vs plugin.
+- Guide utilisateur `docs/multilingue.md`.
+
 ## [1.0.0-alpha] - 2026-05-05
 
 ### Added
