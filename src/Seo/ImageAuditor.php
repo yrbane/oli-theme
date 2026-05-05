@@ -21,16 +21,16 @@ final class ImageAuditor
     public function audit(string $html): array
     {
         $issues = [];
-        if (\preg_match_all('/<img[^>]*>/si', $html, $m) === false) {
+        if (preg_match_all('/<img[^>]*>/si', $html, $m) === false) {
             return $issues;
         }
-        foreach ($m[0] ?? [] as $tag) {
+        foreach ($m[0] as $tag) {
             $src = '';
-            if (\preg_match('/src=["\']([^"\']+)["\']/i', $tag, $sm) === 1) {
+            if (preg_match('/src=["\']([^"\']+)["\']/i', $tag, $sm) === 1) {
                 $src = $sm[1];
             }
-            $hasAlt = \preg_match('/\salt=["\']([^"\']*)["\']/i', $tag, $am) === 1;
-            $altValue = $hasAlt ? \trim($am[1] ?? '') : null;
+            $hasAlt = preg_match('/\salt=["\']([^"\']*)["\']/i', $tag, $am) === 1;
+            $altValue = $hasAlt ? trim($am[1]) : null;
 
             if (! $hasAlt) {
                 $issues[] = ['src' => $src, 'issue' => 'missing_alt'];
