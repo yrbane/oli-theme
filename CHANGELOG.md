@@ -4,6 +4,24 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+## [1.0.0-alpha.4] - 2026-05-05
+
+### Added (Plan 4 — Navigation)
+
+- `Navigation\MenuItemEntity` — DTO immuable d'item de menu (avec arbre `children`).
+- `Navigation\MenuModel` — convertit la liste plate WP en arbre, résout `current` et `ancestor`.
+- `Navigation\MenuLocations` — enregistre `primary_<code>` et `footer_<code>` pour chaque langue activée.
+- `Navigation\MenuController` — `buildPrimary(Language)` / `buildFooter(Language)`.
+- `Navigation\NavigationModule` — orchestrateur, branché dans `Theme::boot()` (avant `PostsModule`).
+- Interfaces extraites pour le mocking PHPUnit : `MenuModelInterface`, `MenuControllerInterface`.
+- Templates `partials/nav-desktop.html.tpl` + `partials/nav-mobile.html.tpl`.
+- Header (`partials/header.html.tpl`) inclut les deux navs.
+- Footer (`partials/footer.html.tpl`) rend `footerMenu` quand présent.
+- `assets/css/menu.css` — styles BEM desktop/hover + mobile drawer responsive (importé depuis `main.css`).
+- `assets/js/main.js` (entry ES module) + `assets/js/menu-mobile.js` (drawer accessible Escape/Tab).
+- Posts controllers (`PageController`, `PostController`, `NotFoundController`) injectent `MenuControllerInterface` et exposent `primaryMenu` / `footerMenu` aux view-models.
+- Guide utilisateur `docs/navigation.md` + ADR 0005 (locations par langue).
+
 ## [1.0.0-alpha.3] - 2026-05-05
 
 ### Added (Plan 3 — Templates & Posts/Pages)
