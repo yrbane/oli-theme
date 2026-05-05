@@ -15,7 +15,7 @@ namespace OliTheme\I18n;
  *
  * @since 1.0.0
  */
-final class LanguageSwitcherController
+final class LanguageSwitcherController implements LanguageSwitcherControllerInterface
 {
     public function __construct(
         private readonly LanguageRegistry $registry,

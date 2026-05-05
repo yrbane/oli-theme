@@ -21,7 +21,7 @@ use WP_Post;
  *
  * @since 1.0.0
  */
-final class PostModel
+final class PostModel implements PostModelInterface
 {
     public function __construct(
         private readonly LanguageResolverInterface $resolver,
