@@ -46,3 +46,18 @@ body.admin-bar [data-oli-fixed="full"] {
 body.admin-bar [id] {
     scroll-margin-top: calc(var(--oli-admin-bar-offset) + 1rem);
 }
+
+/* Hero plein écran (carousel d'accueil, sections en `100vh/100dvh`) :
+   WP ajoute `margin-top: 32px` au `<html>` quand l'admin bar est là, donc
+   un élément en `100dvh` déborde de cette hauteur — le contenu qui suit
+   (ex. le menu sticky) se retrouve hors viewport au chargement. On retire
+   l'offset au calcul de hauteur.
+
+   La valeur `--header-h` est définie par certaines variations (ex. Olikalari)
+   pour réserver la place du header collé sous le hero ; on la conserve dans
+   le calcul. Sans elle (défaut 0px), c'est juste `100dvh - admin-bar`. */
+body.admin-bar .carousel-fullscreen,
+body.admin-bar [data-oli-fullheight] {
+    height: calc(100vh - var(--header-h, 0px) - var(--oli-admin-bar-offset));
+    height: calc(100dvh - var(--header-h, 0px) - var(--oli-admin-bar-offset));
+}
