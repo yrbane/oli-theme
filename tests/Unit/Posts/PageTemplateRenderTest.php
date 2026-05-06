@@ -68,6 +68,7 @@ final class PageTemplateRenderTest extends TestCase
         ]);
         $renderer->registerMacro('wpHead', static fn (): string => '');
         $renderer->registerMacro('wpFooter', static fn (): string => '');
+        $renderer->registerMacro('extraBodyClass', static fn (): string => '');
 
         $html = $renderer->render('pages/page.html', [
             'post' => $entity,

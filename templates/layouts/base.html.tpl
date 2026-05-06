@@ -20,7 +20,7 @@
     ##wpHead()##
     [% block head_extra %][% endblock %]
 </head>
-<body class="[[ bodyClasses ]]">
+<body class="[[ bodyClasses ]] ##extraBodyClass()##">
     <a class="skip-link" href="#main">Aller au contenu</a>
     [% block banner %]
         [% include 'partials/header.html.tpl' %]

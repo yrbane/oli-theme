@@ -57,9 +57,12 @@ final class AssetManagerTest extends TestCase
 
     public function test_it_should_enqueue_main_script_module(): void
     {
+        // Crée admin-bar.css pour que enqueueFront ne tombe pas en erreur ailleurs.
+        file_put_contents($this->themePath . '/assets/css/admin-bar.css', '/* admin */');
         $expectedVersion = (string) filemtime($this->themePath . '/assets/js/main.js');
 
-        Functions\expect('wp_enqueue_style')->once();
+        // Deux wp_enqueue_style attendus : main.css + admin-bar.css.
+        Functions\expect('wp_enqueue_style')->twice();
         Functions\expect('wp_enqueue_script_module')
             ->once()
             ->with('oli-theme', 'https://example.test/wp-content/themes/oli/assets/js/main.js', [], $expectedVersion);
@@ -73,10 +76,11 @@ final class AssetManagerTest extends TestCase
     public function test_it_should_use_fallback_version_when_file_missing(): void
     {
         unlink($this->themePath . '/assets/css/main.css');
+        // admin-bar.css absent aussi → fallback '1.0.0' également.
 
         Functions\expect('wp_enqueue_style')
-            ->once()
-            ->with('oli-theme', \Mockery::any(), [], '1.0.0');
+            ->twice()
+            ->with(\Mockery::type('string'), \Mockery::any(), \Mockery::type('array'), '1.0.0');
         Functions\expect('wp_enqueue_script_module')->once();
 
         $manager = new AssetManager($this->themePath, 'https://example.test/wp-content/themes/oli');
@@ -90,23 +94,89 @@ final class AssetManagerTest extends TestCase
         $themePath = sys_get_temp_dir() . '/oli-theme-' . uniqid();
         mkdir($themePath . '/assets/css', 0o777, true);
         file_put_contents($themePath . '/assets/css/main.css', '/* test */');
+        file_put_contents($themePath . '/assets/css/admin-bar.css', '/* admin bar */');
         $expectedVersion = (string) filemtime($themePath . '/assets/css/main.css');
 
-        $captured = [];
-        Functions\when('wp_enqueue_style')->alias(static function (string $handle, string $src, array $deps, string $ver) use (&$captured): void {
-            $captured = [$handle, $src, $deps, $ver];
+        /** @var array<int, array{string, string, array<int, string>, string}> $calls */
+        $calls = [];
+        Functions\when('wp_enqueue_style')->alias(static function (string $handle, string $src, array $deps, string $ver) use (&$calls): void {
+            $calls[] = [$handle, $src, $deps, $ver];
         });
         Functions\when('wp_enqueue_script_module')->justReturn();
 
         $manager = new AssetManager($themePath, 'https://example.com/wp-content/themes/oli-theme');
         $manager->enqueueFront();
 
-        self::assertSame('oli-theme', $captured[0]);
-        self::assertSame('https://example.com/wp-content/themes/oli-theme/assets/css/main.css', $captured[1]);
-        self::assertSame([], $captured[2]);
-        self::assertSame($expectedVersion, $captured[3]);
+        self::assertSame('oli-theme', $calls[0][0]);
+        self::assertSame('https://example.com/wp-content/themes/oli-theme/assets/css/main.css', $calls[0][1]);
+        self::assertSame([], $calls[0][2]);
+        self::assertSame($expectedVersion, $calls[0][3]);
 
         unlink($themePath . '/assets/css/main.css');
+        unlink($themePath . '/assets/css/admin-bar.css');
+        rmdir($themePath . '/assets/css');
+        rmdir($themePath . '/assets');
+        rmdir($themePath);
+    }
+
+    public function testEnqueueFrontEnqueuesAdminBarStylesheetAfterMain(): void
+    {
+        $themePath = sys_get_temp_dir() . '/oli-theme-' . uniqid();
+        mkdir($themePath . '/assets/css', 0o777, true);
+        file_put_contents($themePath . '/assets/css/main.css', '/* test */');
+        file_put_contents($themePath . '/assets/css/admin-bar.css', '/* admin bar */');
+
+        /** @var array<int, array{string, string, array<int, string>, string}> $calls */
+        $calls = [];
+        Functions\when('wp_enqueue_style')->alias(static function (string $handle, string $src, array $deps, string $ver) use (&$calls): void {
+            $calls[] = [$handle, $src, $deps, $ver];
+        });
+        Functions\when('wp_enqueue_script_module')->justReturn();
+
+        (new AssetManager($themePath, 'https://example.com/wp-content/themes/oli-theme'))->enqueueFront();
+
+        $handles = array_column($calls, 0);
+        self::assertContains('oli-theme-admin-bar', $handles);
+
+        // admin-bar doit être enqueué APRÈS main + dépendre de oli-theme (pas de variation).
+        $adminBar = array_values(array_filter($calls, static fn ($c) => $c[0] === 'oli-theme-admin-bar'));
+        self::assertSame(['oli-theme'], $adminBar[0][2]);
+
+        unlink($themePath . '/assets/css/main.css');
+        unlink($themePath . '/assets/css/admin-bar.css');
+        rmdir($themePath . '/assets/css');
+        rmdir($themePath . '/assets');
+        rmdir($themePath);
+    }
+
+    public function testEnqueueFrontMakesAdminBarDependOnVariationWhenSelected(): void
+    {
+        $themePath = sys_get_temp_dir() . '/oli-theme-' . uniqid();
+        mkdir($themePath . '/assets/css/variations', 0o777, true);
+        file_put_contents($themePath . '/assets/css/main.css', '/* test */');
+        file_put_contents($themePath . '/assets/css/admin-bar.css', '/* admin bar */');
+        file_put_contents($themePath . '/assets/css/variations/dark.css', '/* dark */');
+
+        Functions\when('get_option')->justReturn('dark');
+        Functions\when('sanitize_key')->returnArg(1);
+
+        /** @var array<int, array{string, string, array<int, string>, string}> $calls */
+        $calls = [];
+        Functions\when('wp_enqueue_style')->alias(static function (string $handle, string $src, array $deps, string $ver) use (&$calls): void {
+            $calls[] = [$handle, $src, $deps, $ver];
+        });
+        Functions\when('wp_enqueue_script_module')->justReturn();
+
+        (new AssetManager($themePath, 'https://example.com/wp-content/themes/oli-theme'))->enqueueFront();
+
+        $adminBar = array_values(array_filter($calls, static fn ($c) => $c[0] === 'oli-theme-admin-bar'));
+        self::assertCount(1, $adminBar);
+        self::assertSame(['oli-theme-variation'], $adminBar[0][2]);
+
+        unlink($themePath . '/assets/css/main.css');
+        unlink($themePath . '/assets/css/admin-bar.css');
+        unlink($themePath . '/assets/css/variations/dark.css');
+        rmdir($themePath . '/assets/css/variations');
         rmdir($themePath . '/assets/css');
         rmdir($themePath . '/assets');
         rmdir($themePath);

@@ -40,7 +40,15 @@ final class AssetManager
             $this->version('assets/css/main.css'),
         );
 
-        $this->enqueueVariation();
+        $variationEnqueued = $this->enqueueVariation();
+
+        // Admin bar : chargé en dernier pour gagner la cascade sur la variation.
+        wp_enqueue_style(
+            'oli-theme-admin-bar',
+            $this->themeUri . '/assets/css/admin-bar.css',
+            [$variationEnqueued ? 'oli-theme-variation' : 'oli-theme'],
+            $this->version('assets/css/admin-bar.css'),
+        );
 
         wp_enqueue_script_module(
             'oli-theme',
@@ -90,17 +98,18 @@ final class AssetManager
 
     /**
      * Enqueue la variation CSS sélectionnée (après main.css pour l'overrider).
-     * Aucun effet si l'option n'est pas définie ou si le fichier n'existe pas.
+     * Retourne true si une variation a été enqueuée, false sinon — utilisé
+     * par {@see self::enqueueFront()} pour calculer les bonnes dépendances.
      */
-    private function enqueueVariation(): void
+    private function enqueueVariation(): bool
     {
         if (!\function_exists('get_option')) {
-            return;
+            return false;
         }
 
         $variation = (string) get_option('oli_theme_variation', '');
         if ($variation === '') {
-            return;
+            return false;
         }
 
         // Sécurité : sanitize_key pour éviter le path-traversal (ex. "../../wp-config").
@@ -108,13 +117,13 @@ final class AssetManager
             $variation = sanitize_key($variation);
         }
         if ($variation === '') {
-            return;
+            return false;
         }
 
         $relative = 'assets/css/variations/' . $variation . '.css';
         $absolute = $this->themePath . '/' . $relative;
         if (!file_exists($absolute)) {
-            return;
+            return false;
         }
 
         wp_enqueue_style(
@@ -123,6 +132,8 @@ final class AssetManager
             ['oli-theme'],
             $this->version($relative),
         );
+
+        return true;
     }
 
     /**

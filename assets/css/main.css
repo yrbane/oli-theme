@@ -6,3 +6,6 @@
 @import url('./carousel.css');
 @import url('./event.css');
 @import url('./contact.css');
+/* admin-bar.css est enqueué séparément par AssetManager pour qu'il soit
+   chargé APRÈS la variation CSS choisie : il doit gagner la cascade pour
+   compenser la barre d'admin WP, peu importe la variation active. */

@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Compensation de la barre d'administration WordPress.
+
+   Quand l'utilisateur est connecté, WP injecte une barre fixe (32px desktop,
+   46px sous 783px) et ajoute la classe `admin-bar` sur <body>. Les éléments
+   en `position: sticky` ou `position: fixed` ancrés `top: 0` passent alors
+   *sous* cette barre — d'où un décalage visuel et des recouvrements.
+
+   Cette feuille n'a aucun effet quand `admin-bar` n'est pas là.
+
+   Variables CSS exposées (utilisables par les variations) :
+     --oli-admin-bar-offset : 32px (desktop) ou 46px (mobile <783px), 0 sinon.
+   ========================================================================== */
+
+:root {
+    --oli-admin-bar-offset: 0px;
+}
+
+body.admin-bar {
+    --oli-admin-bar-offset: 32px;
+}
+
+@media screen and (max-width: 782px) {
+    body.admin-bar {
+        --oli-admin-bar-offset: 46px;
+    }
+}
+
+/* Headers et éléments collés en haut : décalés de l'offset.
+   `top` n'a aucun effet sur les éléments en flux normal — la règle reste
+   donc sans danger pour les thèmes/variations qui ne stickent pas. */
+body.admin-bar .site-header,
+body.admin-bar [data-oli-sticky="top"] {
+    top: var(--oli-admin-bar-offset);
+}
+
+/* Overlays plein écran (ex. menu mobile) : on commence sous la barre
+   d'admin pour ne pas masquer ses items cliquables. */
+body.admin-bar .nav-mobile__overlay,
+body.admin-bar [data-oli-fixed="full"] {
+    top: var(--oli-admin-bar-offset);
+}
+
+/* Éléments avec `scroll-margin-top` (anchor scroll) : ajoute l'offset
+   pour que le scroll ne s'arrête pas sous la barre admin. */
+body.admin-bar [id] {
+    scroll-margin-top: calc(var(--oli-admin-bar-offset) + 1rem);
+}

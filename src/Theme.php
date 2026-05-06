@@ -350,5 +350,18 @@ final class Theme
 
             return (string) ob_get_clean();
         });
+
+        // Classes <body> dynamiques injectées par WP au moment du rendu, ex.
+        // `admin-bar` quand l'utilisateur est connecté. Le bodyClasses figé
+        // dans le ViewModel ne peut pas les inclure car il est calculé avant
+        // que WP ait fini son init côté front. Une macro lazy résout ça.
+        $renderer->registerMacro('extraBodyClass', static function (): string {
+            $extras = [];
+            if (\function_exists('is_admin_bar_showing') && is_admin_bar_showing()) {
+                $extras[] = 'admin-bar';
+            }
+
+            return implode(' ', $extras);
+        });
     }
 }

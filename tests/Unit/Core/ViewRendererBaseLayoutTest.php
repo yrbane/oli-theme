@@ -49,6 +49,7 @@ final class ViewRendererBaseLayoutTest extends TestCase
         ]);
         $renderer->registerMacro('wpHead', static fn (): string => '');
         $renderer->registerMacro('wpFooter', static fn (): string => '');
+        $renderer->registerMacro('extraBodyClass', static fn (): string => '');
 
         $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
 
@@ -63,7 +64,9 @@ final class ViewRendererBaseLayoutTest extends TestCase
 
         self::assertStringContainsString('<!DOCTYPE html>', $html);
         self::assertStringContainsString('<html lang="fr" dir="ltr">', $html);
-        self::assertStringContainsString('<body class="home">', $html);
+        // L'espace après `home` provient du macro `##extraBodyClass()##` qui
+        // retourne vide ici (pas connecté admin).
+        self::assertMatchesRegularExpression('/<body class="home ?">/', $html);
         self::assertStringContainsString('<main id="main"', $html);
     }
 

@@ -6,6 +6,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ### Added
 
+- **Compensation de la barre d'admin WordPress (sticky/fixed)**. Quand l'utilisateur est connecté, WP injecte une barre fixe (32 px desktop / 46 px sous 783 px) en haut de page. Les éléments en `position: sticky` ou `position: fixed` ancrés `top: 0` (header de la variation Olikalari, overlay menu mobile…) passaient sous cette barre, créant un décalage visuel et masquant ses items. **Fix** :
+  - Nouveau `assets/css/admin-bar.css` qui expose une variable CSS `--oli-admin-bar-offset` (32px / 46px / 0) et applique `top: var(--oli-admin-bar-offset)` sur `.site-header`, `.nav-mobile__overlay`, et tout élément taggé `data-oli-sticky="top"` ou `data-oli-fixed="full"`. Ajoute aussi `scroll-margin-top` pour les ancres internes.
+  - Aucun effet quand `body.admin-bar` n'est pas là — feuille « passive ».
+  - Enqueué **après** la variation CSS (via `wp_enqueue_style` avec dépendance dynamique sur `oli-theme-variation` ou `oli-theme`) pour gagner la cascade quelle que soit la variation active.
+  - Nouvelle macro Lunar `##extraBodyClass()##` ajoutée dans `Theme::bootstrapViewRenderer` qui retourne `admin-bar` si `is_admin_bar_showing()` est vrai. `templates/layouts/base.html.tpl` injecte la classe dynamiquement : `<body class="[[ bodyClasses ]] ##extraBodyClass()##">` — sans cela, le `bodyClasses` figé dans le ViewModel (calculé avant l'init WP front) ne pouvait pas porter `admin-bar`.
 - **Variations CSS du thème + sélecteur admin**. Nouveau système permettant de surcharger le CSS du thème sans toucher à `main.css` :
   - Dossier `assets/css/variations/` à la racine du thème : déposez-y un fichier `*.css` par variation. Un commentaire d'en-tête `/* Theme Variation: Mon nom */` permet de personnaliser le label, sinon il est dérivé du nom de fichier (`dark-mode.css` → « Dark mode »).
   - Sous-page admin **Apparence > Variations CSS** avec un `<select>` listant toutes les variations détectées + option « Aucune (CSS de base) ». Le choix est persisté dans l'option `oli_theme_variation` (sanitize via `sanitize_key()` + validation contre la liste réelle, immune au path-traversal).
