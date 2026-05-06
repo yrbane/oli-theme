@@ -228,7 +228,23 @@ header.site-header {
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
   padding: 0.4rem;
   min-width: 12rem;
-  margin-top: 0.25rem;
+  /* Pas de margin-top : un margin n'est PAS hoverable, donc la souris perd
+     le :hover en traversant et le sous-menu se ferme. On colle le sous-menu
+     au parent et on crée une zone-pont invisible via ::before ci-dessous. */
+  margin-top: 0;
+}
+
+/* Zone-pont invisible au-dessus du sous-menu : couvre l'espace entre le
+   parent et le dropdown pour que la souris puisse traverser sans perdre
+   le :hover. La hauteur (8px) doit couvrir la marge visuelle souhaitée. */
+.site-header .nav--desktop .nav__sublist::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 8px;
+  background: transparent;
 }
 .site-header .nav--desktop .nav__sublist .nav__item {
   margin: 0;
