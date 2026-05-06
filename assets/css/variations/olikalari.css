@@ -369,7 +369,7 @@ nav[aria-label*="language" i] {
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 4rem 0 6rem;
+  padding: 1rem 0 6rem;
   background: #ffffff;
 }
 article, .post, .page {
