@@ -46,9 +46,15 @@ final class SocialAdminPage
         ?>
         <div class="wrap oli-social-admin">
             <h1><?php esc_html_e('Réseaux sociaux', 'oli-theme'); ?></h1>
-            <p class="description">
-                <?php esc_html_e('Renseignez l\'URL de votre profil pour chaque plateforme. Les icônes correspondantes seront affichées dans le pied de page du site. Laissez vide pour masquer un réseau.', 'oli-theme'); ?>
-            </p>
+
+            <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
+                <p style="margin:0 0 0.5rem;"><strong><?php esc_html_e('Comment ça apparaît sur le site', 'oli-theme'); ?></strong></p>
+                <ul style="margin:0 0 0 1.25rem;list-style:disc;line-height:1.6;">
+                    <li><?php esc_html_e('Les icônes des réseaux sociaux renseignés s\'affichent automatiquement dans le pied de page de toutes les pages du site.', 'oli-theme'); ?></li>
+                    <li><?php esc_html_e('Les plateformes laissées vides ne sont PAS affichées (pas d\'icône grisée ou inactive).', 'oli-theme'); ?></li>
+                    <li><?php esc_html_e('Pour retirer un réseau du widget, il suffit d\'effacer son URL et d\'enregistrer.', 'oli-theme'); ?></li>
+                </ul>
+            </div>
 
             <form method="post" action="">
                 <?php wp_nonce_field('oli_social_save', '_oli_social_nonce'); ?>

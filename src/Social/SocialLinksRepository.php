@@ -21,6 +21,19 @@ final class SocialLinksRepository
     public const OPTION = 'oli_social_links';
 
     /**
+     * URLs par défaut tant que l'admin n'a rien enregistré.
+     * Une fois l'option sauvegardée (même partiellement), ces valeurs ne
+     * s'appliquent plus — l'utilisateur a la main.
+     *
+     * @var array<string, string>
+     */
+    private const DEFAULTS = [
+        'facebook'  => 'https://www.facebook.com/oli.kalari/',
+        'instagram' => 'https://www.instagram.com/oli_kalari/?hl=en',
+        'youtube'   => 'https://www.youtube.com/channel/UCfR1dfixUpEzBsFW81N6qsQ?view_as=subscriber',
+    ];
+
+    /**
      * Plateformes supportées, dans l'ordre d'affichage.
      *
      * Chaque entrée :
@@ -49,10 +62,18 @@ final class SocialLinksRepository
      */
     public function all(): array
     {
-        $raw = get_option(self::OPTION, []);
+        // Sentinelle pour distinguer « option absente » de « option vide » :
+        // tant que l'admin n'a jamais sauvegardé, get_option retourne false.
+        $raw = get_option(self::OPTION, false);
+
+        if ($raw === false) {
+            // Première utilisation : on initialise avec les valeurs par défaut.
+            $raw = self::DEFAULTS;
+        }
         if (!\is_array($raw)) {
             $raw = [];
         }
+
         $out = [];
         foreach (self::PLATFORMS as $p) {
             $url = isset($raw[$p['id']]) && \is_string($raw[$p['id']]) ? trim($raw[$p['id']]) : '';

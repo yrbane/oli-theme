@@ -51,9 +51,35 @@ final class GalleryAdminPage
         ?>
         <div class="wrap oli-gallery-admin">
             <h1><?php esc_html_e('Galerie', 'oli-theme'); ?></h1>
-            <p class="description">
-                <?php esc_html_e('Configurez les photos et vidéos affichées sur les pages /galerie/photos et /galerie/videos.', 'oli-theme'); ?>
-            </p>
+
+            <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
+                <p style="margin:0 0 0.5rem;"><strong><?php esc_html_e('Comment afficher les galeries sur le site', 'oli-theme'); ?></strong></p>
+                <ul style="margin:0 0 0 1.25rem;list-style:disc;line-height:1.6;">
+                    <li>
+                        <?php
+                        printf(
+                            /* translators: %1$s, %2$s: URL des pages galerie */
+                            esc_html__('Les galeries sont rendues automatiquement sur les pages WordPress dont le slug est %1$s ou %2$s (ainsi que leurs équivalents EN %3$s et %4$s).', 'oli-theme'),
+                            '<code>photos</code>',
+                            '<code>videos</code>',
+                            '<code>photos-en</code>',
+                            '<code>videos-en</code>',
+                        );
+                        ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e('Si ces pages n\'existent pas, créez-les dans Pages > Ajouter (le contenu est libre, le thème injectera le layout galerie automatiquement). Ajoutez-les ensuite à votre menu via Apparence > Menus.', 'oli-theme'); ?>
+                    </li>
+                    <li>
+                        <strong><?php esc_html_e('Photos :', 'oli-theme'); ?></strong>
+                        <?php esc_html_e('le bouton « Ajouter des photos » ouvre la médiathèque WP en sélection multiple. La légende est facultative.', 'oli-theme'); ?>
+                    </li>
+                    <li>
+                        <strong><?php esc_html_e('Vidéos :', 'oli-theme'); ?></strong>
+                        <?php esc_html_e('si aucune vidéo n\'est ajoutée manuellement ci-dessous, les 15 dernières vidéos publiées de la chaîne YouTube sont récupérées automatiquement (cache 1 h). Pour forcer l\'ordre ou personnaliser les titres, ajoutez vos propres entrées — elles remplacent l\'auto-fetch.', 'oli-theme'); ?>
+                    </li>
+                </ul>
+            </div>
 
             <form method="post" action="">
                 <?php wp_nonce_field('oli_gallery_save', '_oli_gallery_nonce'); ?>
