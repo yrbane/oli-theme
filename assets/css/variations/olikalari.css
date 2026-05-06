@@ -389,6 +389,7 @@ article, .post, .page {
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: #111111;
+  text-align: center;
 }
 .page__content, .entry-content, .post__content {
   max-width: 100%;
