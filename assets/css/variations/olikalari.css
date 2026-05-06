@@ -997,6 +997,71 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
 }
 
 /* ==========================================================================
+   Lightbox photo : overlay plein écran, sombre, image centrée.
+   ========================================================================== */
+.oli-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  cursor: zoom-out;
+  /* Fade-in */
+  animation: oli-lightbox-fade 180ms ease-out;
+}
+@keyframes oli-lightbox-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.oli-lightbox__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: default;
+  box-shadow: 0 16px 48px -16px rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+}
+.oli-lightbox__caption {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 0.9rem;
+  border-radius: 999px;
+  max-width: 80vw;
+  text-align: center;
+  pointer-events: none;
+}
+.oli-lightbox__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.oli-lightbox__close:hover,
+.oli-lightbox__close:focus-visible {
+  background: rgba(255, 255, 255, 0.24);
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
    Bannière Olikalari sur les pages sans carousel plein écran (donc toutes
    les pages sauf la home). Le menu sticky vient se coller juste en dessous
    au chargement, puis colle au top du viewport en scrollant — même
