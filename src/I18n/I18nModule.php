@@ -46,6 +46,47 @@ final class I18nModule implements ModuleInterface
             return $filter->filterHomeUrl($url, $path);
         }, 10, 2);
 
+        // Filtre les permaliens internes (pages, articles, CPT) pour conserver la langue
+        // active sur les liens du menu, des cards et de la navigation interne.
+        $permalinkFilter = function ($url): string {
+            if (!\is_string($url)) {
+                return (string) $url;
+            }
+            $filter = $this->container->get(LanguageUrlFilter::class);
+            \assert($filter instanceof LanguageUrlFilter);
+
+            return $filter->filterPermalink($url);
+        };
+        add_filter('page_link', $permalinkFilter, 10, 1);
+        add_filter('post_link', $permalinkFilter, 10, 1);
+        add_filter('post_type_link', $permalinkFilter, 10, 1);
+
+        // Persistance de la langue dans un cookie : si la requête courante a résolu
+        // la langue depuis l'URL (oli_lang query var), on la mémorise pour la prochaine
+        // requête au cas où l'utilisateur tomberait sur une URL non préfixée.
+        add_action('template_redirect', function (): void {
+            $resolver = $this->container->get(LanguageResolver::class);
+            \assert($resolver instanceof LanguageResolver);
+
+            if (!\in_array($resolver->source(), ['path', 'query_var'], true)) {
+                return;
+            }
+
+            if (headers_sent()) {
+                return;
+            }
+
+            setcookie(
+                LanguageResolver::COOKIE_NAME,
+                $resolver->current()->code,
+                [
+                    'expires'  => time() + 30 * 86400,
+                    'path'     => '/',
+                    'samesite' => 'Lax',
+                ],
+            );
+        });
+
         add_action('add_meta_boxes', function (): void {
             $metabox = $this->container->get(LanguageMetabox::class);
             \assert($metabox instanceof LanguageMetabox);

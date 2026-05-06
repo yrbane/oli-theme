@@ -51,6 +51,46 @@ final class LanguageUrlFilterTest extends TestCase
         self::assertSame('https://example.test/en/page', $url);
     }
 
+    public function test_it_should_prefix_permalink_with_active_non_default_language(): void
+    {
+        $filter = $this->buildFilter('en');
+        $url    = $filter->filterPermalink('https://example.test/about/');
+
+        self::assertSame('https://example.test/en/about/', $url);
+    }
+
+    public function test_it_should_not_prefix_permalink_for_default_language(): void
+    {
+        $filter = $this->buildFilter('fr');
+        $url    = $filter->filterPermalink('https://example.test/about/');
+
+        self::assertSame('https://example.test/about/', $url);
+    }
+
+    public function test_it_should_not_double_prefix_already_prefixed_permalink(): void
+    {
+        $filter = $this->buildFilter('en');
+        $url    = $filter->filterPermalink('https://example.test/en/about/');
+
+        self::assertSame('https://example.test/en/about/', $url);
+    }
+
+    public function test_it_should_skip_admin_urls_in_permalink_filter(): void
+    {
+        $filter = $this->buildFilter('en');
+        $url    = $filter->filterPermalink('https://example.test/wp-admin/post.php?post=42&action=edit');
+
+        self::assertSame('https://example.test/wp-admin/post.php?post=42&action=edit', $url);
+    }
+
+    public function test_it_should_skip_login_urls_in_permalink_filter(): void
+    {
+        $filter = $this->buildFilter('en');
+        $url    = $filter->filterPermalink('https://example.test/wp-login.php');
+
+        self::assertSame('https://example.test/wp-login.php', $url);
+    }
+
     private function buildFilter(string $code): LanguageUrlFilter
     {
         $request = new RequestContext(query: ['oli_lang' => $code]);

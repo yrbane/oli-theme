@@ -108,4 +108,14 @@ final readonly class RequestContext
 
         return \is_string($value) ? $value : null;
     }
+
+    /**
+     * Lecture d'une variable serveur brute (ex. REQUEST_URI, REQUEST_METHOD).
+     */
+    public function server(string $key): ?string
+    {
+        $value = $this->server[$key] ?? null;
+
+        return \is_string($value) ? $value : null;
+    }
 }

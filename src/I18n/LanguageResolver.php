@@ -23,6 +23,9 @@ final class LanguageResolver implements LanguageResolverInterface
 
     private ?Language $memo = null;
 
+    /** @var 'path'|'query_var'|'cookie'|'accept_language'|'default' */
+    private string $lastSource = 'default';
+
     public function __construct(
         private readonly LanguageRegistry $registry,
         private readonly RequestContext $request,
@@ -45,20 +48,78 @@ final class LanguageResolver implements LanguageResolverInterface
         return $this->resolve();
     }
 
+    /**
+     * Source de la dernière résolution. Utile pour décider de poser un cookie
+     * de persistance quand la langue vient de l'URL.
+     *
+     * @return 'path'|'query_var'|'cookie'|'accept_language'|'default'
+     */
+    public function source(): string
+    {
+        $this->resolve();
+
+        return $this->lastSource;
+    }
+
     private function resolveOnce(): Language
     {
-        $candidate = $this->request->queryVar(self::QUERY_VAR)
-            ?? $this->request->cookie(self::COOKIE_NAME)
-            ?? $this->parseAcceptLanguage();
+        // Le path est la source de vérité côté front : `/en/about/` → en.
+        // WordPress route ces URL via les rewrite rules vers index.php?oli_lang=en
+        // mais ce paramètre n'est pas dans $_GET, il est injecté dans WP_Query.
+        // On parse donc directement REQUEST_URI pour rester indépendant de WP.
+        $fromPath = $this->resolveFromPath();
+        if ($fromPath !== null) {
+            $this->lastSource = 'path';
+            return $fromPath;
+        }
 
-        if ($candidate !== null) {
-            $language = $this->registry->get($candidate);
+        $fromQuery = $this->request->queryVar(self::QUERY_VAR);
+        if ($fromQuery !== null) {
+            $language = $this->registry->get($fromQuery);
             if ($language !== null) {
+                $this->lastSource = 'query_var';
                 return $language;
             }
         }
 
+        $fromCookie = $this->request->cookie(self::COOKIE_NAME);
+        if ($fromCookie !== null) {
+            $language = $this->registry->get($fromCookie);
+            if ($language !== null) {
+                $this->lastSource = 'cookie';
+                return $language;
+            }
+        }
+
+        $fromHeader = $this->parseAcceptLanguage();
+        if ($fromHeader !== null) {
+            $language = $this->registry->get($fromHeader);
+            if ($language !== null) {
+                $this->lastSource = 'accept_language';
+                return $language;
+            }
+        }
+
+        $this->lastSource = 'default';
         return $this->registry->default();
+    }
+
+    /**
+     * Détecte un préfixe de langue dans le path de REQUEST_URI : `/en/...` ou `/en`.
+     */
+    private function resolveFromPath(): ?Language
+    {
+        $uri = $this->request->server('REQUEST_URI');
+        if ($uri === null) {
+            return null;
+        }
+
+        $path = (string) parse_url($uri, \PHP_URL_PATH);
+        if (preg_match('~^/([a-z]{2})(?:/|$)~', $path, $matches) !== 1) {
+            return null;
+        }
+
+        return $this->registry->get($matches[1]);
     }
 
     /**
