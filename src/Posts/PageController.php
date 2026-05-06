@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OliTheme\Posts;
 
 use OliTheme\Core\RendererInterface;
+use OliTheme\Gallery\GalleryRepository;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\Seo\BreadcrumbsControllerInterface;
@@ -20,6 +21,12 @@ use OliTheme\Slides\HomeCarouselControllerInterface;
  */
 final class PageController
 {
+    /** Slugs des pages traitées comme galerie photos. */
+    private const PHOTO_SLUGS = ['photos', 'photos-en'];
+
+    /** Slugs des pages traitées comme galerie vidéos. */
+    private const VIDEO_SLUGS = ['videos', 'videos-en'];
+
     public function __construct(
         private readonly PostModelInterface $posts,
         private readonly LanguageResolverInterface $resolver,
@@ -30,6 +37,7 @@ final class PageController
         private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
         private readonly CoverExtractor $coverExtractor = new CoverExtractor(),
+        private readonly ?GalleryRepository $gallery = null,
     ) {
     }
 
@@ -61,6 +69,22 @@ final class PageController
 
         if ($this->isFrontPage($entity->id)) {
             $vm['carousel'] = $this->carousel->build();
+        }
+
+        // Routing spécial pour les pages galerie : on rend un template dédié
+        // avec la liste de photos ou vidéos passée en plus du contenu normal.
+        if ($this->gallery !== null) {
+            if (\in_array($entity->slug, self::PHOTO_SLUGS, true)) {
+                $vm['photos'] = $this->gallery->getPhotos();
+                $vm['hasPhotos'] = $vm['photos'] !== [];
+                return $this->renderer->render('pages/gallery-photos.html', $vm);
+            }
+            if (\in_array($entity->slug, self::VIDEO_SLUGS, true)) {
+                $vm['videos']  = $this->gallery->getVideos();
+                $vm['hasVideos'] = $vm['videos'] !== [];
+                $vm['channelUrl'] = $this->gallery->getYoutubeChannel();
+                return $this->renderer->render('pages/gallery-videos.html', $vm);
+            }
         }
 
         return $this->renderer->render('pages/page.html', $vm);

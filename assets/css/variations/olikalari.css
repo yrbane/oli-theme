@@ -830,6 +830,149 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
 }
 
 /* ==========================================================================
+   Galeries Photos & Vidéos : layout vignettes-gauche / grande-droite.
+   ========================================================================== */
+.gallery {
+  display: grid;
+  grid-template-columns: minmax(180px, 320px) 1fr;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 1rem auto 4rem;
+  padding: 0 1.5rem;
+}
+.gallery__main {
+  position: sticky;
+  top: calc(var(--header-h, 75px) + var(--oli-admin-bar-offset, 0px) + 1rem);
+  align-self: start;
+  background: #ffffff;
+}
+.gallery__main-figure { margin: 0; }
+.gallery__main-image,
+.gallery__main-iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.12);
+  background: #f0f0f1;
+}
+.gallery__main-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.12);
+  background: #000;
+}
+.gallery__main-frame .gallery__main-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.gallery__main-caption {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Liste de vignettes : grille 2-3 colonnes selon largeur. */
+.gallery__thumbs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.4rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scrollbar-width: thin;
+}
+.gallery__thumb-item { margin: 0; }
+.gallery__thumb-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #f0f0f1;
+  cursor: pointer;
+  position: relative;
+  aspect-ratio: 1;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.gallery--videos .gallery__thumb-button { aspect-ratio: 16 / 9; }
+.gallery__thumb-button:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+  transform: scale(1.02);
+}
+.gallery__thumb-button.is-active {
+  border-color: #111111;
+  box-shadow: 0 0 0 2px #111111 inset;
+}
+.gallery__thumb-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.gallery__thumb-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.gallery__empty {
+  text-align: center;
+  color: #6b6b6b;
+  font-style: italic;
+  padding: 3rem 1rem;
+}
+
+/* Lien chaîne YouTube sous le titre (page vidéos). */
+.page__channel {
+  text-align: center;
+  margin: -0.75rem 0 1.5rem;
+}
+.page__channel-link {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+.page__channel-link:hover { color: #111111; }
+
+/* Mobile : layout en colonne, vignettes en ligne scrollable horizontalement. */
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+  .gallery__main { position: static; }
+  .gallery__thumbs {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 100px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+  }
+}
+
+/* ==========================================================================
    Bannière Olikalari sur les pages sans carousel plein écran (donc toutes
    les pages sauf la home). Le menu sticky vient se coller juste en dessous
    au chargement, puis colle au top du viewport en scrollant — même

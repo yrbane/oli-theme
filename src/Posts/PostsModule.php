@@ -61,6 +61,10 @@ final class PostsModule implements ModuleInterface
                     $c->get(SeoControllerInterface::class),
                     $c->get(BreadcrumbsControllerInterface::class),
                     $c->get(RendererInterface::class),
+                    new CoverExtractor(),
+                    $c->has(\OliTheme\Gallery\GalleryRepository::class)
+                        ? $c->get(\OliTheme\Gallery\GalleryRepository::class)
+                        : null,
                 ),
             );
         }

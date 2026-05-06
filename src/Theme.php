@@ -314,6 +314,7 @@ final class Theme
         (new \OliTheme\Contact\ContactModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
         (new \OliTheme\Appearance\AppearanceModule($container))->register();
+        (new \OliTheme\Gallery\GalleryModule($container))->register();
     }
 
     /**
