@@ -225,11 +225,10 @@ nav[aria-label*="language" i] {
   filter: grayscale(1);
   transition: filter 150ms ease;
 }
-/* Variante SVG : taille un peu plus stricte + ombre fine pour
-   distinguer le drapeau blanc du fond. */
+/* Variante SVG : 16px de haut, largeur auto (ratio 4:3 du SVG). */
 .language-switcher__flag--svg {
-  width: 1.6em;
-  height: 1.2em;
+  height: 16px;
+  width: auto;
   object-fit: cover;
   border-radius: 2px;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
