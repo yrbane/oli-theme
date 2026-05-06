@@ -400,8 +400,10 @@ final class Theme
                         $svg = (string) preg_replace('~\sfill="[^"]*"~', '', $raw);
                     }
                 }
+                $idAttr = htmlspecialchars($l['id'], \ENT_QUOTES, 'UTF-8');
                 $html .= '<li class="social-links__item">';
-                $html .= '<a class="social-links__link" href="' . htmlspecialchars($l['url'], \ENT_QUOTES, 'UTF-8') . '"';
+                $html .= '<a class="social-links__link social-links__link--' . $idAttr . '"';
+                $html .= ' href="' . htmlspecialchars($l['url'], \ENT_QUOTES, 'UTF-8') . '"';
                 $html .= ' target="_blank" rel="noopener noreferrer"';
                 $html .= ' aria-label="' . htmlspecialchars($l['label'], \ENT_QUOTES, 'UTF-8') . '"';
                 $html .= ' title="' . htmlspecialchars($l['label'], \ENT_QUOTES, 'UTF-8') . '">';

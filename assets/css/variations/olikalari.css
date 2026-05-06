@@ -677,7 +677,9 @@ body > footer a:hover, .site-footer a:hover { opacity: 0.55; }
 }
 .site-footer .social-links__link:hover,
 .site-footer .social-links__link:focus-visible {
-  color: #111111;
+  /* On ne force PAS color ici pour laisser les couleurs de marque
+     (.social-links__link--facebook etc., dans base.css) reprendre la
+     main au survol. Juste un léger fond gris pour signaler la zone. */
   opacity: 1;
   background: #f4f4f3;
 }

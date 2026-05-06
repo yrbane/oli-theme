@@ -86,7 +86,6 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
 }
 .social-links__link:hover,
 .social-links__link:focus-visible {
-    opacity: 0.6;
     transform: translateY(-1px);
 }
 .social-links__link svg {
@@ -95,6 +94,29 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
     fill: currentColor;
     display: block;
 }
+
+/* Couleurs de marque au survol — couleurs officielles ou dominante.
+   Hors hover, l'icône hérite de currentColor (gris du footer/thème). */
+.social-links__link--facebook:hover,
+.social-links__link--facebook:focus-visible  { color: #1877F2; }
+.social-links__link--instagram:hover,
+.social-links__link--instagram:focus-visible { color: #E4405F; }  /* dominante rose */
+.social-links__link--x:hover,
+.social-links__link--x:focus-visible         { color: #000000; }
+.social-links__link--youtube:hover,
+.social-links__link--youtube:focus-visible   { color: #FF0000; }
+.social-links__link--linkedin:hover,
+.social-links__link--linkedin:focus-visible  { color: #0A66C2; }
+.social-links__link--tiktok:hover,
+.social-links__link--tiktok:focus-visible    { color: #000000; }
+.social-links__link--pinterest:hover,
+.social-links__link--pinterest:focus-visible { color: #BD081C; }
+.social-links__link--whatsapp:hover,
+.social-links__link--whatsapp:focus-visible  { color: #25D366; }
+.social-links__link--telegram:hover,
+.social-links__link--telegram:focus-visible  { color: #26A5E4; }
+.social-links__link--email:hover,
+.social-links__link--email:focus-visible     { color: inherit; opacity: 0.8; }
 .btn {
     display: inline-block; padding: var(--space-3) var(--space-5);
     background: var(--color-accent); color: var(--color-accent-contrast); text-decoration: none;
