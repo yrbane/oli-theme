@@ -13,8 +13,9 @@
         <ul class="language-switcher" aria-label="Changer de langue">
             [% for item in languageSwitcher.items %]
                 <li class="language-switcher__item[% if item.isCurrent %] language-switcher__item--current[% endif %]">
-                    <a href="[[ item.url ]]" hreflang="[[ item.code ]]" lang="[[ item.code ]]">
-                        [[ item.label ]]
+                    <a href="[[ item.url ]]" hreflang="[[ item.code ]]" lang="[[ item.code ]]" title="[[ item.label ]]" aria-label="[[ item.label ]]">
+                        <span class="language-switcher__flag" aria-hidden="true">[[ item.flag ]]</span>
+                        <span class="screen-reader-text">[[ item.label ]]</span>
                     </a>
                 </li>
             [% endfor %]

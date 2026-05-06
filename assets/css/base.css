@@ -16,6 +16,21 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
 .site-nav__list { list-style: none; display: flex; gap: var(--space-4); margin: var(--space-3) 0 0; }
 .language-switcher { list-style: none; display: flex; gap: var(--space-3); margin: var(--space-3) 0 0; }
 .language-switcher__item--current a { font-weight: 700; }
+.language-switcher a { display: inline-flex; align-items: center; gap: 0.25rem; line-height: 1; }
+.language-switcher__flag { font-size: 1.25rem; line-height: 1; }
+/* Accessibilité : libellé textuel caché visuellement mais lu par les
+   lecteurs d'écran (drapeaux seuls = identifiants peu accessibles). */
+.screen-reader-text {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    word-wrap: normal !important;
+}
 .archive__list, .search-results__list { list-style: none; display: grid; gap: var(--space-5); }
 .btn {
     display: inline-block; padding: var(--space-3) var(--space-5);
