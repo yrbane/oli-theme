@@ -74,6 +74,8 @@ final class PageTemplateRenderTest extends TestCase
             'lang' => $french,
             'languageSwitcher' => new LanguageSwitcherViewModel($french, []),
             'bodyClasses' => 'page',
+            'coverHtml' => null,
+            'bodyHtml' => $entity->content,
         ]);
 
         self::assertStringContainsString('À propos', $html);

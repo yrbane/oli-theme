@@ -29,6 +29,7 @@ final class PageController
         private readonly SeoControllerInterface $seo,
         private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
+        private readonly CoverExtractor $coverExtractor = new CoverExtractor(),
     ) {
     }
 
@@ -53,6 +54,10 @@ final class PageController
         $vm['seo'] = $this->seo->buildForPost($entity);
         $vm['crumbs'] = $this->breadcrumbs->buildForPost($entity);
         $vm['bodyClasses'] = \sprintf('page page-id-%d lang-%s', $entity->id, $entity->language->code);
+
+        $split = $this->coverExtractor->split($entity->content);
+        $vm['coverHtml'] = $split['cover'];
+        $vm['bodyHtml']  = $split['body'];
 
         if ($this->isFrontPage($entity->id)) {
             $vm['carousel'] = $this->carousel->build();

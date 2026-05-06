@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+### Changed
+
+- **Pages : titre sous l'image bannière**. Quand une page commence par une `<figure>` (image bannière insérée par l'éditeur de contenu), elle est maintenant détachée et rendue *au-dessus* du `<h1>`, plutôt que sous le titre. Nouveau `Posts\CoverExtractor` (5 tests) qui sépare via regex la première figure du `post.content`. `PageController` injecte deux variables `coverHtml` et `bodyHtml` dans le ViewModel ; `templates/pages/page.html.tpl` les utilise. Si aucune figure de tête n'est détectée, le contenu est restitué inchangé (fallback sur l'image à la une si présente).
+
 ### Fixed
 
 - **Bug i18n critique : la langue retombait toujours sur fr en changeant de page**. Deux causes structurelles :
