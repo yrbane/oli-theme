@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace OliTheme\Appearance;
 
 /**
- * Bibliothèque curated de Google Fonts populaires (sans dépendance réseau).
+ * Catalogue complet des Google Fonts (~1900 familles).
  *
- * Suffit largement pour 95 % des cas. Si l'utilisateur veut une police absente
- * de cette liste, il peut éditer cette classe ou bien rajouter manuellement
- * dans l'option WP `oli_theme_titles_font` — le rendu côté front la chargera
- * tant que le nom est valide côté Google Fonts.
+ * Le catalogue est bundlé en local (`assets/data/google-fonts.json`) — pas de
+ * dépendance réseau côté thème. Pour rafraîchir la liste, voir
+ * `bin/refresh-google-fonts.php` (ou re-télécharger
+ * https://fonts.google.com/metadata/fonts puis filtrer la propriété `family`).
  *
  * @package OliTheme\Appearance
  *
@@ -18,102 +18,61 @@ namespace OliTheme\Appearance;
  */
 final class GoogleFontsLibrary
 {
+    private const DEFAULT_CATALOG_PATH = __DIR__ . '/../../assets/data/google-fonts.json';
+
+    /** @var list<array{family: string, category: string}>|null */
+    private ?array $cache = null;
+
+    public function __construct(private readonly ?string $catalogPath = null)
+    {
+    }
+
     /**
-     * Liste de polices populaires (top Google Fonts), triées par catégorie.
+     * Liste de toutes les polices Google Fonts connues, triées par nom.
      *
-     * @var list<array{family: string, category: string}>
-     */
-    private const FONTS = [
-        // --- Sans-serif ---
-        ['family' => 'Inter',              'category' => 'sans-serif'],
-        ['family' => 'Manrope',            'category' => 'sans-serif'],
-        ['family' => 'Roboto',             'category' => 'sans-serif'],
-        ['family' => 'Open Sans',          'category' => 'sans-serif'],
-        ['family' => 'Lato',               'category' => 'sans-serif'],
-        ['family' => 'Montserrat',         'category' => 'sans-serif'],
-        ['family' => 'Poppins',            'category' => 'sans-serif'],
-        ['family' => 'Raleway',            'category' => 'sans-serif'],
-        ['family' => 'Nunito',             'category' => 'sans-serif'],
-        ['family' => 'Nunito Sans',        'category' => 'sans-serif'],
-        ['family' => 'Ubuntu',             'category' => 'sans-serif'],
-        ['family' => 'Work Sans',          'category' => 'sans-serif'],
-        ['family' => 'Fira Sans',          'category' => 'sans-serif'],
-        ['family' => 'IBM Plex Sans',      'category' => 'sans-serif'],
-        ['family' => 'DM Sans',            'category' => 'sans-serif'],
-        ['family' => 'Karla',              'category' => 'sans-serif'],
-        ['family' => 'Mulish',             'category' => 'sans-serif'],
-        ['family' => 'Rubik',              'category' => 'sans-serif'],
-        ['family' => 'Quicksand',          'category' => 'sans-serif'],
-        ['family' => 'Comfortaa',          'category' => 'sans-serif'],
-        ['family' => 'Cabin',              'category' => 'sans-serif'],
-        ['family' => 'PT Sans',            'category' => 'sans-serif'],
-        ['family' => 'Source Sans 3',      'category' => 'sans-serif'],
-        ['family' => 'Noto Sans',          'category' => 'sans-serif'],
-        ['family' => 'Archivo',            'category' => 'sans-serif'],
-        ['family' => 'Archivo Narrow',     'category' => 'sans-serif'],
-        ['family' => 'Hind',               'category' => 'sans-serif'],
-        ['family' => 'Space Grotesk',      'category' => 'sans-serif'],
-        ['family' => 'Barlow',             'category' => 'sans-serif'],
-        ['family' => 'Outfit',             'category' => 'sans-serif'],
-        ['family' => 'Plus Jakarta Sans',  'category' => 'sans-serif'],
-
-        // --- Serif ---
-        ['family' => 'Playfair Display',   'category' => 'serif'],
-        ['family' => 'Merriweather',       'category' => 'serif'],
-        ['family' => 'Lora',               'category' => 'serif'],
-        ['family' => 'PT Serif',           'category' => 'serif'],
-        ['family' => 'Roboto Slab',        'category' => 'serif'],
-        ['family' => 'Crimson Text',       'category' => 'serif'],
-        ['family' => 'EB Garamond',        'category' => 'serif'],
-        ['family' => 'Cormorant Garamond', 'category' => 'serif'],
-        ['family' => 'Libre Baskerville',  'category' => 'serif'],
-        ['family' => 'Bitter',             'category' => 'serif'],
-        ['family' => 'IBM Plex Serif',     'category' => 'serif'],
-        ['family' => 'DM Serif Display',   'category' => 'serif'],
-        ['family' => 'Source Serif 4',     'category' => 'serif'],
-        ['family' => 'Noto Serif',         'category' => 'serif'],
-        ['family' => 'Spectral',           'category' => 'serif'],
-        ['family' => 'Vollkorn',           'category' => 'serif'],
-
-        // --- Display ---
-        ['family' => 'Anton',              'category' => 'display'],
-        ['family' => 'Bebas Neue',         'category' => 'display'],
-        ['family' => 'Oswald',             'category' => 'display'],
-        ['family' => 'Abril Fatface',      'category' => 'display'],
-        ['family' => 'Righteous',          'category' => 'display'],
-
-        // --- Handwriting ---
-        ['family' => 'Pacifico',           'category' => 'handwriting'],
-        ['family' => 'Dancing Script',     'category' => 'handwriting'],
-        ['family' => 'Caveat',             'category' => 'handwriting'],
-        ['family' => 'Sacramento',         'category' => 'handwriting'],
-        ['family' => 'Permanent Marker',   'category' => 'handwriting'],
-        ['family' => 'Indie Flower',       'category' => 'handwriting'],
-
-        // --- Monospace ---
-        ['family' => 'Roboto Mono',        'category' => 'monospace'],
-        ['family' => 'Fira Code',          'category' => 'monospace'],
-        ['family' => 'JetBrains Mono',     'category' => 'monospace'],
-        ['family' => 'IBM Plex Mono',      'category' => 'monospace'],
-        ['family' => 'Source Code Pro',    'category' => 'monospace'],
-        ['family' => 'Inconsolata',        'category' => 'monospace'],
-        ['family' => 'Space Mono',         'category' => 'monospace'],
-    ];
-
-    /**
      * @return list<array{family: string, category: string}>
      */
     public function all(): array
     {
-        return self::FONTS;
+        if ($this->cache !== null) {
+            return $this->cache;
+        }
+
+        $path = $this->catalogPath ?? self::DEFAULT_CATALOG_PATH;
+        if (!is_file($path)) {
+            return $this->cache = [];
+        }
+
+        $raw = file_get_contents($path);
+        if ($raw === false) {
+            return $this->cache = [];
+        }
+
+        $data = json_decode($raw, true);
+        if (!\is_array($data)) {
+            return $this->cache = [];
+        }
+
+        $out = [];
+        foreach ($data as $entry) {
+            if (!\is_array($entry) || empty($entry['family']) || !\is_string($entry['family'])) {
+                continue;
+            }
+            $out[] = [
+                'family'   => $entry['family'],
+                'category' => \is_string($entry['category'] ?? null) ? $entry['category'] : 'Sans Serif',
+            ];
+        }
+
+        return $this->cache = $out;
     }
 
     /**
-     * Vérifie qu'une famille est dans la liste blanche (sécurité côté admin).
+     * Vérifie qu'une famille existe dans le catalogue (sécurité côté admin).
      */
     public function has(string $family): bool
     {
-        foreach (self::FONTS as $font) {
+        foreach ($this->all() as $font) {
             if ($font['family'] === $family) {
                 return true;
             }
@@ -128,10 +87,8 @@ final class GoogleFontsLibrary
      */
     public function cssUrlFor(string $family): string
     {
-        $encoded = str_replace('+', '+', rawurlencode($family));
-
-        // L'URL Google Fonts utilise `+` au lieu de `%20`.
-        $encoded = str_replace('%20', '+', $encoded);
+        // Google Fonts utilise `+` au lieu de `%20` pour les espaces.
+        $encoded = str_replace('%20', '+', rawurlencode($family));
 
         return 'https://fonts.googleapis.com/css2?family=' . $encoded . ':wght@400;500;700&display=swap';
     }
