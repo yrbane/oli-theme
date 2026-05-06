@@ -53,6 +53,9 @@ final class AssetManager
         // Surcharge admin de l'image bandeau (pages internes), via custom-property.
         $this->injectInternalBannerOverride($variationEnqueued ? 'oli-theme-variation' : 'oli-theme');
 
+        // Police personnalisée pour les titres (Google Fonts) si configurée.
+        $this->injectTitlesFontOverride('oli-theme-admin-bar');
+
         wp_enqueue_script_module(
             'oli-theme',
             $this->themeUri . '/assets/js/main.js',
@@ -168,6 +171,50 @@ final class AssetManager
         }
 
         $css = \sprintf("html{--oli-internal-banner-url:url('%s');}", $url);
+        wp_add_inline_style($handle, $css);
+    }
+
+    /**
+     * Police personnalisée pour les titres (h1–h6, .banner__title,
+     * .carousel-fullscreen__title) configurée via Apparence > Variations CSS.
+     * Charge la stylesheet Google Fonts et injecte un override !important pour
+     * gagner la cascade sur les variations.
+     */
+    private function injectTitlesFontOverride(string $handle): void
+    {
+        if (!\function_exists('get_option')) {
+            return;
+        }
+
+        $family = (string) get_option('oli_theme_titles_font', '');
+        if ($family === '') {
+            return;
+        }
+
+        // Sécurité : la sanitize côté admin a déjà validé contre la liste
+        // blanche, mais on re-nettoie pour le cas où l'option serait éditée
+        // directement en base. On accepte uniquement [A-Za-z0-9 ].
+        $family = trim((string) preg_replace('~[^A-Za-z0-9 ]~', '', $family));
+        if ($family === '') {
+            return;
+        }
+
+        if (!\function_exists('wp_enqueue_style') || !\function_exists('wp_add_inline_style')) {
+            return;
+        }
+
+        // Google Fonts CSS (sans dépendances explicites — pas de race avec le thème).
+        $url = 'https://fonts.googleapis.com/css2?family='
+            . str_replace('%20', '+', rawurlencode($family))
+            . ':wght@400;500;700&display=swap';
+
+        wp_enqueue_style('oli-theme-titles-font', $url, [], null);
+
+        // Override CSS sur les sélecteurs cibles (chargé en dernier via $handle).
+        $css = \sprintf(
+            "h1,h2,h3,h4,h5,h6,.banner__title,.carousel-fullscreen__title{font-family:'%s',system-ui,sans-serif !important;}",
+            addslashes($family),
+        );
         wp_add_inline_style($handle, $css);
     }
 

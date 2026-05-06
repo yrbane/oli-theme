@@ -23,12 +23,16 @@ final class ThemeVariationPage
 
     public const OPTION_BANNER = 'oli_internal_banner_image';
 
+    public const OPTION_TITLES_FONT = 'oli_theme_titles_font';
+
     public const GROUP = 'oli_theme_variation_group';
 
     public const PAGE_SLUG = 'oli-theme-variations';
 
-    public function __construct(private readonly ThemeVariationRegistry $registry)
-    {
+    public function __construct(
+        private readonly ThemeVariationRegistry $registry,
+        private readonly GoogleFontsLibrary $fonts = new GoogleFontsLibrary(),
+    ) {
     }
 
     /**
@@ -69,6 +73,12 @@ final class ThemeVariationPage
             'sanitize_callback' => [$this, 'sanitizeBanner'],
             'default'           => '',
         ]);
+
+        register_setting(self::GROUP, self::OPTION_TITLES_FONT, [
+            'type'              => 'string',
+            'sanitize_callback' => [$this, 'sanitizeFont'],
+            'default'           => '',
+        ]);
     }
 
     /**
@@ -97,11 +107,28 @@ final class ThemeVariationPage
         return (string) esc_url_raw($value);
     }
 
+    /**
+     * Sanitize de la police : doit être présente dans la liste blanche
+     * (sécurité contre injection CSS via le nom de famille).
+     */
+    public function sanitizeFont(mixed $value): string
+    {
+        if (!\is_string($value) || $value === '') {
+            return '';
+        }
+
+        $value = sanitize_text_field($value);
+
+        return $this->fonts->has($value) ? $value : '';
+    }
+
     public function render(): void
     {
-        $current    = (string) get_option(self::OPTION, '');
-        $bannerUrl  = (string) get_option(self::OPTION_BANNER, '');
-        $variations = $this->registry->all();
+        $current     = (string) get_option(self::OPTION, '');
+        $bannerUrl   = (string) get_option(self::OPTION_BANNER, '');
+        $titlesFont  = (string) get_option(self::OPTION_TITLES_FONT, '');
+        $variations  = $this->registry->all();
+        $allFonts    = $this->fonts->all();
 
         // URL de l'image par défaut du thème (utilisée comme preview tant que
         // l'admin n'a pas configuré une image personnalisée). Permet à l'utilisateur
@@ -171,6 +198,31 @@ final class ThemeVariationPage
         echo ' <button type="button" class="button-link" id="oli-internal-banner-clear" style="margin-left:0.5rem;color:#b32d2e;">' . esc_html__('Retirer (revenir au défaut)', 'oli-theme') . '</button>';
         echo '</div>';
         echo '<p class="description">' . esc_html__('Affiché en haut des pages autres que la home (dans les variations qui le supportent, ex. Olikalari). Si vide, le thème utilise son image par défaut affichée ci-dessus.', 'oli-theme') . '</p>';
+        echo '</td></tr>';
+
+        // --- Police des titres ---
+        echo '<tr>';
+        echo '<th scope="row"><label for="oli-titles-font">' . esc_html__('Police des titres', 'oli-theme') . '</label></th>';
+        echo '<td>';
+        echo '<div class="oli-font-picker">';
+        echo '<input type="search" id="oli-titles-font-search" class="regular-text" placeholder="' . esc_attr__('Rechercher une police Google Fonts…', 'oli-theme') . '" style="margin-bottom:0.5rem;display:block;max-width:32rem;">';
+        echo '<select id="oli-titles-font" name="' . esc_attr(self::OPTION_TITLES_FONT) . '" size="8" style="display:block;width:100%;max-width:32rem;font-family:system-ui;">';
+        echo '<option value=""' . selected($titlesFont, '', false) . '>' . esc_html__('— Police par défaut du thème —', 'oli-theme') . '</option>';
+        foreach ($allFonts as $font) {
+            echo '<option value="' . esc_attr($font['family']) . '" data-category="' . esc_attr($font['category']) . '"'
+                . selected($titlesFont, $font['family'], false) . '>'
+                . esc_html($font['family']) . ' (' . esc_html($font['category']) . ')'
+                . '</option>';
+        }
+        echo '</select>';
+        // Preview live (la police est chargée dynamiquement par le JS).
+        echo '<div id="oli-titles-font-preview" style="margin-top:1rem;padding:1.25rem;background:#fff;border:1px solid #dcdcde;border-radius:3px;max-width:32rem;">';
+        echo '<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;color:#646970;margin-bottom:0.5rem;">' . esc_html__('Aperçu', 'oli-theme') . ' — <span id="oli-titles-font-name">' . esc_html($titlesFont !== '' ? $titlesFont : 'Default') . '</span></div>';
+        echo '<div id="oli-titles-font-sample" style="font-size:1.75rem;line-height:1.2;font-weight:700;color:#111;">The quick brown fox</div>';
+        echo '<div style="font-size:1rem;color:#444;margin-top:0.25rem;" id="oli-titles-font-sample-2">jumps over the lazy dog 0123456789</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '<p class="description">' . esc_html__('S\'applique aux balises h1–h6, au nom du site dans la barre de menu (.banner__title) et au titre du carousel d\'accueil. La police est chargée dynamiquement depuis Google Fonts.', 'oli-theme') . '</p>';
         echo '</td></tr>';
 
         echo '</tbody></table>';
@@ -248,6 +300,71 @@ final class ThemeVariationPage
                 clear.addEventListener('click', function () {
                     input.value = '';
                     updatePreview(defaultUrl, false);
+                });
+            }
+        })();
+        </script>
+
+        <script>
+        // Picker de police Google Fonts : recherche + preview live + chargement
+        // dynamique du <link href="fonts.googleapis.com/...">.
+        (function () {
+            const search  = document.getElementById('oli-titles-font-search');
+            const select  = document.getElementById('oli-titles-font');
+            const sample  = document.getElementById('oli-titles-font-sample');
+            const sample2 = document.getElementById('oli-titles-font-sample-2');
+            const name    = document.getElementById('oli-titles-font-name');
+            if (!select || !sample) { return; }
+
+            const loaded = new Set();
+
+            const loadFont = function (family) {
+                if (!family || loaded.has(family)) return;
+                loaded.add(family);
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.googleapis.com/css2?family='
+                    + family.replace(/\s+/g, '+') + ':wght@400;500;700&display=swap';
+                document.head.appendChild(link);
+            };
+
+            const applyPreview = function (family) {
+                if (family) {
+                    loadFont(family);
+                    sample.style.fontFamily = '"' + family + '", system-ui, sans-serif';
+                    if (sample2) sample2.style.fontFamily = '"' + family + '", system-ui, sans-serif';
+                    if (name) name.textContent = family;
+                } else {
+                    sample.style.fontFamily = '';
+                    if (sample2) sample2.style.fontFamily = '';
+                    if (name) name.textContent = 'Default';
+                }
+            };
+
+            // Preview initial
+            applyPreview(select.value);
+
+            // Change → preview
+            select.addEventListener('change', function () {
+                applyPreview(select.value);
+            });
+
+            // Hover sur une option → preview anticipée
+            select.addEventListener('mouseover', function (e) {
+                if (e.target && e.target.tagName === 'OPTION' && e.target.value) {
+                    loadFont(e.target.value);
+                }
+            });
+
+            // Recherche : filtre les options visibles
+            if (search) {
+                search.addEventListener('input', function () {
+                    const q = search.value.trim().toLowerCase();
+                    Array.from(select.options).forEach(function (opt) {
+                        if (!opt.value) { opt.hidden = false; return; }
+                        const haystack = (opt.textContent || '').toLowerCase();
+                        opt.hidden = q !== '' && !haystack.includes(q);
+                    });
                 });
             }
         })();
