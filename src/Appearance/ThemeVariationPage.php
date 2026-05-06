@@ -40,21 +40,13 @@ final class ThemeVariationPage
      */
     public function register(): void
     {
-        $hook = add_theme_page(
+        add_theme_page(
             __('Variations CSS', 'oli-theme'),
             __('Variations CSS', 'oli-theme'),
             'manage_options',
             self::PAGE_SLUG,
             [$this, 'render'],
         );
-
-        if (\is_string($hook) && $hook !== '') {
-            add_action('admin_enqueue_scripts', function (string $current) use ($hook): void {
-                if ($current === $hook) {
-                    wp_enqueue_media();
-                }
-            });
-        }
     }
 
     /**
@@ -124,6 +116,14 @@ final class ThemeVariationPage
 
     public function render(): void
     {
+        // Charge le media uploader WP nécessaire au picker d'image (bouton
+        // « Choisir une image »). Appelé ici plutôt que sur admin_enqueue_scripts
+        // pour ne pas dépendre de la comparaison du hook_suffix : à ce stade
+        // les scripts sont imprimés en footer, donc l'enqueue tardif fonctionne.
+        if (\function_exists('wp_enqueue_media')) {
+            wp_enqueue_media();
+        }
+
         $current     = (string) get_option(self::OPTION, '');
         $bannerUrl   = (string) get_option(self::OPTION_BANNER, '');
         $titlesFont  = (string) get_option(self::OPTION_TITLES_FONT, '');
