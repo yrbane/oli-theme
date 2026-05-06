@@ -24,10 +24,19 @@ final class GalleryModule implements ModuleInterface
     {
         $c = $this->container;
 
+        if (!$c->has(YoutubeChannelFetcher::class)) {
+            $c->factory(
+                YoutubeChannelFetcher::class,
+                static fn (): YoutubeChannelFetcher => new YoutubeChannelFetcher(),
+            );
+        }
+
         if (!$c->has(GalleryRepository::class)) {
             $c->factory(
                 GalleryRepository::class,
-                static fn (): GalleryRepository => new GalleryRepository(),
+                static fn (Container $c): GalleryRepository => new GalleryRepository(
+                    $c->get(YoutubeChannelFetcher::class),
+                ),
             );
         }
 

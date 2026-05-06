@@ -24,6 +24,10 @@ final class GalleryRepository
 
     public const DEFAULT_CHANNEL = 'https://www.youtube.com/@OliKalari';
 
+    public function __construct(private readonly ?YoutubeChannelFetcher $fetcher = null)
+    {
+    }
+
     /**
      * Retourne les photos enrichies (URL + alt résolus depuis WP).
      *
@@ -103,9 +107,34 @@ final class GalleryRepository
     /**
      * Retourne les vidéos enrichies (embed_url + thumbnail YT résolus).
      *
+     * Mode mixte :
+     *   - Si l'admin a saisi des vidéos manuelles (option non vide) → on les
+     *     utilise (override, captions custom).
+     *   - Sinon → fetch auto via {@see YoutubeChannelFetcher} (15 dernières
+     *     vidéos publiées de la chaîne, depuis le RSS public).
+     *
      * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
      */
     public function getVideos(): array
+    {
+        $manual = $this->getManualVideos();
+        if ($manual !== []) {
+            return $manual;
+        }
+
+        if ($this->fetcher !== null) {
+            return $this->fetcher->fetchVideos($this->getYoutubeChannel());
+        }
+
+        return [];
+    }
+
+    /**
+     * Lit la liste de vidéos saisies manuellement (option `oli_gallery_videos`).
+     *
+     * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
+     */
+    public function getManualVideos(): array
     {
         $raw = $this->readJson(self::OPTION_VIDEOS);
         $out = [];

@@ -856,6 +856,14 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   margin: 1rem auto 4rem;
   padding: 0 1.5rem;
 }
+
+/* Page Vidéos : layout inversé — player large à gauche, vignettes en grille
+   à droite. Plus de place au lecteur, vignettes alignées sur le côté. */
+.gallery--videos {
+  grid-template-columns: 1fr minmax(220px, 360px);
+}
+.gallery--videos .gallery__main { grid-column: 1; grid-row: 1; }
+.gallery--videos .gallery__thumbs { grid-column: 2; grid-row: 1; }
 .gallery__main {
   position: sticky;
   top: calc(var(--header-h, 75px) + var(--oli-admin-bar-offset, 0px) + 1rem);
