@@ -100,9 +100,52 @@ final class RedirectModel implements RedirectModelInterface
     /**
      * {@inheritDoc}
      */
+    public function update(int $id, string $source, string $target, int $code): RedirectEntity
+    {
+        $this->wpdb->update(
+            $this->table(),
+            ['source' => $source, 'target' => $target, 'code' => $code],
+            ['id' => $id],
+            ['%s', '%s', '%d'],
+            ['%d'],
+        );
+
+        /** @var \stdClass|null $row */
+        $row = $this->wpdb->get_row(
+            $this->wpdb->prepare(\sprintf('SELECT * FROM `%s` WHERE id = %%d LIMIT 1', $this->table()), $id),
+        );
+
+        return $row !== null ? $this->hydrate($row) : new RedirectEntity(
+            id: $id,
+            source: $source,
+            target: $target,
+            code: $code,
+            hits: 0,
+            createdAt: new \DateTimeImmutable('now'),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function delete(int $id): void
     {
         $this->wpdb->delete($this->table(), ['id' => $id], ['%d']);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function count(): int
+    {
+        if ($this->installer !== null && !$this->installer->tableExists()) {
+            return 0;
+        }
+
+        /** @var string|null $total */
+        $total = $this->wpdb->get_var(\sprintf('SELECT COUNT(*) FROM `%s`', $this->table()));
+
+        return (int) ($total ?? 0);
     }
 
     /**

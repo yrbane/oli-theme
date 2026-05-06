@@ -10,6 +10,19 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ### Added
 
+- **Page Outils > Redirections : CRUD complet** (issue de QA cycle 1). La page n'avait qu'un listing read-only « MVP » avec le commentaire `extension ultérieure prévue`. Refonte complète :
+  - Formulaire `create/edit` avec validation : source obligatoire commençant par `/`, target requis pour 301/302 (optionnel pour 410), code limité à `{301, 302, 410}`.
+  - Suppression via `admin-post.php?action=oli_redirect_delete` avec nonce dynamique par ID + `confirm()` JS.
+  - Notices traduites pour chaque cas (`created`, `updated`, `deleted`, `invalid_source`, `missing_target`, `invalid_code`).
+  - Pagination 25 par page (`?paged=N`) si > 25 redirections.
+  - Édition par ID (préserve la `source` quand on la modifie, contrairement à l'upsert par source).
+  - Hooks branchés sur `admin_init` (et non `admin_menu`) car `admin-post.php` ne déclenche pas le menu admin.
+- `RedirectModelInterface::update(int $id, ...)` — mise à jour explicite par identifiant (différent de `save()` qui upserte par source).
+- `RedirectModelInterface::count(): int` — nombre total de redirections (pour la pagination).
+- 8 nouveaux tests unitaires (`RedirectsPageTest` : create, edit, validations source/target/code, delete) + 2 tests `RedirectModelTest` (`update`, `count`). 329 tests / 1108 assertions au total, PHPStan level 8 clean, CS-Fixer clean.
+
+### Added
+
 - **#1** — `mkdir() Permission denied` sur l'activation. Nouveau `Core\CacheDirectoryEnsurer` (TDD, 5 tests) qui crée le dossier et le valide sans lever d'exception ; fallback sur `sys_get_temp_dir()` si `.cache/templates` n'est pas writable, avec admin_notice (`oli_theme_cache_error`) au lieu d'un fatal Lunar. `.cache/templates/.gitkeep` versionné + contenu ignoré dans `.gitignore`.
 - **#4** — `template_include` manquant. Tous les fichiers `theme-bridge/*.php` étaient ignorés par WP (qui ne descend pas dans les sous-dossiers) → seul `index.php` à la racine était utilisé, donnant l'archive des posts pour toutes les URL. Nouveau `Core\TemplateRouter` (TDD, 10 tests) hooké via `template_include` qui aiguille vers le bon shim selon `is_front_page`, `is_singular('oli_event')`, `is_post_type_archive`, `is_page`, `is_single`, `is_search`, `is_archive`, `is_404`.
 - **#5** — `MenuController::buildFor()` passait une `theme_location` (string) à `wp_get_nav_menu_items()`, qui attend un menu ID, ce qui faisait retourner `false` et laissait les menus vides en permanence. Résolution préalable via `get_nav_menu_locations()[$location]` + 2 nouveaux tests de régression.

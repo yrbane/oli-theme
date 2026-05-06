@@ -161,6 +161,148 @@ final class RedirectModelTest extends TestCase
         self::assertStringContainsString('hits = hits + 1', $queryCalls[0]);
         self::assertStringContainsString('42', $queryCalls[0]);
     }
+
+    /**
+     * update() doit appeler wpdb::update sur la ligne id, en mettant à jour source/target/code.
+     */
+    public function testUpdateModifiesExistingRecordById(): void
+    {
+        $row = $this->makeRow(id: 7, source: '/edited', target: 'https://example.com/edited', code: 302);
+
+        /** @var array<array{data: array<string,mixed>, where: array<string,mixed>}> $updateCalls */
+        $updateCalls = [];
+
+        $wpdb = new class ($row, $updateCalls) {
+            public string $prefix = 'wp_';
+
+            /** @var array<array{data: array<string,mixed>, where: array<string,mixed>}> */
+            private array $updateCalls;
+
+            /** @param array<array{data: array<string,mixed>, where: array<string,mixed>}> &$updateCalls */
+            public function __construct(private \stdClass $row, array &$updateCalls)
+            {
+                $this->updateCalls = &$updateCalls;
+            }
+
+            public function prepare(string $query, mixed ...$args): string
+            {
+                return vsprintf(str_replace(['%s', '%d'], ["'%s'", '%d'], $query), $args);
+            }
+
+            public function get_row(string $query): ?\stdClass
+            {
+                return $this->row;
+            }
+
+            /** @return \stdClass[] */
+            public function get_results(string $query): array
+            {
+                return [];
+            }
+
+            /**
+             * @param array<string,mixed> $data
+             * @param array<string,mixed> $where
+             */
+            public function update(string $table, array $data, array $where, mixed $dataFormats = [], mixed $whereFormats = []): int
+            {
+                $this->updateCalls[] = ['data' => $data, 'where' => $where];
+
+                return 1;
+            }
+
+            /** @param array<string,mixed> $data */
+            public function insert(string $table, array $data, mixed $formats = []): int
+            {
+                return 1;
+            }
+
+            /** @param array<string,mixed> $where */
+            public function delete(string $table, array $where, mixed $whereFormats = []): int
+            {
+                return 1;
+            }
+
+            public function query(string $query): int
+            {
+                return 1;
+            }
+        };
+
+        // @phpstan-ignore argument.type
+        $model = new RedirectModel($wpdb);
+        $entity = $model->update(7, '/edited', 'https://example.com/edited', 302);
+
+        self::assertCount(1, $updateCalls);
+        self::assertSame(['id' => 7], $updateCalls[0]['where']);
+        self::assertSame('/edited', $updateCalls[0]['data']['source']);
+        self::assertSame('https://example.com/edited', $updateCalls[0]['data']['target']);
+        self::assertSame(302, $updateCalls[0]['data']['code']);
+        self::assertInstanceOf(RedirectEntity::class, $entity);
+        self::assertSame(7, $entity->id);
+    }
+
+    /**
+     * count() retourne le total de redirections (utile pour la pagination).
+     */
+    public function testCountReturnsTotalNumberOfRedirects(): void
+    {
+        $wpdb = new class () {
+            public string $prefix = 'wp_';
+
+            public function prepare(string $query, mixed ...$args): string
+            {
+                return $query;
+            }
+
+            public function get_var(string $query): ?string
+            {
+                return '42';
+            }
+
+            public function get_row(string $query): ?\stdClass
+            {
+                return null;
+            }
+
+            /** @return \stdClass[] */
+            public function get_results(string $query): array
+            {
+                return [];
+            }
+
+            /** @param array<string,mixed> $data */
+            public function insert(string $table, array $data, mixed $formats = []): int
+            {
+                return 1;
+            }
+
+            /**
+             * @param array<string,mixed> $data
+             * @param array<string,mixed> $where
+             */
+            public function update(string $table, array $data, array $where, mixed $dataFormats = [], mixed $whereFormats = []): int
+            {
+                return 1;
+            }
+
+            /** @param array<string,mixed> $where */
+            public function delete(string $table, array $where, mixed $whereFormats = []): int
+            {
+                return 1;
+            }
+
+            public function query(string $query): int
+            {
+                return 1;
+            }
+        };
+
+        // @phpstan-ignore argument.type
+        $model = new RedirectModel($wpdb);
+
+        self::assertSame(42, $model->count());
+    }
     /**
      * Crée une ligne stdClass représentant une redirection en base.
      */

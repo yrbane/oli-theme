@@ -315,5 +315,11 @@ final class SeoModule implements ModuleInterface
             $this->container->get(SeoOverviewPage::class)->register();
             $this->container->get(RedirectsPage::class)->register();
         });
+
+        // Hooks admin-post.php pour le CRUD redirections : admin_menu n'est pas appelé
+        // sur admin-post.php, on doit donc les brancher via admin_init.
+        add_action('admin_init', function (): void {
+            $this->container->get(RedirectsPage::class)->registerActions();
+        });
     }
 }

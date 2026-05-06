@@ -78,3 +78,77 @@
     padding-top: 1rem;
     border-top: 1px solid #dcdcde;
 }
+
+/* Page Outils > Redirections : CRUD complet. */
+.oli-redirects {
+    max-width: 80rem;
+}
+
+.oli-redirects__form.card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.oli-redirects__form .form-table th {
+    width: 12rem;
+    padding: 0.75rem 1rem 0.75rem 0;
+}
+
+.oli-redirects__form .form-table td input[type="text"],
+.oli-redirects__form .form-table td select {
+    width: 100%;
+    max-width: 32rem;
+}
+
+.oli-redirects__form .submit {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #dcdcde;
+}
+
+.oli-redirects__form .submit .button-secondary {
+    margin-left: 0.5rem;
+}
+
+.oli-redirects__table code {
+    font-size: 0.875em;
+    background: #f6f7f7;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.oli-redirects__table th.num,
+.oli-redirects__table td.num {
+    text-align: right;
+    width: 4rem;
+}
+
+.oli-redirects__table th.actions,
+.oli-redirects__table td.actions {
+    width: 14rem;
+    white-space: nowrap;
+}
+
+.oli-redirects__table td.actions .button {
+    margin-right: 0.25rem;
+}
+
+.oli-redirects .count {
+    font-weight: 400;
+    color: #50575e;
+}
+
+.oli-redirects__pagination {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.oli-redirects__pagination .displaying-num {
+    color: #50575e;
+}
