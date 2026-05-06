@@ -29,7 +29,8 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
      */
     public function build(int $currentPostId): LanguageSwitcherViewModel
     {
-        $current = $this->resolver->current();
+        $current      = $this->resolver->current();
+        $default      = $this->registry->default();
         $translations = $currentPostId > 0
             ? $this->translations->getTranslations($currentPostId)
             : [];
@@ -37,9 +38,21 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
         $items = [];
         foreach ($this->registry->all() as $language) {
             $hasTranslation = isset($translations[$language->code]);
-            $url = $hasTranslation
-                ? (string) get_permalink($translations[$language->code])
-                : home_url('/' . $language->code . '/');
+
+            if ($hasTranslation) {
+                // get_permalink passe par notre filtre et préfixe avec la langue
+                // active ; on relocalise vers la langue cible pour le switcher.
+                $url = $this->relocateUrl(
+                    (string) get_permalink($translations[$language->code]),
+                    $current,
+                    $language,
+                    $default,
+                );
+            } else {
+                $url = $language->equals($default)
+                    ? (string) home_url('/')
+                    : (string) home_url('/' . $language->code . '/');
+            }
 
             $items[] = new LanguageSwitcherItem(
                 code: $language->code,
@@ -53,5 +66,32 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
         }
 
         return new LanguageSwitcherViewModel($current, $items);
+    }
+
+    /**
+     * Re-préfixe une URL pour qu'elle pointe vers la langue cible, en retirant
+     * d'abord le préfixe de la langue active s'il a été ajouté par les filtres.
+     * Garantit que `get_permalink()` côté switcher cible bien l'autre langue.
+     */
+    private function relocateUrl(string $url, Language $current, Language $target, Language $default): string
+    {
+        // 1. Retire le préfixe de la langue active si présent et différent de la cible.
+        if (!$current->equals($target) && !$current->equals($default)) {
+            $activePrefix = '/' . $current->code . '/';
+            $pos          = strpos($url, $activePrefix);
+            if ($pos !== false) {
+                $url = substr_replace($url, '/', $pos, \strlen($activePrefix));
+            }
+        }
+
+        // 2. Ajoute le préfixe de la cible (sauf si cible = défaut).
+        if (!$target->equals($default)) {
+            $targetPrefix = '/' . $target->code . '/';
+            if (!str_contains($url, $targetPrefix)) {
+                $url = preg_replace('~^(https?://[^/]+)/~', '$1' . $targetPrefix, $url, 1) ?? $url;
+            }
+        }
+
+        return $url;
     }
 }

@@ -66,7 +66,9 @@ final class LanguageSwitcherControllerTest extends TestCase
         $vm = $controller->build(10);
         $en = $this->itemByCode($vm, 'en');
 
-        self::assertSame('https://example.test/post-20', $en->url);
+        // Depuis fr (default), le lien vers EN doit être préfixé /en/ pour
+        // que la langue cible soit bien activée par les rewrite rules.
+        self::assertSame('https://example.test/en/post-20', $en->url);
     }
 
     public function test_view_model_url_falls_back_to_home_when_no_translation(): void
@@ -79,6 +81,77 @@ final class LanguageSwitcherControllerTest extends TestCase
         $en = $this->itemByCode($vm, 'en');
 
         self::assertSame('https://example.test/en/', $en->url);
+    }
+
+    /**
+     * Scénario réel : on est sur /en/, on clique vers FR. get_permalink()
+     * retourne une URL préfixée /en/ (filtre permalink). Le switcher doit
+     * relocaliser vers /post-fr (sans préfixe car FR = langue par défaut).
+     */
+    public function test_target_url_strips_active_lang_prefix_when_target_is_default(): void
+    {
+        Functions\when('get_post_meta')->justReturn('group-A');
+        Functions\when('get_posts')->justReturn([10, 20]);
+        Functions\when('wp_get_post_terms')->alias(static function (int $postId) {
+            $term = new \stdClass();
+            $term->slug = $postId === 10 ? 'fr' : 'en';
+
+            return [$term];
+        });
+        // Simule le permalien filtré par LanguageUrlFilter qui ajoute /en/.
+        Functions\when('get_permalink')->alias(static fn (int $id) => "https://example.test/en/post-{$id}");
+
+        $controller = $this->buildController('en');
+        $vm = $controller->build(20);
+        $fr = $this->itemByCode($vm, 'fr');
+
+        self::assertSame('https://example.test/post-10', $fr->url);
+    }
+
+    /**
+     * Inverse : on est sur /, on clique vers EN. get_permalink retourne une
+     * URL non préfixée. Le switcher doit ajouter /en/.
+     */
+    public function test_target_url_adds_target_prefix_when_active_is_default(): void
+    {
+        Functions\when('get_post_meta')->justReturn('group-A');
+        Functions\when('get_posts')->justReturn([10, 20]);
+        Functions\when('wp_get_post_terms')->alias(static function (int $postId) {
+            $term = new \stdClass();
+            $term->slug = $postId === 10 ? 'fr' : 'en';
+
+            return [$term];
+        });
+        Functions\when('get_permalink')->alias(static fn (int $id) => "https://example.test/post-{$id}");
+
+        $controller = $this->buildController('fr');
+        $vm = $controller->build(10);
+        $en = $this->itemByCode($vm, 'en');
+
+        self::assertSame('https://example.test/en/post-20', $en->url);
+    }
+
+    /**
+     * Cas pathologique : sur /en/ avec une URL déjà préfixée /en/, le lien
+     * vers EN lui-même ne doit pas dupliquer le préfixe.
+     */
+    public function test_target_url_does_not_duplicate_prefix_when_target_matches_active(): void
+    {
+        Functions\when('get_post_meta')->justReturn('group-A');
+        Functions\when('get_posts')->justReturn([10, 20]);
+        Functions\when('wp_get_post_terms')->alias(static function (int $postId) {
+            $term = new \stdClass();
+            $term->slug = $postId === 10 ? 'fr' : 'en';
+
+            return [$term];
+        });
+        Functions\when('get_permalink')->alias(static fn (int $id) => "https://example.test/en/post-{$id}");
+
+        $controller = $this->buildController('en');
+        $vm = $controller->build(20);
+        $en = $this->itemByCode($vm, 'en');
+
+        self::assertSame('https://example.test/en/post-20', $en->url);
     }
 
     private function buildController(string $current): LanguageSwitcherController
