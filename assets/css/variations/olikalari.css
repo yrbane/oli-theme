@@ -572,9 +572,12 @@ figure.page-cover.page-cover--bg {
   color: #6b6b6b;
   background: none;
   border: none;
-  padding: 0 2rem;
-  max-width: 1200px;
-  margin: 1.25rem auto 1.5rem;
+  /* Calé à gauche, collé au menu. Padding-left = padding du menu pour
+     l'alignement vertical avec le branding ; vertical réduit pour rester
+     proche du haut. */
+  padding: 0.25rem 1rem 0.4rem;
+  max-width: none;
+  margin: 0;
   letter-spacing: 0.01em;
 }
 .breadcrumbs__list {
@@ -621,8 +624,8 @@ figure.page-cover.page-cover--bg {
 @media (max-width: 640px) {
   .breadcrumbs {
     font-size: 0.72rem;
-    padding: 0 1rem;
-    margin: 1rem auto 1rem;
+    padding: 0.2rem 0.75rem 0.3rem;
+    margin: 0;
   }
 }
 
