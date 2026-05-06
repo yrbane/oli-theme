@@ -9,6 +9,7 @@ use OliTheme\Core\ModuleInterface;
 use OliTheme\Core\RendererInterface;
 use OliTheme\Events\EventModelInterface;
 use OliTheme\I18n\LanguageRegistryInterface;
+use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\TranslationModelInterface;
 use OliTheme\Posts\PostModelInterface;
 use OliTheme\Seo\Admin\RedirectsPage;
@@ -129,7 +130,9 @@ final class SeoModule implements ModuleInterface
         if (! $container->has(BreadcrumbsController::class)) {
             $container->factory(
                 BreadcrumbsController::class,
-                static fn (): BreadcrumbsController => new BreadcrumbsController(),
+                static fn (Container $c): BreadcrumbsController => new BreadcrumbsController(
+                    $c->has(LanguageResolverInterface::class) ? $c->get(LanguageResolverInterface::class) : null,
+                ),
             );
         }
 

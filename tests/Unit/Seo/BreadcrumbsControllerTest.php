@@ -112,6 +112,79 @@ final class BreadcrumbsControllerTest extends TestCase
         self::assertTrue($crumbs[1]->isCurrent);
     }
 
+    public function testBuildForPostInEnglish(): void
+    {
+        $lang = new Language('en', 'English', 'English', '🇬🇧', 'en_US');
+        $post = $this->makePost(type: 'post', title: 'My article', lang: $lang);
+
+        $crumbs = (new BreadcrumbsController())->buildForPost($post);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('News', $crumbs[1]->label);
+    }
+
+    public function testBuildForEventInEnglish(): void
+    {
+        $lang  = new Language('en', 'English', 'English', '🇬🇧', 'en_US');
+        $event = $this->makeEvent(title: 'Yoga retreat', lang: $lang);
+
+        $crumbs = (new BreadcrumbsController())->buildForEvent($event);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('Events', $crumbs[1]->label);
+    }
+
+    public function testBuildForSearchInEnglish(): void
+    {
+        $lang = new Language('en', 'English', 'English', '🇬🇧', 'en_US');
+
+        $crumbs = (new BreadcrumbsController())->buildForSearch('yoga', $lang);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('Search: yoga', $crumbs[1]->label);
+    }
+
+    public function testBuildFor404InEnglish(): void
+    {
+        $lang = new Language('en', 'English', 'English', '🇬🇧', 'en_US');
+
+        $crumbs = (new BreadcrumbsController())->buildFor404($lang);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('Page not found', $crumbs[1]->label);
+    }
+
+    public function testBuildForArchivePostInEnglish(): void
+    {
+        $lang = new Language('en', 'English', 'English', '🇬🇧', 'en_US');
+
+        $crumbs = (new BreadcrumbsController())->buildForArchive('post', $lang);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('News', $crumbs[1]->label);
+    }
+
+    public function testBuildForArchiveEventInItalian(): void
+    {
+        $lang = new Language('it', 'Italian', 'Italiano', '🇮🇹', 'it_IT');
+
+        $crumbs = (new BreadcrumbsController())->buildForArchive('oli_event', $lang);
+
+        self::assertSame('Home', $crumbs[0]->label);
+        self::assertSame('Eventi', $crumbs[1]->label);
+    }
+
+    public function testBuildForPostInSpanish(): void
+    {
+        $lang = new Language('es', 'Spanish', 'Español', '🇪🇸', 'es_ES');
+        $post = $this->makePost(type: 'post', title: 'Mi artículo', lang: $lang);
+
+        $crumbs = (new BreadcrumbsController())->buildForPost($post);
+
+        self::assertSame('Inicio', $crumbs[0]->label);
+        self::assertSame('Noticias', $crumbs[1]->label);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------

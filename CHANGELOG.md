@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+### Added
+
+- **Breadcrumb localisé**. Les libellés du fil d'Ariane (« Accueil », « Actualités », « Événements », « Recherche », « Page introuvable ») sont désormais traduits selon la langue active : Home/News/Events/Search/Page not found en EN, Home/Notizie/Eventi/Ricerca/Pagina non trovata en IT, Inicio/Noticias/Eventos/Búsqueda/Página no encontrada en ES. Dictionnaire interne dans `BreadcrumbsController::LABELS` (pas de dépendance aux .po/.mo qui ne sont pas garantis chargés côté front). Sur les URL préfixées (ex. `/en/`), le contrôleur privilégie la **langue active** (résolue depuis l'URL) sur la langue du contenu pour les libellés — utile quand WP sert un post fr sur `/en/`. Couvert par 7 nouveaux tests EN/IT/ES.
+
 ### Changed
 
 - **Pages : titre sous l'image bannière**. Quand une page commence par une `<figure>` (image bannière insérée par l'éditeur de contenu), elle est maintenant détachée et rendue *au-dessus* du `<h1>`, plutôt que sous le titre. Nouveau `Posts\CoverExtractor` (5 tests) qui sépare via regex la première figure du `post.content`. `PageController` injecte deux variables `coverHtml` et `bodyHtml` dans le ViewModel ; `templates/pages/page.html.tpl` les utilise. Si aucune figure de tête n'est détectée, le contenu est restitué inchangé (fallback sur l'image à la une si présente).
