@@ -62,10 +62,37 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
                 url: $url,
                 isCurrent: $language->equals($current),
                 hasTranslation: $hasTranslation,
+                flagUrl: $this->flagUrlFor($language->code),
             );
         }
 
         return new LanguageSwitcherViewModel($current, $items);
+    }
+
+    /**
+     * URL absolue vers un drapeau SVG/PNG si présent dans
+     * `assets/img/flags/{code}.{svg|png}`. Retourne null sinon
+     * (le template tombera alors sur l'emoji `flag`).
+     */
+    private function flagUrlFor(string $code): ?string
+    {
+        if (!\function_exists('get_template_directory')) {
+            return null;
+        }
+
+        $themePath = (string) get_template_directory();
+        foreach (['svg', 'png'] as $ext) {
+            $relative = 'assets/img/flags/' . $code . '.' . $ext;
+            if (is_file($themePath . '/' . $relative)) {
+                $themeUri = \function_exists('get_template_directory_uri')
+                    ? (string) get_template_directory_uri()
+                    : '';
+
+                return $themeUri . '/' . $relative;
+            }
+        }
+
+        return null;
     }
 
     /**

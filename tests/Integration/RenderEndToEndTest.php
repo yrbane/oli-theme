@@ -40,6 +40,7 @@ final class RenderEndToEndTest extends TestCase
         Functions\when('home_url')->justReturn('https://example.com');
         Functions\when('get_bloginfo')->justReturn('Oli');
         Functions\when('get_template_directory_uri')->justReturn('https://example.com/wp-content/themes/oli-theme');
+        Functions\when('get_template_directory')->justReturn(\dirname(__DIR__, 2));
         Functions\when('get_option')->justReturn(['enabled' => ['fr'], 'default' => 'fr']);
         Functions\when('apply_filters')->returnArg(2);
         Functions\when('get_permalink')->justReturn('https://example.com/fr/about');

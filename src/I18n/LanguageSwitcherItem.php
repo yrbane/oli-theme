@@ -13,6 +13,11 @@ namespace OliTheme\I18n;
  */
 final readonly class LanguageSwitcherItem
 {
+    /**
+     * @param string $flag Emoji drapeau (fallback si flagUrl est null).
+     * @param string|null $flagUrl URL absolue vers un SVG/PNG dans
+     *                             `assets/img/flags/{code}.svg|.png` si présent.
+     */
     public function __construct(
         public string $code,
         public string $label,
@@ -21,6 +26,7 @@ final readonly class LanguageSwitcherItem
         public string $url,
         public bool $isCurrent,
         public bool $hasTranslation,
+        public ?string $flagUrl = null,
     ) {
     }
 }

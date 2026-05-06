@@ -224,6 +224,15 @@ nav[aria-label*="language" i] {
   filter: grayscale(0.35);
   transition: filter 120ms ease;
 }
+/* Variante SVG : taille un peu plus stricte + ombre fine pour
+   distinguer le drapeau blanc du fond. */
+.language-switcher__flag--svg {
+  width: 1.6em;
+  height: 1.2em;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
 .language-switcher a:hover .language-switcher__flag,
 .language-switcher__item--current .language-switcher__flag {
   filter: grayscale(0);
@@ -271,7 +280,7 @@ article, .post, .page {
   color: #111111;
 }
 .page__content, .entry-content, .post__content {
-  max-width: 720px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 2rem;
 }
