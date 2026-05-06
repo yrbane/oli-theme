@@ -134,7 +134,7 @@ final class ThemeVariationPage
         // l'admin n'a pas configuré une image personnalisée). Permet à l'utilisateur
         // de voir ce qui sera affiché côté front quand l'option est vide.
         $defaultBannerUrl = \function_exists('get_template_directory_uri')
-            ? rtrim((string) get_template_directory_uri(), '/') . '/assets/img/channels4_banner.jpg'
+            ? rtrim((string) get_template_directory_uri(), '/') . '/assets/img/banner.jpg'
             : '';
         $isCustom    = $bannerUrl !== '';
         $previewUrl  = $isCustom ? $bannerUrl : $defaultBannerUrl;

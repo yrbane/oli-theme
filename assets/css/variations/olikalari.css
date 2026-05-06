@@ -842,7 +842,7 @@ body:not(:has(.carousel-fullscreen))::before {
   background-color: #ffffff;
   /* L'URL est surchargée par l'admin via la custom-property
      --oli-internal-banner-url (Apparence > Variations CSS). */
-  background-image: var(--oli-internal-banner-url, url('../../img/channels4_banner.jpg'));
+  background-image: var(--oli-internal-banner-url, url('../../img/banner.jpg'));
   background-size: contain;
   background-position: center center;
   background-repeat: no-repeat;
