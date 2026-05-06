@@ -1,0 +1,648 @@
+/* Theme Variation: Olikalari */
+/* ==========================================================================
+   Olikalari — variation minimaliste éditoriale (Twenty Twenty-Five style)
+   Fond blanc, texte noir, une seule police (Manrope), pas d'effet.
+   Sur la home : carousel plein écran + menu en bandeau bas → sticky top.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap');
+
+:root {
+  --c-bg:           #ffffff;
+  --c-bg-soft:      #f7f7f6;
+  --c-surface:      #ffffff;
+  --c-surface-2:    #fafaf9;
+  --c-line:         #00000014;
+  --c-line-strong:  #00000028;
+  --c-ink:          #111111;
+  --c-ink-soft:     #333333;
+  --c-ink-muted:    #6b6b6b;
+  --c-accent:       #111111;
+  --c-accent-2:     #111111;
+  --ff-serif: 'Manrope', system-ui, sans-serif;
+  --ff-sans:  'Manrope', system-ui, sans-serif;
+  --ff-mono:  'Manrope', ui-monospace, monospace;
+  --maxw-prose:   60ch;
+  --maxw-content: 720px;
+  --maxw-wide:    1200px;
+}
+
+body::before, body::after { display: none !important; content: none !important; }
+
+html, body {
+  background: #ffffff;
+  color: #111111;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: only light;
+  forced-color-adjust: none;
+}
+
+/* ==========================================================================
+   Typographie
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 400;
+  color: #111111;
+  letter-spacing: -0.01em;
+  text-shadow: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 1.5rem; }
+h2 { font-size: 1.5rem; line-height: 1.2; margin: 2.5rem 0 1rem; }
+h3 { font-size: 1.2rem; line-height: 1.3; margin: 2rem 0 0.75rem; }
+p { margin: 0 0 1.25em; color: #111111; }
+
+a {
+  color: #111111;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: opacity 150ms ease;
+}
+a:hover { opacity: 0.55; }
+
+em, i {
+  font-style: italic;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: #111111;
+}
+
+/* ==========================================================================
+   Header — sticky top:0 par défaut. Sur la home avec carousel plein écran,
+   il devient bandeau fixe en bas, puis bascule sticky-top après le scroll.
+   ========================================================================== */
+body > header,
+.site-header,
+header.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid #00000014;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.site-header > * { min-width: 0; }
+.site-header .banner,
+.site-header .site-branding,
+.site-header__branding { flex: 0 0 auto; }
+.site-header .language-switcher,
+.site-header ul.lang-switcher { flex: 0 0 auto; align-self: center; }
+
+.site-header .site-branding,
+.site-header__branding {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+}
+
+.site-header a,
+.site-header .banner__home,
+.site-header .site-title a {
+  color: #111111;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.site-header .site-title a::before {
+  content: '◐';
+  font-family: 'Manrope', system-ui, sans-serif;
+  color: #111111;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  font-size: 1.2em;
+}
+
+.site-header .nav,
+.site-header nav.nav--desktop { flex: 1 1 auto; min-width: 0; }
+
+.site-header .nav__list,
+.site-header .nav__list--root,
+.site-header nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header .nav__item,
+.site-header nav li { margin: 0; list-style: none; }
+
+.site-header .nav__link,
+.site-header nav a:not(.banner__home):not([class*="language-switcher"]) {
+  display: inline-block;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  color: #333333;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.site-header .nav__link:hover,
+.site-header nav a:not(.banner__home):not([class*="language-switcher"]):hover {
+  color: #111111;
+  background: #00000014;
+  opacity: 1;
+}
+
+.site-header .nav__item--current > .nav__link,
+.site-header .nav__item--ancestor > .nav__link,
+.site-header nav .current-menu-item > a,
+.site-header nav .current-menu-ancestor > a,
+.site-header nav a[aria-current] {
+  color: #111111;
+  background: #f4f4f3;
+  border: 1px solid #00000028;
+  text-decoration: none;
+}
+
+/* Switcher de langue */
+.language-switcher,
+nav[aria-label*="langue" i],
+nav[aria-label*="language" i] {
+  display: inline-flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.75rem;
+  background: none;
+  border: none;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.language-switcher li { margin: 0; }
+.language-switcher a,
+.language-switcher__link {
+  color: #6b6b6b;
+  font-weight: 400;
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0;
+}
+.language-switcher a::after,
+.language-switcher__link::after {
+  content: attr(hreflang);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+.language-switcher a:hover { opacity: 0.55; background: none; }
+.language-switcher__item--current a,
+.language-switcher .is-active a,
+.language-switcher__link--current,
+.language-switcher [aria-current] {
+  color: #111111;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  background: none;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+.site-main, main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 4rem 0 6rem;
+  background: #ffffff;
+}
+article, .post, .page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  background: transparent;
+}
+.page__header, .entry-header, .post__header {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+.page__title, .entry-title, .post__title {
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
+.page__content, .entry-content, .post__content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ==========================================================================
+   Hero / sections — neutralise les effets Lunar
+   ========================================================================== */
+.hero, .front-hero {
+  position: relative;
+  text-align: center;
+  padding: 4rem 2rem 5rem;
+  margin: 0 0 3rem;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+  isolation: auto;
+}
+.hero::before, .hero::after,
+.front-hero::before, .front-hero::after { display: none !important; content: none !important; }
+
+.hero__eyebrow, .front-hero__eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+.hero h1, .front-hero h1 {
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #111111;
+  margin: 0 auto 1.5rem;
+  max-width: 22ch;
+}
+.hero h1 em, .front-hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: #111111;
+}
+.hero__lead, .front-hero__lead {
+  font-size: 1.05rem;
+  color: #333333;
+  max-width: 56ch;
+  margin: 0 auto 2rem;
+}
+.hero__cta, .front-hero__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Boutons */
+.btn, button, .wp-block-button__link, input[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid #111111;
+  background: #ffffff;
+  color: #111111;
+  cursor: pointer;
+  text-decoration: none;
+  text-shadow: none;
+  box-shadow: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.btn:hover, button:hover, .wp-block-button__link:hover, input[type="submit"]:hover {
+  background: #111111; color: #ffffff; border-color: #111111;
+}
+.btn--primary, .btn-primary { background: #111111; color: #ffffff; border-color: #111111; box-shadow: none; }
+.btn--primary:hover, .btn-primary:hover { background: #ffffff; color: #111111; }
+
+/* Grille features */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 3rem 2.5rem;
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+.feature-card {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: visible;
+}
+.feature-card:hover { border: none; transform: none; box-shadow: none; }
+.feature-card__icon {
+  width: 32px; height: 32px;
+  font-size: 1rem;
+  background: none;
+  border: 1px solid #00000028;
+  border-radius: 999px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.feature-card__title {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  color: #111111;
+}
+.feature-card__desc { font-size: 0.95rem; color: #333333; margin: 0; }
+.feature-card__link {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.9rem;
+  text-transform: none;
+  color: #111111;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  margin-top: auto;
+  padding: 0;
+}
+.feature-card__link::after { content: ' →'; text-decoration: none; }
+.feature-card__media {
+  margin: 0 0 0.75rem;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  overflow: hidden;
+}
+.feature-card__media img { width: 100%; height: 100%; object-fit: cover; filter: none; }
+.feature-card__media::after, .feature-card__media::before { display: none !important; content: none !important; }
+
+/* Photos / covers : pas de désaturation ni d'overlay */
+.media, .media-cover, .feature-cover, .page-cover, .hero-cover, figure.post-cover {
+  position: relative; margin: 0; border-radius: 0; box-shadow: none; border: none; overflow: hidden;
+}
+.media img, .media-cover img, .feature-cover img,
+.page-cover img, .hero-cover img, figure.post-cover img {
+  width: 100%; height: 100%; display: block; object-fit: cover; filter: none;
+}
+.media::after, .media-cover::after, .feature-cover::after,
+.page-cover::after, .hero-cover::after, figure.post-cover::after {
+  display: none !important; content: none !important;
+}
+
+/* Featured image avec parallaxe (sans désaturation) */
+figure.page-cover.page-cover--bg {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  filter: none;
+  min-height: clamp(280px, 38vw, 480px);
+  margin-bottom: 3rem;
+}
+@media (max-width: 900px), (hover: none) {
+  figure.page-cover.page-cover--bg { background-attachment: scroll; }
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  background: none;
+  border: none;
+  padding: 0 2rem;
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+}
+.breadcrumbs a { color: #6b6b6b; text-decoration: none; }
+.breadcrumbs a:hover { color: #111111; text-decoration: underline; }
+
+/* Footer */
+body > footer, .site-footer {
+  background: transparent;
+  border-top: 1px solid #00000014;
+  color: #111111;
+  padding: 4rem 2rem 3rem;
+  margin-top: 6rem;
+}
+body > footer a, .site-footer a { color: #111111; text-decoration: none; }
+body > footer a:hover, .site-footer a:hover { opacity: 0.55; }
+
+/* Tableaux, code */
+table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; }
+th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid #00000014; font-size: 0.95rem; }
+th { font-weight: 700; }
+tbody tr:hover { background: #fafaf9; }
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #f7f7f6;
+  color: #111111;
+  border-radius: 4px;
+}
+code { padding: 0.1em 0.4em; font-size: 0.85em; }
+pre {
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid #00000014;
+  font-size: 0.85rem;
+}
+pre code { background: none; padding: 0; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  border-left: 2px solid #111111;
+  color: #333333;
+  font-style: italic;
+}
+
+@media (max-width: 720px) {
+  html, body { font-size: 18px; }
+  .site-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1.25rem; }
+  .site-header nav ul { gap: 0.75rem 1rem; }
+  .features-grid { grid-template-columns: 1fr; gap: 2.5rem; padding: 0 1.5rem; }
+  .hero, .front-hero { padding: 2.5rem 1.25rem 3rem; }
+  .page__content, .entry-content, .post__content,
+  .page__header, .entry-header, .post__header { padding-left: 1.25rem; padding-right: 1.25rem; }
+}
+
+/* ==========================================================================
+   Carousel plein écran (home + variation Olikalari)
+   Injecté côté client par le mu-plugin (oli-test-styles).
+   ========================================================================== */
+.carousel-fullscreen {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+  z-index: 1;
+}
+.carousel-fullscreen__slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.carousel-fullscreen__slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Voile sombre pour lisibilité du texte */
+.carousel-fullscreen__slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.35) 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+}
+.carousel-fullscreen__caption {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  padding: 0 2rem;
+  text-align: center;
+  color: #ffffff;
+}
+.carousel-fullscreen__title {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: clamp(2rem, 1.4rem + 3vw, 4rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+.carousel-fullscreen__excerpt {
+  font-size: clamp(1rem, 0.85rem + 0.5vw, 1.25rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.carousel-fullscreen__excerpt p { color: inherit; margin: 0; }
+
+.carousel-fullscreen__dots {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--header-h, 75px) + 1.5rem);
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 0.5rem;
+}
+.carousel-fullscreen__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.carousel-fullscreen__dot.is-active {
+  background: #ffffff;
+  transform: scale(1.2);
+}
+.carousel-fullscreen__dot:hover { background: rgba(255, 255, 255, 0.6); }
+
+/* ==========================================================================
+   Header sur la home avec carousel : initialement bandeau bas (over carousel),
+   puis sticky-top après scroll au-delà du carousel.
+   ========================================================================== */
+body.has-fullscreen-hero .site-header {
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid #00000014;
+  border-bottom: none;
+  transition: background 200ms ease;
+}
+
+body.has-fullscreen-hero.scrolled-past-hero .site-header {
+  position: sticky;
+  top: 0;
+  bottom: auto;
+  border-top: none;
+  border-bottom: 1px solid #00000014;
+}
+
+/* Quand le carousel est en place, le main commence à 100vh : pas de padding-top,
+   et le hero/header de page sont masqués (le carousel sert de hero). */
+body.has-fullscreen-hero main.site-main {
+  padding-top: 0;
+}
+body.has-fullscreen-hero article.page--accueil > .page__header,
+body.has-fullscreen-hero article.page--accueil > .page__content > section.hero,
+body.has-fullscreen-hero article.page--accueil > .page__content > .breadcrumbs,
+body.has-fullscreen-hero > nav.breadcrumbs {
+  display: none;
+}
+
+/* La grille de features remonte sous le carousel avec un padding-block confortable */
+body.has-fullscreen-hero article.page--accueil > .page__content {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+/* Quand on est en sticky-top, on doit compenser le hauteur du header pour
+   éviter un saut visuel : aucun ajustement ici car sticky se substitue au flow. */
+
+/* Mobile : carousel un peu moins haut, dots plus visibles */
+@media (max-width: 640px) {
+  .carousel-fullscreen { height: 100svh; }
+  .carousel-fullscreen__caption { padding: 0 1.5rem; }
+  .carousel-fullscreen__title { font-size: clamp(1.6rem, 1.4rem + 2vw, 2.4rem); }
+  .carousel-fullscreen__dots { bottom: calc(var(--header-h, 100px) + 1rem); }
+}
