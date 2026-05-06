@@ -50,6 +50,7 @@ final class ViewRendererBaseLayoutTest extends TestCase
         $renderer->registerMacro('wpHead', static fn (): string => '');
         $renderer->registerMacro('wpFooter', static fn (): string => '');
         $renderer->registerMacro('extraBodyClass', static fn (): string => '');
+        $renderer->registerMacro('socialIcons', static fn (): string => '');
 
         $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
 

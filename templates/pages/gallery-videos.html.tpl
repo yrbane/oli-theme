@@ -33,8 +33,8 @@
                                 data-gallery-thumb
                                 data-embed="[[ video.embed_url ]]"
                                 data-caption="[[ video.caption ]]">
-                            <img class="gallery__thumb-image" src="[[ video.thumb ]]" alt="[[ video.caption ]]" loading="lazy">
                             <span class="gallery__thumb-play" aria-hidden="true">▶</span>
+                            <span class="gallery__thumb-title">[[ video.caption ]]</span>
                         </button>
                     </li>
                 [% endfor %]

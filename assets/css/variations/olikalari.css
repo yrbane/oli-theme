@@ -663,6 +663,29 @@ body > footer, .site-footer {
 body > footer a, .site-footer a { color: #111111; text-decoration: none; }
 body > footer a:hover, .site-footer a:hover { opacity: 0.55; }
 
+/* Réseaux sociaux dans le pied de page : icônes 1.2rem, gris doux puis
+   foncé au hover. Le tout centré avec un peu d'air autour. */
+.site-footer .social-links {
+  margin: 1.25rem auto;
+  gap: 1rem;
+}
+.site-footer .social-links__link {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #6b6b6b;
+  background: transparent;
+}
+.site-footer .social-links__link:hover,
+.site-footer .social-links__link:focus-visible {
+  color: #111111;
+  opacity: 1;
+  background: #f4f4f3;
+}
+.site-footer .social-links__link svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* Tableaux, code */
 table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; }
 th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid #00000014; font-size: 0.95rem; }
@@ -863,26 +886,74 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   padding: 0 1.5rem;
 }
 
-/* Page Vidéos : layout inversé — player large à gauche, vignettes en grille
-   à droite. Plus de place au lecteur, vignettes alignées sur le côté.
-   Colonne droite plus large (480px) + vignettes plus généreuses (160px min)
-   pour qu'on voie clairement le contenu de chaque vidéo. */
+/* Page Vidéos : layout inversé — player large à gauche, listes des titres
+   à droite. Vignettes des vidéos masquées (l'iframe YouTube affiche déjà
+   la vidéo en cours), seuls le picto ▶ et la légende restent visibles. */
 .gallery--videos {
-  grid-template-columns: 1fr minmax(320px, 480px);
+  grid-template-columns: 1fr minmax(280px, 380px);
 }
 .gallery--videos .gallery__main { grid-column: 1; grid-row: 1; }
 .gallery--videos .gallery__thumbs {
   grid-column: 2;
   grid-row: 1;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.5rem;
+  /* Une seule colonne : liste verticale de titres. */
+  grid-template-columns: 1fr;
+  grid-auto-flow: row;
+  gap: 0.25rem;
 }
+.gallery--videos .gallery__thumb-item { width: 100%; }
 .gallery--videos .gallery__thumb-button {
-  /* Vignettes vidéo plus grandes, ratio 16:9 préservé. */
-  aspect-ratio: 16 / 9;
+  /* Pas de vignette image : on libère le ratio. */
+  aspect-ratio: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border-radius: 3px;
+  text-align: left;
 }
+.gallery--videos .gallery__thumb-button:hover {
+  background: #f4f4f3;
+  transform: none;
+}
+.gallery--videos .gallery__thumb-button.is-active {
+  background: #f4f4f3;
+  border-color: transparent;
+  box-shadow: none;
+}
+/* La vignette image n'est plus rendue. */
+.gallery--videos .gallery__thumb-image {
+  display: none;
+}
+/* Le picto ▶ reste affiché en début de ligne (à la place de la vignette). */
 .gallery--videos .gallery__thumb-play {
-  font-size: 2rem;
+  position: static;
+  inset: auto;
+  width: 1.5rem;
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+  color: #6b6b6b;
+  text-shadow: none;
+  pointer-events: none;
+}
+.gallery--videos .gallery__thumb-button.is-active .gallery__thumb-play,
+.gallery--videos .gallery__thumb-button:hover .gallery__thumb-play {
+  color: #111111;
+}
+/* Le caption (data-caption) est en alt — on l'expose via ::after pour l'avoir
+   visible. Plus simple : on injecte le titre via .gallery__thumb-image[alt]
+   sera plus complexe… On va plutôt rendre directement le caption depuis le
+   template, voir ci-dessous. */
+.gallery--videos .gallery__thumb-title {
+  flex: 1 1 auto;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: inherit;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .gallery__main {
   position: sticky;

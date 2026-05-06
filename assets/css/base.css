@@ -52,6 +52,40 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
     word-wrap: normal !important;
 }
 .archive__list, .search-results__list { list-style: none; display: grid; gap: var(--space-5); }
+
+/* Réseaux sociaux : liste d'icônes SVG colorisables via currentColor. */
+.social-links {
+    list-style: none;
+    margin: var(--space-3) 0;
+    padding: 0;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+.social-links__item { margin: 0; }
+.social-links__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    color: currentColor;
+    transition: opacity 120ms ease, transform 120ms ease;
+    text-decoration: none;
+}
+.social-links__link:hover,
+.social-links__link:focus-visible {
+    opacity: 0.6;
+    transform: translateY(-1px);
+}
+.social-links__link svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: currentColor;
+    display: block;
+}
 .btn {
     display: inline-block; padding: var(--space-3) var(--space-5);
     background: var(--color-accent); color: var(--color-accent-contrast); text-decoration: none;

@@ -315,6 +315,7 @@ final class Theme
         (new \OliTheme\Posts\PostsModule($container))->register();
         (new \OliTheme\Appearance\AppearanceModule($container))->register();
         (new \OliTheme\Gallery\GalleryModule($container))->register();
+        (new \OliTheme\Social\SocialModule($container))->register();
     }
 
     /**
@@ -364,6 +365,52 @@ final class Theme
             }
 
             return implode(' ', $extras);
+        });
+
+        // Réseaux sociaux : rendu inline d'un <ul> avec les icônes SVG
+        // intégrées en file_get_contents (pour pouvoir les coloriser via
+        // currentColor). Macro lazy pour s'exécuter au moment du rendu, pas
+        // au boot (avant que les options WP soient lues).
+        $themePath = $container->has(\OliTheme\Core\AssetManager::class)
+            ? null  // récupéré dynamiquement
+            : null;
+        $renderer->registerMacro('socialIcons', static function () use ($container): string {
+            if (!$container->has(\OliTheme\Social\SocialLinksRepository::class)) {
+                return '';
+            }
+            $repo   = $container->get(\OliTheme\Social\SocialLinksRepository::class);
+            $links  = $repo->active();
+            if ($links === []) {
+                return '';
+            }
+
+            $iconsDir = \function_exists('get_template_directory')
+                ? rtrim((string) get_template_directory(), '/') . '/assets/img/icons/social'
+                : '';
+
+            $html  = '<ul class="social-links" aria-label="Réseaux sociaux">';
+            foreach ($links as $l) {
+                $svg = '';
+                if ($iconsDir !== '') {
+                    $path = $iconsDir . '/' . $l['icon'];
+                    if (is_file($path)) {
+                        $raw = (string) file_get_contents($path);
+                        // On retire les attributs fill du SVG pour pouvoir
+                        // colorer via currentColor au CSS.
+                        $svg = (string) preg_replace('~\sfill="[^"]*"~', '', $raw);
+                    }
+                }
+                $html .= '<li class="social-links__item">';
+                $html .= '<a class="social-links__link" href="' . htmlspecialchars($l['url'], \ENT_QUOTES, 'UTF-8') . '"';
+                $html .= ' target="_blank" rel="noopener noreferrer"';
+                $html .= ' aria-label="' . htmlspecialchars($l['label'], \ENT_QUOTES, 'UTF-8') . '"';
+                $html .= ' title="' . htmlspecialchars($l['label'], \ENT_QUOTES, 'UTF-8') . '">';
+                $html .= $svg;
+                $html .= '</a>';
+                $html .= '</li>';
+            }
+            $html .= '</ul>';
+            return $html;
         });
     }
 }

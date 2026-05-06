@@ -66,6 +66,7 @@ final class SinglePostTemplateRenderTest extends TestCase
         $renderer->registerMacro('wpHead', static fn (): string => '');
         $renderer->registerMacro('wpFooter', static fn (): string => '');
         $renderer->registerMacro('extraBodyClass', static fn (): string => '');
+        $renderer->registerMacro('socialIcons', static fn (): string => '');
 
         $html = $renderer->render('pages/single-post.html', [
             'post' => $entity,

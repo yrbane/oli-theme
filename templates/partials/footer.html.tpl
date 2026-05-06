@@ -16,6 +16,7 @@
                 </ul>
             </nav>
         [% endif %]
+        ##socialIcons()##
         <p class="site-footer__copy">© [[ currentYear ]] [[ siteName ]]. Tous droits réservés.</p>
     </div>
 </footer>
