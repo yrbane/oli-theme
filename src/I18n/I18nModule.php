@@ -39,7 +39,15 @@ final class I18nModule implements ModuleInterface
             return $rules->addQueryVar($vars);
         });
 
+        // Filtre `home_url` UNIQUEMENT après le hook `wp` (= après parse_request).
+        // Sinon WP utilise home_url() filtrée pour calculer le `$home_path` qu'il
+        // retire de REQUEST_URI ; en préfixant /en/, on ferait sauter la rewrite
+        // spécifique (ex. ^en/events/?$) au profit de la verbose-page-rule
+        // (`pagename=events`).
         add_filter('home_url', function (string $url, string $path): string {
+            if (! did_action('wp')) {
+                return $url;
+            }
             $filter = $this->container->get(LanguageUrlFilter::class);
             \assert($filter instanceof LanguageUrlFilter);
 

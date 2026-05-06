@@ -83,7 +83,7 @@ final class EventsModuleTest extends TestCase
 
     public function testRegisterHooksAllEvents(): void
     {
-        Actions\expectAdded('init')->once();
+        Actions\expectAdded('init')->twice(); // CPT (priority 10) + EventArchiveRewriteRules (priority 5)
         Actions\expectAdded('add_meta_boxes')->once();
         Actions\expectAdded('save_post_oli_event')->once();
 

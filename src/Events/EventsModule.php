@@ -45,6 +45,15 @@ final class EventsModule implements ModuleInterface
             );
         }
 
+        if (! $container->has(EventArchiveRewriteRules::class)) {
+            $container->factory(
+                EventArchiveRewriteRules::class,
+                static fn (Container $c): EventArchiveRewriteRules => new EventArchiveRewriteRules(
+                    $c->get(LanguageRegistryInterface::class),
+                ),
+            );
+        }
+
         if (! $container->has(EventModel::class)) {
             $container->factory(
                 EventModel::class,
@@ -117,6 +126,14 @@ final class EventsModule implements ModuleInterface
         add_action('init', function (): void {
             $this->container->get(EventCpt::class)->register();
         });
+
+        // Priorité 5 (avant I18nModule à priorité 10) pour que nos rewrites
+        // d'archive (^en/events/?$) soient enregistrées AVANT les rewrites
+        // génériques de langue (^en/(.+)/?$). WP teste les règles dans leur
+        // ordre d'insertion : la règle spécifique doit donc venir en premier.
+        add_action('init', function (): void {
+            $this->container->get(EventArchiveRewriteRules::class)->register();
+        }, 5);
 
         add_action('add_meta_boxes', function (): void {
             $this->container->get(EventMetabox::class)->register();
