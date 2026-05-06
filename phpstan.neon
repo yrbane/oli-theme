@@ -23,6 +23,3 @@ parameters:
         # Tableau générique dans le constructeur des stubs anonymes de test
         - message: '#has parameter \$insertCalls with no value type specified in iterable type array#'
           path: tests/Unit/Seo/RedirectModelTest.php
-        # ThemeSettingsPage::$settings sera utilisé dans les futures méthodes de rendu partiel
-        - message: '#Property OliTheme\\Settings\\ThemeSettingsPage::\$settings is never read, only written#'
-          path: src/Settings/ThemeSettingsPage.php

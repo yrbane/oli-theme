@@ -1,8 +1,80 @@
 /* Styles admin oli-theme — page Settings + métaboxes. */
-.oli-settings { max-width: 60rem; }
-.oli-settings__form { margin-top: 1rem; }
-.oli-settings .form-table th { width: 14rem; }
-.oli-settings .description { color: #6c6c6c; font-size: 0.9em; }
 
-/* Onglets : reprend les classes natives WP (.nav-tab) sans surcharge. */
-.oli-settings .nav-tab-wrapper { margin-bottom: 1rem; }
+.oli-settings {
+    max-width: 64rem;
+}
+
+.oli-settings__form {
+    margin-top: 1.5rem;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.oli-settings .form-table th {
+    width: 16rem;
+    padding: 1rem 1rem 1rem 0;
+    font-weight: 600;
+}
+
+.oli-settings .form-table td {
+    padding: 1rem 0;
+}
+
+.oli-settings .form-table input[type="text"],
+.oli-settings .form-table input[type="url"],
+.oli-settings .form-table input[type="email"],
+.oli-settings .form-table textarea,
+.oli-settings .form-table select {
+    width: 100%;
+    max-width: 32rem;
+}
+
+.oli-settings .form-table input[type="number"].small-text {
+    width: 6rem;
+}
+
+.oli-settings .description {
+    color: #50575e;
+    font-size: 0.875em;
+    margin-top: 0.35rem;
+}
+
+.oli-settings__form h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1d2327;
+    border-bottom: 1px solid #dcdcde;
+    padding-bottom: 0.5rem;
+}
+
+.oli-settings__form > h2:first-of-type {
+    margin-top: 0;
+}
+
+/* Onglets : reprend les classes natives WP (.nav-tab) sans surcharge majeure. */
+.oli-settings .nav-tab-wrapper {
+    margin-bottom: 0;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.oli-settings .nav-tab {
+    margin-left: 0;
+    margin-right: 0.25rem;
+    font-weight: 500;
+}
+
+.oli-settings .nav-tab-active {
+    background: #fff;
+    border-bottom-color: #fff;
+}
+
+/* Submit button alignment. */
+.oli-settings__form .submit {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dcdcde;
+}
