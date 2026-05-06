@@ -224,10 +224,14 @@ header.site-header {
 .site-header .nav--desktop .nav__sublist {
   background: #ffffff;
   border: 1px solid #00000014;
-  border-radius: 6px;
+  border-radius: 3px;
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
-  padding: 0.4rem;
+  /* Padding réduit à 0 pour que les liens prennent toute la largeur du
+     dropdown et que toute leur zone soit cliquable. Les liens ont leur
+     propre padding interne. */
+  padding: 0;
   min-width: 12rem;
+  overflow: hidden; /* clipe le coin haut-gauche du premier <a> selon le radius */
   /* Pas de margin-top : un margin n'est PAS hoverable, donc la souris perd
      le :hover en traversant et le sous-menu se ferme. On colle le sous-menu
      au parent et on crée une zone-pont invisible via ::before ci-dessous. */
@@ -251,8 +255,10 @@ header.site-header {
 }
 .site-header .nav--desktop .nav__sublist .nav__link {
   display: block;
-  padding: 0.45rem 0.7rem;
-  border-radius: 4px;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0;
   font-size: 0.85rem;
   white-space: nowrap;
   color: #444444;
