@@ -8,11 +8,6 @@
     <article class="page page--gallery page--gallery-videos page--[[ post.slug ]]" lang="[[ post.language.code ]]">
         <header class="page__header">
             <h1 class="page__title">[[ post.title ]]</h1>
-            <p class="page__channel">
-                <a href="[[ channelUrl ]]" target="_blank" rel="noopener noreferrer" class="page__channel-link">
-                    [[ channelUrl ]]
-                </a>
-            </p>
         </header>
 
         [% if hasVideos %]

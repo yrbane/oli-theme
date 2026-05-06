@@ -148,13 +148,23 @@ final class YoutubeChannelFetcher
 
     /**
      * Wrapper HTTP GET : utilise wp_remote_get si disponible, file_get_contents sinon.
+     *
+     * User-agent navigateur + cookies CONSENT/SOCS pour bypass la page RGPD
+     * que YouTube renvoie aux requêtes server-side. Sans ces cookies, la
+     * réponse est une page de "Before you continue to YouTube" qui ne
+     * contient pas le marker `externalId`.
      */
     private function httpGet(string $url): string
     {
+        $userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+        $consentCookies = 'CONSENT=YES+cb; SOCS=CAISEwgDEgk2NDU3MDc2NjUaAmVuIAEaBgiA0_aXBg';
+
         if (\function_exists('wp_remote_get')) {
             $response = wp_remote_get($url, [
-                'timeout'    => 8,
-                'user-agent' => 'oli-theme/1.0 YouTube channel fetcher',
+                'timeout'     => 8,
+                'redirection' => 5,
+                'user-agent'  => $userAgent,
+                'headers'     => ['Cookie' => $consentCookies],
             ]);
             if (\function_exists('is_wp_error') && is_wp_error($response)) {
                 return '';
@@ -170,8 +180,10 @@ final class YoutubeChannelFetcher
 
         $context = stream_context_create([
             'http' => [
-                'timeout' => 8,
-                'header'  => "User-Agent: oli-theme/1.0\r\n",
+                'timeout'        => 8,
+                'follow_location' => 1,
+                'max_redirects'  => 5,
+                'header'         => "User-Agent: {$userAgent}\r\nCookie: {$consentCookies}\r\n",
             ],
         ]);
         $body = @file_get_contents($url, false, $context);
