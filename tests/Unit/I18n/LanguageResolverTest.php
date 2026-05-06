@@ -71,10 +71,54 @@ final class LanguageResolverTest extends TestCase
 
     public function test_it_should_fall_back_to_cookie_when_no_url_prefix(): void
     {
+        // Cookie + pas de REQUEST_URI = contexte hors front (CLI, hook tôt) → cookie utilisé.
         $request = new RequestContext(cookies: ['oli_lang' => 'it']);
         $resolver = new LanguageResolver(new LanguageRegistry(), $request);
 
         self::assertSame('it', $resolver->resolve()->code);
+    }
+
+    /**
+     * Sur le front, une URL sans préfixe (`/installation/`, `/`) est
+     * canoniquement la langue par défaut. Le cookie ne doit PAS écraser
+     * ce signal explicite : sinon, après un passage sur /en/, on ne peut
+     * plus revenir sur fr en cliquant sur le switcher (cookie=en gagne).
+     */
+    public function test_front_url_without_prefix_returns_default_even_if_cookie_says_otherwise(): void
+    {
+        $request = new RequestContext(
+            cookies: ['oli_lang' => 'en'],
+            server: ['REQUEST_URI' => '/installation/'],
+        );
+        $resolver = new LanguageResolver(new LanguageRegistry(), $request);
+
+        self::assertSame('fr', $resolver->resolve()->code);
+    }
+
+    public function test_front_root_url_returns_default_even_if_cookie_says_otherwise(): void
+    {
+        $request = new RequestContext(
+            cookies: ['oli_lang' => 'en'],
+            server: ['REQUEST_URI' => '/'],
+        );
+        $resolver = new LanguageResolver(new LanguageRegistry(), $request);
+
+        self::assertSame('fr', $resolver->resolve()->code);
+    }
+
+    /**
+     * Mais en admin (URL /wp-admin/), l'URL ne contient pas la langue,
+     * le cookie reste pertinent pour personnaliser l'affichage.
+     */
+    public function test_admin_url_falls_back_to_cookie(): void
+    {
+        $request = new RequestContext(
+            cookies: ['oli_lang' => 'en'],
+            server: ['REQUEST_URI' => '/wp-admin/post.php?post=42&action=edit'],
+        );
+        $resolver = new LanguageResolver(new LanguageRegistry(), $request);
+
+        self::assertSame('en', $resolver->resolve()->code);
     }
 
     public function test_it_should_fall_back_to_accept_language_header(): void

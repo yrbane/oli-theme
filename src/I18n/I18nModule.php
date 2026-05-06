@@ -68,7 +68,7 @@ final class I18nModule implements ModuleInterface
             $resolver = $this->container->get(LanguageResolver::class);
             \assert($resolver instanceof LanguageResolver);
 
-            if (!\in_array($resolver->source(), ['path', 'query_var'], true)) {
+            if (!\in_array($resolver->source(), ['path', 'path_default', 'query_var'], true)) {
                 return;
             }
 

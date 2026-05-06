@@ -23,7 +23,7 @@ final class LanguageResolver implements LanguageResolverInterface
 
     private ?Language $memo = null;
 
-    /** @var 'path'|'query_var'|'cookie'|'accept_language'|'default' */
+    /** @var 'path'|'path_default'|'query_var'|'cookie'|'accept_language'|'default' */
     private string $lastSource = 'default';
 
     public function __construct(
@@ -52,7 +52,7 @@ final class LanguageResolver implements LanguageResolverInterface
      * Source de la dernière résolution. Utile pour décider de poser un cookie
      * de persistance quand la langue vient de l'URL.
      *
-     * @return 'path'|'query_var'|'cookie'|'accept_language'|'default'
+     * @return 'path'|'path_default'|'query_var'|'cookie'|'accept_language'|'default'
      */
     public function source(): string
     {
@@ -63,14 +63,26 @@ final class LanguageResolver implements LanguageResolverInterface
 
     private function resolveOnce(): Language
     {
-        // Le path est la source de vérité côté front : `/en/about/` → en.
-        // WordPress route ces URL via les rewrite rules vers index.php?oli_lang=en
-        // mais ce paramètre n'est pas dans $_GET, il est injecté dans WP_Query.
-        // On parse donc directement REQUEST_URI pour rester indépendant de WP.
-        $fromPath = $this->resolveFromPath();
-        if ($fromPath !== null) {
-            $this->lastSource = 'path';
-            return $fromPath;
+        // Le path est la source de vérité côté front. Trois cas :
+        //   1. /en/...    → langue 'en' (préfixe explicite)
+        //   2. /xyz/...   → langue par défaut (l'absence de préfixe est explicite ;
+        //                   sinon le cookie d'une session précédente écraserait
+        //                   le choix de l'utilisateur de revenir au défaut)
+        //   3. /wp-admin/ → pas du front, on tombe sur les autres sources
+        $uri = $this->request->server('REQUEST_URI');
+        if ($uri !== null) {
+            $path = (string) parse_url($uri, \PHP_URL_PATH);
+
+            $fromPath = $this->resolveFromPath($path);
+            if ($fromPath !== null) {
+                $this->lastSource = 'path';
+                return $fromPath;
+            }
+
+            if (! $this->isAdminLikePath($path)) {
+                $this->lastSource = 'path_default';
+                return $this->registry->default();
+            }
         }
 
         $fromQuery = $this->request->queryVar(self::QUERY_VAR);
@@ -105,21 +117,28 @@ final class LanguageResolver implements LanguageResolverInterface
     }
 
     /**
-     * Détecte un préfixe de langue dans le path de REQUEST_URI : `/en/...` ou `/en`.
+     * Détecte un préfixe de langue dans un path : `/en/...` ou `/en`.
      */
-    private function resolveFromPath(): ?Language
+    private function resolveFromPath(string $path): ?Language
     {
-        $uri = $this->request->server('REQUEST_URI');
-        if ($uri === null) {
-            return null;
-        }
-
-        $path = (string) parse_url($uri, \PHP_URL_PATH);
         if (preg_match('~^/([a-z]{2})(?:/|$)~', $path, $matches) !== 1) {
             return null;
         }
 
         return $this->registry->get($matches[1]);
+    }
+
+    /**
+     * Détecte les paths d'administration ou d'API (qui ne portent pas la langue).
+     */
+    private function isAdminLikePath(string $path): bool
+    {
+        return str_starts_with($path, '/wp-admin/')
+            || str_starts_with($path, '/wp-login.php')
+            || str_starts_with($path, '/wp-json/')
+            || str_starts_with($path, '/wp-cron.php')
+            || str_starts_with($path, '/feed/')
+            || str_starts_with($path, '/xmlrpc.php');
     }
 
     /**
