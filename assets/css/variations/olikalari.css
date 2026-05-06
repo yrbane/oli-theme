@@ -864,12 +864,26 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
 }
 
 /* Page Vidéos : layout inversé — player large à gauche, vignettes en grille
-   à droite. Plus de place au lecteur, vignettes alignées sur le côté. */
+   à droite. Plus de place au lecteur, vignettes alignées sur le côté.
+   Colonne droite plus large (480px) + vignettes plus généreuses (160px min)
+   pour qu'on voie clairement le contenu de chaque vidéo. */
 .gallery--videos {
-  grid-template-columns: 1fr minmax(220px, 360px);
+  grid-template-columns: 1fr minmax(320px, 480px);
 }
 .gallery--videos .gallery__main { grid-column: 1; grid-row: 1; }
-.gallery--videos .gallery__thumbs { grid-column: 2; grid-row: 1; }
+.gallery--videos .gallery__thumbs {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+.gallery--videos .gallery__thumb-button {
+  /* Vignettes vidéo plus grandes, ratio 16:9 préservé. */
+  aspect-ratio: 16 / 9;
+}
+.gallery--videos .gallery__thumb-play {
+  font-size: 2rem;
+}
 .gallery__main {
   position: sticky;
   top: calc(var(--header-h, 75px) + var(--oli-admin-bar-offset, 0px) + 1rem);
