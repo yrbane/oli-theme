@@ -665,3 +665,21 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   .carousel-fullscreen__title { font-size: clamp(1.6rem, 1.4rem + 2vw, 2.4rem); }
   .carousel-fullscreen__dots { bottom: calc(var(--header-h, 100px) + 1rem); }
 }
+
+/* ==========================================================================
+   Bannière Olikalari sur les pages sans carousel plein écran (donc toutes
+   les pages sauf la home). Le menu sticky vient se coller juste en dessous
+   au chargement, puis colle au top du viewport en scrollant — même
+   comportement que sur la home, mais avec une image fixe au lieu du carousel.
+   ========================================================================== */
+body:not(:has(.carousel-fullscreen))::before {
+  display: block !important;
+  content: '' !important;
+  width: 100%;
+  height: clamp(120px, 14vw, 220px);
+  background-color: #ffffff;
+  background-image: url('../../img/channels4_banner.jpg');
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
