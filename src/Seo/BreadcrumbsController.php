@@ -99,14 +99,49 @@ final class BreadcrumbsController implements BreadcrumbsControllerInterface
             ];
         }
 
+        // Pour les pages, insère la chaîne d'ancêtres (post_parent → racine)
+        // entre la home et la page courante. Ainsi `/a-propos/notre-equipe/`
+        // donne « Accueil › À propos › Notre équipe ».
+        $ancestors = $this->ancestorsFor($post->id);
+
         return [
             $home,
+            ...$ancestors,
             new BreadcrumbItemEntity(
                 label: $post->title,
                 url: $post->permalink,
                 isCurrent: true,
             ),
         ];
+    }
+
+    /**
+     * Construit la liste des ancêtres d'une page (du plus haut au plus proche).
+     *
+     * @return BreadcrumbItemEntity[]
+     */
+    private function ancestorsFor(int $postId): array
+    {
+        if (!\function_exists('get_post_ancestors')) {
+            return [];
+        }
+
+        // get_post_ancestors retourne du plus proche au plus lointain → on inverse.
+        /** @var int[] $ids */
+        $ids = (array) get_post_ancestors($postId);
+        $ids = array_reverse($ids);
+
+        $crumbs = [];
+        foreach ($ids as $aid) {
+            $title = \function_exists('get_the_title') ? (string) get_the_title($aid) : '';
+            $url   = \function_exists('get_permalink') ? (string) get_permalink($aid) : '';
+            if ($title === '') {
+                continue;
+            }
+            $crumbs[] = new BreadcrumbItemEntity(label: $title, url: $url, isCurrent: false);
+        }
+
+        return $crumbs;
     }
 
     /**

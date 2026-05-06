@@ -564,18 +564,67 @@ figure.page-cover.page-cover--bg {
   figure.page-cover.page-cover--bg { background-attachment: scroll; }
 }
 
-/* Breadcrumbs */
+/* ==========================================================================
+   Fil d'Ariane — discret, espacé, séparateurs « › » entre items.
+   ========================================================================== */
 .breadcrumbs {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #6b6b6b;
   background: none;
   border: none;
   padding: 0 2rem;
   max-width: 1200px;
-  margin: 0 auto 1.5rem;
+  margin: 1.25rem auto 1.5rem;
+  letter-spacing: 0.01em;
 }
-.breadcrumbs a { color: #6b6b6b; text-decoration: none; }
-.breadcrumbs a:hover { color: #111111; text-decoration: underline; }
+.breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumbs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+/* Séparateur « › » entre items, sauf après le dernier. */
+.breadcrumbs__item:not(:last-child)::after {
+  content: '›';
+  color: #c8c8c8;
+  font-weight: 400;
+  font-size: 1.1em;
+  line-height: 1;
+}
+.breadcrumbs a {
+  color: #6b6b6b;
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  color: #111111;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+/* Item courant : juste plus foncé + un peu plus dense (pas d'encadrement). */
+.breadcrumbs [aria-current="page"] {
+  color: #111111;
+  font-weight: 600;
+}
+
+/* Mobile : font légèrement réduite, padding réduit. */
+@media (max-width: 640px) {
+  .breadcrumbs {
+    font-size: 0.72rem;
+    padding: 0 1rem;
+    margin: 1rem auto 1rem;
+  }
+}
 
 /* Footer */
 body > footer, .site-footer {
