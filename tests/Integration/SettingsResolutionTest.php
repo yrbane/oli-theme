@@ -54,6 +54,7 @@ final class SettingsResolutionTest extends TestCase
         Functions\when('home_url')->justReturn('https://example.com');
         Functions\when('get_bloginfo')->justReturn('Oli');
         Functions\when('get_template_directory_uri')->justReturn('https://example.com/theme');
+        Functions\when('get_template_directory')->justReturn($themePath);
         Functions\when('get_option')->justReturn(false);
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);

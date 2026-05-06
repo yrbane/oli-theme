@@ -313,6 +313,7 @@ final class Theme
         (new \OliTheme\Events\EventsModule($container))->register();
         (new \OliTheme\Contact\ContactModule($container))->register();
         (new \OliTheme\Posts\PostsModule($container))->register();
+        (new \OliTheme\Appearance\AppearanceModule($container))->register();
     }
 
     /**

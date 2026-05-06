@@ -60,6 +60,7 @@ final class SeoE2ETest extends TestCase
         Functions\when('home_url')->justReturn('https://example.com');
         Functions\when('get_bloginfo')->justReturn('Oli');
         Functions\when('get_template_directory_uri')->justReturn('https://example.com/theme');
+        Functions\when('get_template_directory')->justReturn(\dirname(__DIR__, 2));
         Functions\when('get_option')->justReturn(['enabled' => ['fr'], 'default' => 'fr']);
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);

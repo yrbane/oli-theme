@@ -1,0 +1,31 @@
+/* Theme Variation: Sombre */
+
+:root {
+    --color-bg: #0f172a;
+    --color-text: #e2e8f0;
+    --color-muted: #94a3b8;
+    --color-primary: #38bdf8;
+    --color-border: #334155;
+}
+
+body {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+a {
+    color: var(--color-primary);
+}
+
+.site-header,
+.site-footer {
+    background: #1e293b;
+    border-color: var(--color-border);
+}
+
+.event--card,
+.page__cover figure,
+.archive__title {
+    background: #1e293b;
+    color: var(--color-text);
+}

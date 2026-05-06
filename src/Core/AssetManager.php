@@ -40,6 +40,8 @@ final class AssetManager
             $this->version('assets/css/main.css'),
         );
 
+        $this->enqueueVariation();
+
         wp_enqueue_script_module(
             'oli-theme',
             $this->themeUri . '/assets/js/main.js',
@@ -83,6 +85,43 @@ final class AssetManager
             $this->themeUri . '/assets/js/seo-metabox.js',
             [],
             $this->version('assets/js/seo-metabox.js'),
+        );
+    }
+
+    /**
+     * Enqueue la variation CSS sélectionnée (après main.css pour l'overrider).
+     * Aucun effet si l'option n'est pas définie ou si le fichier n'existe pas.
+     */
+    private function enqueueVariation(): void
+    {
+        if (!\function_exists('get_option')) {
+            return;
+        }
+
+        $variation = (string) get_option('oli_theme_variation', '');
+        if ($variation === '') {
+            return;
+        }
+
+        // Sécurité : sanitize_key pour éviter le path-traversal (ex. "../../wp-config").
+        if (\function_exists('sanitize_key')) {
+            $variation = sanitize_key($variation);
+        }
+        if ($variation === '') {
+            return;
+        }
+
+        $relative = 'assets/css/variations/' . $variation . '.css';
+        $absolute = $this->themePath . '/' . $relative;
+        if (!file_exists($absolute)) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'oli-theme-variation',
+            $this->themeUri . '/' . $relative,
+            ['oli-theme'],
+            $this->version($relative),
         );
     }
 

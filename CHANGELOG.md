@@ -6,6 +6,15 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ### Added
 
+- **Variations CSS du thème + sélecteur admin**. Nouveau système permettant de surcharger le CSS du thème sans toucher à `main.css` :
+  - Dossier `assets/css/variations/` à la racine du thème : déposez-y un fichier `*.css` par variation. Un commentaire d'en-tête `/* Theme Variation: Mon nom */` permet de personnaliser le label, sinon il est dérivé du nom de fichier (`dark-mode.css` → « Dark mode »).
+  - Sous-page admin **Apparence > Variations CSS** avec un `<select>` listant toutes les variations détectées + option « Aucune (CSS de base) ». Le choix est persisté dans l'option `oli_theme_variation` (sanitize via `sanitize_key()` + validation contre la liste réelle, immune au path-traversal).
+  - `Core\AssetManager::enqueueFront()` enqueue automatiquement la variation choisie après `main.css` avec une dépendance WP, garantissant l'ordre de cascade côté front.
+  - Deux variations livrées en exemple : `dark.css` (mode sombre) et `sunset.css` (palette chaude).
+  - Nouveau module `Appearance\AppearanceModule` + `ThemeVariationRegistry` (8 tests) + `ThemeVariationPage`. Aucune dépendance ajoutée à `SettingsBag` (option WP dédiée).
+
+### Added
+
 - **Breadcrumb localisé**. Les libellés du fil d'Ariane (« Accueil », « Actualités », « Événements », « Recherche », « Page introuvable ») sont désormais traduits selon la langue active : Home/News/Events/Search/Page not found en EN, Home/Notizie/Eventi/Ricerca/Pagina non trovata en IT, Inicio/Noticias/Eventos/Búsqueda/Página no encontrada en ES. Dictionnaire interne dans `BreadcrumbsController::LABELS` (pas de dépendance aux .po/.mo qui ne sont pas garantis chargés côté front). Sur les URL préfixées (ex. `/en/`), le contrôleur privilégie la **langue active** (résolue depuis l'URL) sur la langue du contenu pour les libellés — utile quand WP sert un post fr sur `/en/`. Couvert par 7 nouveaux tests EN/IT/ES.
 
 ### Changed

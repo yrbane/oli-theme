@@ -20,6 +20,9 @@ final class AssetManagerTest extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
+        // Pas de variation par défaut : enqueueVariation() devient un no-op.
+        Functions\when('get_option')->justReturn('');
+        Functions\when('sanitize_key')->returnArg(1);
         $this->themePath = sys_get_temp_dir() . '/oli-asset-test-' . uniqid();
         mkdir($this->themePath . '/assets/css', recursive: true);
         mkdir($this->themePath . '/assets/js', recursive: true);

@@ -1,0 +1,26 @@
+/* Theme Variation: Coucher de soleil */
+
+:root {
+    --color-bg: #fff7ed;
+    --color-text: #431407;
+    --color-primary: #f97316;
+    --color-accent: #ec4899;
+}
+
+body {
+    background: linear-gradient(180deg, #fff7ed 0%, #fed7aa 100%);
+    color: var(--color-text);
+}
+
+a {
+    color: var(--color-primary);
+}
+
+a:hover {
+    color: var(--color-accent);
+}
+
+.site-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+}
