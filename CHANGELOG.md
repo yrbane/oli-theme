@@ -6,6 +6,30 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ### Added
 
+- **Module Galerie : pages Photos & Vidéos** (ADR 0012, [`docs/gallery.md`](docs/gallery.md)). Deux pages spéciales avec layout vignettes/principal :
+  - **Photos** (`/photos/`, `/gallery/photos-en/`) : sélection multi via la médiathèque WP avec légende par photo. Au clic sur la photo principale, ouverture d'une **lightbox** plein écran (fond noir 92 %, fade-in, fermeture clavier `Escape` / clic / bouton ×).
+  - **Vidéos** (`/videos/`, `/gallery/videos-en/`) : auto-fetch des **15 dernières vidéos** de la chaîne YouTube via le flux RSS public (sans clé API). Bypass de la page consent RGPD via cookies `CONSENT=YES+cb` + `SOCS=…` et user-agent navigateur. Cache transient 7 j (channel_id) + 1 h (vidéos). Mode mixte : si l'admin saisit des vidéos manuelles, override.
+  - `Gallery\GalleryRepository`, `YoutubeChannelFetcher` (8 tests), `GalleryAdminPage`, `GalleryModule`. Templates `gallery-photos.html.tpl`, `gallery-videos.html.tpl`. Module ES `gallery.js` (init au DOMContentLoaded, swap au clic, lightbox).
+  - Routing slug-based dans `PageController` (rétro-compatible : repo injecté en option).
+
+- **Module Réseaux sociaux** (ADR 0013, [`docs/social.md`](docs/social.md)). Page admin `Apparence > Réseaux sociaux` pour 10 plateformes (Facebook, Instagram, X, YouTube, LinkedIn, TikTok, Pinterest, WhatsApp, Telegram, Email). Icônes SVG embarquées dans `assets/img/icons/social/` (Simple Icons MIT pour les logos brand + Material Symbols pour Email). Aucun appel réseau au runtime. Macro Lunar `##socialIcons()##` injectée dans le footer ; SVG inlinés (file_get_contents + suppression `fill=`) pour colorisation `currentColor`. Couleurs de marque au survol (`.social-links__link--facebook` etc.). Plateformes vides masquées. URLs par défaut Facebook/Instagram/YouTube tant que l'admin n'a rien sauvegardé.
+
+- **Module Apparence : variations CSS, bandeau, polices** (ADR 0011, [`docs/appearance.md`](docs/appearance.md)). Page unifiée `Apparence > Variations CSS` :
+  - **Variations CSS** : un fichier `*.css` dans `assets/css/variations/` = une variation. Découverte auto, en-tête `/* Theme Variation: ... */` pour le label, sélecteur dans l'admin. Trois variations livrées : Sombre, Coucher de soleil, Olikalari (style éditorial minimaliste).
+  - **Bandeau pages internes** : choix d'une image via le media uploader WP, override par CSS custom-property `--oli-internal-banner-url`. Preview admin toujours visible (image perso ou défaut du thème), badge couleur.
+  - **Police des titres** : catalogue Google Fonts complet (~1 900 polices, `assets/data/google-fonts.json`). Picker combobox HTML5 avec autocomplete + preview live. Override `!important` sur `h1-h6, .banner__title, .carousel-fullscreen__title`.
+  - `Appearance\ThemeVariationRegistry` (8 tests), `ThemeVariationPage`, `GoogleFontsLibrary` (4 tests), `AppearanceModule`.
+
+- **Drapeaux SVG dans le sélecteur de langue**. Remplace les emojis Unicode par des SVG vectoriels (rendu identique sur tous les OS). Source : [flag-icons](https://github.com/lipis/flag-icons) (MIT) — fr, gb (alias en), it, es. **UX** : le drapeau de la langue active est en couleur, les autres en N&B (`filter: grayscale(1)`), retour à la couleur au survol/focus. Tooltip natif via `title=` + `aria-label` pour l'accessibilité. Hauteur fixe 16 px, ratio 4:3 conservé.
+
+- **Galerie configurable depuis le menu Apparence** : page « Galerie » sous Apparence avec sections Photos (multi-sélection médiathèque + caption) + Vidéos (URL chaîne YouTube + override manuel). Notice info détaillée expliquant comment activer les pages côté front.
+
+- **Pages admin avec preview du bandeau** : la page Variations CSS affiche systématiquement une preview du bandeau (image perso ou défaut), badge `Image personnalisée` (vert) ou `Image par défaut du thème` (gris).
+
+- **Notices admin explicatives** : Apparence > Réseaux sociaux et Apparence > Galerie ont des notices info en haut détaillant comment ces réglages se manifestent côté front.
+
+- **Bannière thème (vignette WP)** : `screenshot.png` à la racine = logo Oli Kalari (1024×1024). Affiché dans Apparence > Thèmes.
+
 - **Compensation de la barre d'admin WordPress (sticky/fixed)**. Quand l'utilisateur est connecté, WP injecte une barre fixe (32 px desktop / 46 px sous 783 px) en haut de page. Les éléments en `position: sticky` ou `position: fixed` ancrés `top: 0` (header de la variation Olikalari, overlay menu mobile…) passaient sous cette barre, créant un décalage visuel et masquant ses items. **Fix** :
   - Nouveau `assets/css/admin-bar.css` qui expose une variable CSS `--oli-admin-bar-offset` (32px / 46px / 0) et applique `top: var(--oli-admin-bar-offset)` sur `.site-header`, `.nav-mobile__overlay`, et tout élément taggé `data-oli-sticky="top"` ou `data-oli-fixed="full"`. Ajoute aussi `scroll-margin-top` pour les ancres internes.
   - Aucun effet quand `body.admin-bar` n'est pas là — feuille « passive ».

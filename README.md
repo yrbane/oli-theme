@@ -6,17 +6,24 @@ Thème WordPress custom OOP / MVC, multilingue, réutilisable sur plusieurs site
 
 - Architecture **MVC stricte**, principes **SOLID** / **DRY** / **KISS**
 - Moteur de templates [Lunar Template Engine](https://github.com/yrbane/lunar-template) (auteur : yrbane)
-- Système **multilingue custom** (URLs `/fr/`, `/en/`, `/it/`...) sans dépendance plugin
+- Système **multilingue custom** (URLs `/fr/`, `/en/`, `/it/`, `/es/`) sans dépendance plugin
 - Custom Post Types dédiés : `oli_event`, `oli_slide`
-- Module **SEO complet** intégré (JSON-LD `@graph`, sitemap multilingue, Flesch-FR, score 0-100, redirections 301/410, métabox live)
+- Module **SEO complet** intégré (JSON-LD `@graph`, sitemap multilingue, Flesch-FR, score 0-100, redirections 301/410, métabox live, dashboard CSV)
+- Module **Apparence** : variations CSS (skins), bandeau personnalisable, sélecteur Google Fonts complet (~1 900 polices)
+- Module **Galerie** : pages Photos (lightbox) et Vidéos (auto-fetch RSS YouTube, sans clé API)
+- Module **Réseaux sociaux** : 10 plateformes, icônes SVG embarquées (Simple Icons + Material Symbols), couleurs de marque au hover
+- Drapeaux SVG pour le sélecteur de langue (flag-icons)
+- Compensation automatique de la barre d'admin WP (sticky/fixed)
 - CSS / JavaScript **vanilla** (pas de pipeline de build)
 - Tests **TDD** via PHPUnit 11 + Brain Monkey
 - Qualité : **PHPStan niveau 8**, **PHP-CS-Fixer** (PSR-12 + PHP 8.3 migration)
 - **PHP `^8.3`**, **WordPress 6.9+**
 
-## État du projet — **Cycle 1 livré** ✅
+## État du projet
 
-Tag courant : **`v1.0.0-rc.1`** (Cycle 1 complet, en attente des audits manuels).
+**Tag courant :** `v1.0.0-rc.1` ✅ (Cycle 1) — `main` continue avec les améliorations cycle 2.
+
+### Cycle 1 — livré
 
 | Plan | Tag | Tests | Périmètre |
 |------|-----|-------|-----------|
@@ -30,9 +37,27 @@ Tag courant : **`v1.0.0-rc.1`** (Cycle 1 complet, en attente des audits manuels)
 | 8 — Contact | `v1.0.0-alpha.8-contact` | 271 | Formulaire OOP/TDD sécurisé (CSRF + honeypot + time-trap + rate-limit), ADR 0009 |
 | 9 — Settings | `v1.0.0-alpha.9-settings` | 298 | Page admin `Apparence > Identité du site` (6 onglets), ADR 0010 |
 | 10 — QA & finalisation | `v1.0.0-rc.1` | 298 | Doc unifiée, checklist QA, prêt pour audits |
-| Hotfixes post-RC | `main` | 315 | Issues #1 (cache fail-safe), #2 (perms vendor), #4 (template_include), #5 (menu location → ID) |
 
-Le cycle 1 livre **9 modules fonctionnels**, **315 tests** (1063 assertions), **10 ADR**, **8 guides utilisateur**, et couvre intégralement la spec d'origine. Voir [`docs/qa-cycle1.md`](docs/qa-cycle1.md) pour la checklist d'audit.
+### Cycle 2 — `main`
+
+État : **404 tests / 1 257 assertions**, PHPStan level 8 clean, CS-Fixer clean.
+
+Améliorations majeures depuis le RC1 :
+
+- **Hotfixes RC1** : cache fail-safe (#1), perms vendor (#2), template_include (#4), menu location → ID (#5)
+- **Admin Settings** : refonte des 6 onglets (~30 champs) qui ne s'enregistraient pas
+- **Redirections** : page Outils complétée en CRUD (create/edit/delete + pagination)
+- **SEO Dashboard** : listing complet contenus + scores 0-100 + filtres + export CSV
+- **Bug i18n majeur** : la langue retombait sur fr en changeant de page (résolution depuis le path + filtre permaliens étendu)
+- **Pages internes** : titre sous l'image bannière (extraction de la première figure)
+- **Breadcrumb localisé** : labels traduits par langue, hiérarchie d'ancêtres incluse
+- **Variations CSS** + sélecteur admin (Olikalari, Sombre, Coucher de soleil)
+- **Bandeau pages internes** configurable depuis l'admin
+- **Police des titres** : sélecteur Google Fonts complet (~1 900 polices, autocomplete + preview live)
+- **Drapeaux SVG** pour le sélecteur de langue (flag-icons)
+- **Pages Galerie** Photos (avec lightbox) + Vidéos (auto-fetch RSS YouTube)
+- **Réseaux sociaux** : page admin + 10 plateformes + icônes SVG embarquées
+- **Compensation admin-bar** automatique pour les éléments sticky/fixed
 
 ## Installation
 
@@ -40,7 +65,7 @@ Le cycle 1 livre **9 modules fonctionnels**, **315 tests** (1063 assertions), **
 composer install
 ```
 
-Puis activer le thème dans `Apparence > Thèmes`. Détails : [`docs/installation.md`](docs/installation.md).
+Puis activer le thème dans **Apparence > Thèmes**. Détails : [`docs/installation.md`](docs/installation.md).
 
 ## Scripts Composer
 
@@ -55,7 +80,6 @@ Puis activer le thème dans `Apparence > Thèmes`. Détails : [`docs/installatio
 | `composer cs:fix` | Corrige le formatage |
 | `composer qa` | `cs` + `analyse` + `test` |
 | `composer ci` | `cs` + `analyse` + `test:all` (cible CI) |
-| `composer docs` | Désactivé temporairement (incompatibilité PHP 8.5 — voir CHANGELOG) |
 
 ## Documentation
 
@@ -66,7 +90,12 @@ Puis activer le thème dans `Apparence > Thèmes`. Détails : [`docs/installatio
 - [`docs/navigation.md`](docs/navigation.md) — gérer les menus par langue
 - [`docs/slides.md`](docs/slides.md) — créer un slide (CPT `oli_slide`)
 - [`docs/events.md`](docs/events.md) — publier un événement (CPT `oli_event`)
-- [`docs/seo.md`](docs/seo.md) — métabox SEO, score, redirections
+- [`docs/seo.md`](docs/seo.md) — métabox SEO, score, redirections, dashboard
+- [`docs/settings.md`](docs/settings.md) — page admin « Identité du site » (6 onglets)
+- [`docs/contact.md`](docs/contact.md) — formulaire de contact sécurisé
+- [`docs/appearance.md`](docs/appearance.md) — **(nouveau)** variations CSS, bandeau, polices
+- [`docs/gallery.md`](docs/gallery.md) — **(nouveau)** galerie photos + vidéos YouTube
+- [`docs/social.md`](docs/social.md) — **(nouveau)** réseaux sociaux + icônes
 
 ### Guides développeur
 
@@ -86,6 +115,8 @@ Liste complète dans [`docs/decisions/`](docs/decisions/) :
 - 0006 — CPT dédié `oli_slide`
 - 0007 — CPT dédié `oli_event`
 - 0008 — Module SEO custom (vs Yoast / RankMath / SEOPress)
+- 0009 — Module Contact custom (vs Contact Form 7)
+- 0010 — Settings via Options API
 
 ### Spec produit
 
