@@ -60,6 +60,58 @@ final class MenuModelTest extends TestCase
         self::assertFalse($tree[0]->children[0]->isAncestor);
     }
 
+    /**
+     * Sur une archive de CPT, get_queried_object_id() = 0. Le seul moyen de
+     * marquer l'item « Events » du menu courant est de matcher son URL.
+     */
+    public function testItemMatchedByUrlIsCurrentEvenWhenObjectIdIsZero(): void
+    {
+        $items = [
+            $this->buildWpItem(1, 0, 'Home', 'http://example.test/', 5),
+            $this->buildWpItem(2, 0, 'Events', 'http://example.test/en/events/', 69),
+        ];
+
+        $tree = (new MenuModel())->toTree($items, currentObjectId: 0, currentUrlPath: '/en/events');
+
+        self::assertFalse($tree[0]->isCurrent);
+        self::assertTrue($tree[1]->isCurrent);
+    }
+
+    public function testItemMatchedByUrlToleratesTrailingSlashes(): void
+    {
+        $items = [
+            $this->buildWpItem(1, 0, 'Events', 'http://example.test/en/events', 69),
+        ];
+
+        $tree = (new MenuModel())->toTree($items, currentObjectId: 0, currentUrlPath: '/en/events/');
+
+        self::assertTrue($tree[0]->isCurrent);
+    }
+
+    public function testUrlMatchDoesNotOverrideObjectIdMatch(): void
+    {
+        // L'item est déjà courant via object_id ; pas besoin du fallback URL.
+        $items = [
+            $this->buildWpItem(1, 0, 'Cours', 'http://example.test/cours/', 10),
+        ];
+
+        $tree = (new MenuModel())->toTree($items, currentObjectId: 10, currentUrlPath: '/cours');
+
+        self::assertTrue($tree[0]->isCurrent);
+    }
+
+    public function testUrlMatchIsIgnoredWhenCurrentUrlPathIsNull(): void
+    {
+        // Rétro-compatibilité : signature sans le 3e argument.
+        $items = [
+            $this->buildWpItem(1, 0, 'Events', 'http://example.test/en/events/', 69),
+        ];
+
+        $tree = (new MenuModel())->toTree($items, currentObjectId: 0);
+
+        self::assertFalse($tree[0]->isCurrent);
+    }
+
     private function buildWpItem(int $id, int $parent, string $title, string $url, int $objectId): stdClass
     {
         $item = new stdClass();

@@ -78,7 +78,25 @@ final class MenuController implements MenuControllerInterface
         }
 
         $currentObjectId = (int) get_queried_object_id();
+        $currentUrlPath  = $this->currentUrlPath();
 
-        return $this->model->toTree($items, $currentObjectId);
+        return $this->model->toTree($items, $currentObjectId, $currentUrlPath);
+    }
+
+    /**
+     * Path normalisé de l'URL courante (sans query, sans trailing slash). Permet
+     * à `MenuModel` de marquer comme « courant » l'item qui pointe vers une
+     * archive de CPT (où `get_queried_object_id()` vaut 0).
+     */
+    private function currentUrlPath(): ?string
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? null;
+        if (!\is_string($uri) || $uri === '') {
+            return null;
+        }
+
+        $path = parse_url($uri, \PHP_URL_PATH);
+
+        return \is_string($path) ? $path : null;
     }
 }
