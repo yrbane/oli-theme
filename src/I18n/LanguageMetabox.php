@@ -50,15 +50,32 @@ final class LanguageMetabox
      */
     public function render(\WP_Post $post): void
     {
-        $groupId = $this->translations->getGroupId($post->ID) ?? '';
+        $groupId      = $this->translations->getGroupId($post->ID) ?? '';
+        $translations = $this->translations->getTranslations($post->ID);
+
+        // On pré-construit la liste des liens : Lunar Template ne compile pas
+        // correctement les accès indexés dynamiques (`map[obj.attr]`) dans les
+        // templates ; on évite donc le lookup côté template.
+        $entries = [];
+        foreach ($this->registry->all() as $language) {
+            if (!isset($translations[$language->code])) {
+                continue;
+            }
+            $entries[] = [
+                'code'   => $language->code,
+                'label'  => $language->label,
+                'flag'   => $language->flag,
+                'postId' => (int) $translations[$language->code],
+            ];
+        }
 
         echo $this->renderer->render('admin/language-metabox.html', [
-            'languages' => $this->registry->all(),
-            'translations' => $this->translations->getTranslations($post->ID),
-            'groupId' => $groupId,
-            'nonce' => wp_create_nonce(self::NONCE_ACTION),
+            'entries'    => $entries,
+            'hasEntries' => $entries !== [],
+            'groupId'    => $groupId,
+            'nonce'      => wp_create_nonce(self::NONCE_ACTION),
             'nonceField' => self::NONCE_FIELD,
-            'field' => self::FIELD,
+            'field'      => self::FIELD,
         ]);
     }
 

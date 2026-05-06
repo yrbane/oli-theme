@@ -1,7 +1,7 @@
 [# Metabox « Traductions » affichée sur l'écran d'édition des posts/pages.
    Variables :
-   - languages (Language[]) : langues activées
-   - translations (array<string, int>) : code langue -> postId existant
+   - entries (array) : liste des traductions liées (code, label, flag, postId)
+   - hasEntries (bool)
    - groupId (string) : identifiant du groupe de traduction (peut être vide)
    - nonce (string)
    - nonceField (string)
@@ -16,13 +16,11 @@
         <span class="description">Lie cette page à ses traductions. Donnez le même identifiant aux versions FR/EN/IT/ES d'un même contenu.</span>
     </p>
 
-    [% if translations %]
+    [% if hasEntries %]
     <p><strong>Traductions liées</strong></p>
     <ul class="oli-language-metabox__list">
-        [% for lang in languages %]
-            [% if translations[lang.code] %]
-                <li><a href="post.php?post=[[ translations[lang.code] ]]&action=edit">[[ lang.flag ]] [[ lang.label ]]</a></li>
-            [% endif %]
+        [% for entry in entries %]
+            <li><a href="post.php?post=[[ entry.postId ]]&action=edit">[[ entry.flag ]] [[ entry.label ]]</a></li>
         [% endfor %]
     </ul>
     [% else %]
