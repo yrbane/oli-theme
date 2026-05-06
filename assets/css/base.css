@@ -56,6 +56,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
 /* Réseaux sociaux : liste d'icônes SVG colorisables via currentColor. */
 .social-links {
     list-style: none;
+    list-style-type: none;
     margin: var(--space-3) 0;
     padding: 0;
     display: inline-flex;
@@ -63,7 +64,15 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
     gap: 0.75rem;
     justify-content: center;
 }
-.social-links__item { margin: 0; }
+/* Force absence de puce même sous des sélecteurs `ul li` plus larges
+   (hérités d'un reset partiel ou d'une variation CSS). */
+.social-links__item {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    list-style-type: none;
+}
+.social-links__item::marker { content: none; }
 .social-links__link {
     display: inline-flex;
     align-items: center;
