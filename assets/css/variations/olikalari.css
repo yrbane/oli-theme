@@ -217,6 +217,67 @@ header.site-header {
   text-decoration: none;
 }
 
+/* ==========================================================================
+   Sous-menu desktop : dropdown propre + item courant SANS encadrement,
+   juste un renforcement de couleur (demande UX).
+   ========================================================================== */
+.site-header .nav--desktop .nav__sublist {
+  background: #ffffff;
+  border: 1px solid #00000014;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  padding: 0.4rem;
+  min-width: 12rem;
+  margin-top: 0.25rem;
+}
+.site-header .nav--desktop .nav__sublist .nav__item {
+  margin: 0;
+}
+.site-header .nav--desktop .nav__sublist .nav__link {
+  display: block;
+  padding: 0.45rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: #444444;
+}
+.site-header .nav--desktop .nav__sublist .nav__link:hover {
+  background: #f4f4f3;
+  color: #111111;
+}
+
+/* Item courant dans un sous-menu : juste couleur renforcée, pas de cadre.
+   Override des règles de surface/bordure héritées du niveau racine. */
+.site-header .nav--desktop .nav__sublist .nav__item--current > .nav__link,
+.site-header .nav--desktop .nav__sublist .nav__item--ancestor > .nav__link,
+.site-header .nav--desktop .nav__sublist .current-menu-item > a,
+.site-header .nav--desktop .nav__sublist a[aria-current] {
+  background: transparent;
+  border-color: transparent;
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Petit indicateur ▾ visuel à côté des items qui ont des enfants. */
+.site-header .nav--desktop .nav__item--has-children > .nav__link::after {
+  content: ' ▾';
+  font-size: 0.75em;
+  opacity: 0.55;
+  margin-left: 0.15em;
+}
+
+/* Quand le menu s'étoffe : compresse padding et gap pour rester sur 1 ligne
+   sans casser l'alignement. */
+.site-header .nav__list {
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow: visible; /* le sublist peut sortir verticalement */
+}
+.site-header .nav--desktop .nav__list > .nav__item > .nav__link {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.825rem;
+}
+
 /* Switcher de langue */
 .language-switcher,
 nav[aria-label*="langue" i],
