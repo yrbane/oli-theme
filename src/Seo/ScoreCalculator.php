@@ -15,7 +15,7 @@ use OliTheme\Posts\PostEntity;
  *
  * @since 1.0.0
  */
-final class ScoreCalculator
+final class ScoreCalculator implements ScoreCalculatorInterface
 {
     public function __construct(
         private readonly ReadabilityAnalyzer $readability,

@@ -10,6 +10,15 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ### Added
 
+- **Page Outils > SEO Dashboard : listing complet des contenus avec scores 0-100**. La page n'affichait qu'un placeholder (« MVP — extension ultérieure prévue »). Refonte complète :
+  - Liste tous les contenus (`page`, `post`, `oli_event`) avec score SEO calculé par `ScoreCalculator`, mot-clé focus, longueurs de title/description et statut.
+  - Pastille de score colorée (vert ≥ 70, orange ≥ 40, rouge < 40) via classe CSS `score-pill`.
+  - Filtres `?type=`, `?min_score=`, `?max_score=` — chacun normalisé et borné [0, 100].
+  - Lien direct vers l'éditeur du post (`get_edit_post_link`).
+  - Pagination 25 par page (`?paged=N`).
+  - Export CSV via `admin-post.php?action=oli_seo_export_csv` avec BOM UTF-8 (compatible Excel) et réutilisation des filtres courants.
+  - 5 nouveaux tests `SeoOverviewPageTest` (registration, listing avec scores, filtre min_score, filtre type, export CSV).
+- `ScoreCalculatorInterface` extrait de la classe finale `ScoreCalculator` pour permettre l'injection de dépendance dans `SeoOverviewPage` et le mocking dans les tests (PHPUnit ne peut pas doubler les classes finales).
 - **Page Outils > Redirections : CRUD complet** (issue de QA cycle 1). La page n'avait qu'un listing read-only « MVP » avec le commentaire `extension ultérieure prévue`. Refonte complète :
   - Formulaire `create/edit` avec validation : source obligatoire commençant par `/`, target requis pour 301/302 (optionnel pour 410), code limité à `{301, 302, 410}`.
   - Suppression via `admin-post.php?action=oli_redirect_delete` avec nonce dynamique par ID + `confirm()` JS.

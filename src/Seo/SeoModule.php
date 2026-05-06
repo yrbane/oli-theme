@@ -234,6 +234,13 @@ final class SeoModule implements ModuleInterface
             );
         }
 
+        if (! $container->has(ScoreCalculatorInterface::class)) {
+            $container->factory(
+                ScoreCalculatorInterface::class,
+                static fn (Container $c): ScoreCalculatorInterface => $c->get(ScoreCalculator::class),
+            );
+        }
+
         if (! $container->has(InternalLinkSuggester::class)) {
             $container->factory(
                 InternalLinkSuggester::class,
@@ -271,6 +278,9 @@ final class SeoModule implements ModuleInterface
                 SeoOverviewPage::class,
                 static fn (Container $c): SeoOverviewPage => new SeoOverviewPage(
                     $c->get(RendererInterface::class),
+                    $c->get(PostModelInterface::class),
+                    $c->get(SeoMetaModelInterface::class),
+                    $c->get(ScoreCalculatorInterface::class),
                 ),
             );
         }
@@ -316,10 +326,11 @@ final class SeoModule implements ModuleInterface
             $this->container->get(RedirectsPage::class)->register();
         });
 
-        // Hooks admin-post.php pour le CRUD redirections : admin_menu n'est pas appelé
-        // sur admin-post.php, on doit donc les brancher via admin_init.
+        // Hooks admin-post.php (CRUD redirections + export CSV SEO) : admin_menu n'est pas
+        // appelé sur admin-post.php, on doit donc les brancher via admin_init.
         add_action('admin_init', function (): void {
             $this->container->get(RedirectsPage::class)->registerActions();
+            $this->container->get(SeoOverviewPage::class)->registerActions();
         });
     }
 }
