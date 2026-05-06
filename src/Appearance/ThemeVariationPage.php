@@ -262,7 +262,10 @@ final class ThemeVariationPage
         ?>
         <script>
         (function () {
-            if (typeof wp === 'undefined' || !wp.media) { return; }
+            // ⚠️ Ne PAS sortir si wp.media n'est pas encore défini : ses scripts
+            // peuvent être enqueués en footer, donc indisponibles au moment où
+            // ce <script> inline s'exécute. On vérifie wp.media dans le handler
+            // de clic qui, lui, tournera après le DOMContentLoaded.
             const wrap     = document.querySelector('.oli-banner-picker');
             const pick     = document.getElementById('oli-internal-banner-pick');
             const clear    = document.getElementById('oli-internal-banner-clear');
@@ -296,7 +299,13 @@ final class ThemeVariationPage
             };
 
             let frame;
-            pick.addEventListener('click', function () {
+            pick.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (typeof wp === 'undefined' || !wp.media) {
+                    console.error('[oli-theme] wp.media indisponible — wp_enqueue_media() n\'a pas été appelé.');
+                    alert('<?php echo esc_js(__('Impossible d\'ouvrir la médiathèque (wp.media indisponible). Rechargez la page.', 'oli-theme')); ?>');
+                    return;
+                }
                 if (!frame) {
                     frame = wp.media({
                         title: '<?php echo esc_js(__('Choisir une image de bandeau', 'oli-theme')); ?>',
