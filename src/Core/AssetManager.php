@@ -50,6 +50,9 @@ final class AssetManager
             $this->version('assets/css/admin-bar.css'),
         );
 
+        // Surcharge admin de l'image bandeau (pages internes), via custom-property.
+        $this->injectInternalBannerOverride($variationEnqueued ? 'oli-theme-variation' : 'oli-theme');
+
         wp_enqueue_script_module(
             'oli-theme',
             $this->themeUri . '/assets/js/main.js',
@@ -134,6 +137,38 @@ final class AssetManager
         );
 
         return true;
+    }
+
+    /**
+     * Injecte une CSS custom-property `--oli-internal-banner-url` quand
+     * l'admin a choisi une image personnalisée pour le bandeau des pages
+     * internes (option `oli_internal_banner_image`). Les variations qui
+     * supportent cette property l'utilisent à la place de l'image par défaut.
+     */
+    private function injectInternalBannerOverride(string $handle): void
+    {
+        if (!\function_exists('get_option')) {
+            return;
+        }
+
+        $url = (string) get_option('oli_internal_banner_image', '');
+        if ($url === '') {
+            return;
+        }
+
+        if (\function_exists('esc_url')) {
+            $url = esc_url($url);
+        }
+        if ($url === '') {
+            return;
+        }
+
+        if (!\function_exists('wp_add_inline_style')) {
+            return;
+        }
+
+        $css = \sprintf("html{--oli-internal-banner-url:url('%s');}", $url);
+        wp_add_inline_style($handle, $css);
     }
 
     /**

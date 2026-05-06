@@ -95,6 +95,11 @@ header.site-header {
   gap: 0.75rem;
   flex-wrap: nowrap;
   min-width: 0;
+  /* Ombre large et subtile au-dessus ET en-dessous du menu pour le détacher
+     visuellement de la page, qu'il soit en bas du hero ou collé au top. */
+  box-shadow:
+    0 -10px 28px -8px rgba(0, 0, 0, 0.07),
+    0 10px 28px -8px rgba(0, 0, 0, 0.07);
 }
 
 .site-header > * { min-width: 0; }
@@ -111,6 +116,32 @@ header.site-header {
   font-weight: 700;
   letter-spacing: -0.01em;
   text-transform: lowercase;
+}
+
+/* Slogan (tagline WP) en tout petit, sous le nom du site dans le menu. */
+.site-header .banner__home {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  line-height: 1;
+}
+.site-header .banner__title {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+  line-height: 1.1;
+}
+.site-header .banner__tagline {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  line-height: 1.1;
+  margin-top: 0.05rem;
 }
 
 .site-header a,
@@ -678,7 +709,9 @@ body:not(:has(.carousel-fullscreen))::before {
   width: 100%;
   height: clamp(120px, 14vw, 220px);
   background-color: #ffffff;
-  background-image: url('../../img/channels4_banner.jpg');
+  /* L'URL est surchargée par l'admin via la custom-property
+     --oli-internal-banner-url (Apparence > Variations CSS). */
+  background-image: var(--oli-internal-banner-url, url('../../img/channels4_banner.jpg'));
   background-size: contain;
   background-position: center center;
   background-repeat: no-repeat;

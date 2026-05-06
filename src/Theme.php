@@ -328,6 +328,7 @@ final class Theme
         // Variables disponibles dès le boot (fonctions WP synchrones).
         $renderer->setDefaultVariables([
             'siteName'    => get_bloginfo('name'),
+            'siteTagline' => get_bloginfo('description'),
             'siteUrl'     => home_url(),
             'homeUrl'     => home_url(),
             'themeUri'    => get_template_directory_uri(),
