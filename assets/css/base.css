@@ -17,7 +17,14 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
 .language-switcher { list-style: none; display: flex; gap: var(--space-3); margin: var(--space-3) 0 0; }
 .language-switcher__item--current a { font-weight: 700; }
 .language-switcher a { display: inline-flex; align-items: center; gap: 0.25rem; line-height: 1; }
-.language-switcher__flag { font-size: 1.25rem; line-height: 1; }
+.language-switcher__flag {
+    font-size: 1.25rem;
+    line-height: 1;
+    /* Drapeaux non-actifs : noir & blanc. La couleur n'apparaît que pour la
+       langue courante ou au survol (signale l'interactivité). */
+    filter: grayscale(1);
+    transition: filter 150ms ease;
+}
 .language-switcher__flag--svg {
     width: 1.5em;
     height: 1.125em; /* ratio 4:3 */
@@ -25,6 +32,11 @@ h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; }
     border-radius: 2px;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
     vertical-align: middle;
+}
+.language-switcher__item--current .language-switcher__flag,
+.language-switcher a:hover .language-switcher__flag,
+.language-switcher a:focus-visible .language-switcher__flag {
+    filter: grayscale(0);
 }
 /* Accessibilité : libellé textuel caché visuellement mais lu par les
    lecteurs d'écran (drapeaux seuls = identifiants peu accessibles). */

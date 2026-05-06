@@ -221,8 +221,9 @@ nav[aria-label*="language" i] {
   line-height: 1;
   /* Désactive l'underline du parent <a> sur l'emoji. */
   text-decoration: none;
-  filter: grayscale(0.35);
-  transition: filter 120ms ease;
+  /* Drapeaux non-actifs : noir & blanc total. */
+  filter: grayscale(1);
+  transition: filter 150ms ease;
 }
 /* Variante SVG : taille un peu plus stricte + ombre fine pour
    distinguer le drapeau blanc du fond. */
@@ -234,6 +235,7 @@ nav[aria-label*="language" i] {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 .language-switcher a:hover .language-switcher__flag,
+.language-switcher a:focus-visible .language-switcher__flag,
 .language-switcher__item--current .language-switcher__flag {
   filter: grayscale(0);
 }
