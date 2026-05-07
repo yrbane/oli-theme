@@ -45,65 +45,95 @@ export function initGallery() {
     // Lightbox sur la photo principale (galerie photos uniquement).
     if (!isVideo && mainImg) {
         mainImg.style.cursor = 'zoom-in';
-        mainImg.addEventListener('click', () => openLightbox(mainImg));
+        // Construit la liste complète des photos depuis les vignettes
+        // (pour la navigation prev/next dans la lightbox).
+        const photos = Array.from(thumbs).map((btn) => ({
+            url: btn.getAttribute('data-url') || '',
+            alt: btn.getAttribute('data-alt') || '',
+            caption: btn.getAttribute('data-caption') || '',
+        }));
+        mainImg.addEventListener('click', () => {
+            const activeIndex = Array.from(thumbs).findIndex((b) => b.classList.contains('is-active'));
+            openLightbox(photos, Math.max(0, activeIndex));
+        });
     }
 }
 
 /**
- * Lightbox plein écran : overlay sombre + image agrandie + caption.
- * Fermeture au clic, à la touche Escape, ou via le bouton ×.
+ * Lightbox plein écran avec navigation prev/next.
+ * - Clic sur fond ou bouton × → ferme
+ * - Clavier : Escape → ferme, ← → → naviguer
+ * - Clic sur l'image → next (geste naturel)
+ *
+ * @param {Array<{url:string, alt:string, caption:string}>} photos
+ * @param {number} startIndex
  */
-function openLightbox(sourceImg) {
-    if (document.querySelector('.oli-lightbox')) return; // déjà ouverte
+function openLightbox(photos, startIndex) {
+    if (!photos.length || document.querySelector('.oli-lightbox')) return;
+
+    let index = Math.min(Math.max(0, startIndex), photos.length - 1);
 
     const overlay = document.createElement('div');
     overlay.className = 'oli-lightbox';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', sourceImg.alt || 'Photo agrandie');
+    overlay.setAttribute('aria-label', 'Galerie photos agrandie');
 
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'oli-lightbox__close';
-    close.setAttribute('aria-label', 'Fermer');
-    close.innerHTML = '&times;';
+    overlay.innerHTML = `
+        <button type="button" class="oli-lightbox__close" aria-label="Fermer">×</button>
+        <button type="button" class="oli-lightbox__nav oli-lightbox__nav--prev" aria-label="Précédent">‹</button>
+        <button type="button" class="oli-lightbox__nav oli-lightbox__nav--next" aria-label="Suivant">›</button>
+        <figure class="oli-lightbox__figure">
+            <img class="oli-lightbox__image" alt="">
+            <figcaption class="oli-lightbox__caption"></figcaption>
+            <p class="oli-lightbox__counter"></p>
+        </figure>
+    `;
 
-    const img = document.createElement('img');
-    img.className = 'oli-lightbox__image';
-    img.src = sourceImg.src;
-    img.alt = sourceImg.alt || '';
+    const closeBtn = overlay.querySelector('.oli-lightbox__close');
+    const prevBtn  = overlay.querySelector('.oli-lightbox__nav--prev');
+    const nextBtn  = overlay.querySelector('.oli-lightbox__nav--next');
+    const img      = overlay.querySelector('.oli-lightbox__image');
+    const caption  = overlay.querySelector('.oli-lightbox__caption');
+    const counter  = overlay.querySelector('.oli-lightbox__counter');
 
-    overlay.appendChild(close);
-    overlay.appendChild(img);
-
-    // Caption (depuis le sibling figcaption si présent)
-    const figcaption = sourceImg.closest('figure')?.querySelector('figcaption');
-    if (figcaption && figcaption.textContent.trim() !== '') {
-        const cap = document.createElement('p');
-        cap.className = 'oli-lightbox__caption';
-        cap.textContent = figcaption.textContent.trim();
-        overlay.appendChild(cap);
+    function show(i) {
+        index = ((i % photos.length) + photos.length) % photos.length;
+        const p = photos[index];
+        img.src = p.url;
+        img.alt = p.alt || '';
+        caption.textContent = p.caption || '';
+        caption.style.display = p.caption ? 'block' : 'none';
+        counter.textContent = `${index + 1} / ${photos.length}`;
     }
 
-    document.body.appendChild(overlay);
-    document.body.style.overflow = 'hidden';
-
-    const dismiss = () => {
+    function dismiss() {
         overlay.remove();
         document.body.style.overflow = '';
         document.removeEventListener('keydown', onKey);
-    };
-    const onKey = (e) => {
-        if (e.key === 'Escape') dismiss();
-    };
+    }
+
+    function onKey(e) {
+        switch (e.key) {
+            case 'Escape':     dismiss(); break;
+            case 'ArrowLeft':  show(index - 1); break;
+            case 'ArrowRight': show(index + 1); break;
+        }
+    }
 
     overlay.addEventListener('click', (e) => {
-        // ferme au clic n'importe où SAUF sur l'image elle-même
-        if (e.target !== img) dismiss();
+        // Fond cliqué (pas un enfant) → ferme.
+        if (e.target === overlay) dismiss();
     });
-    close.addEventListener('click', dismiss);
+    closeBtn.addEventListener('click', dismiss);
+    prevBtn.addEventListener('click',  (e) => { e.stopPropagation(); show(index - 1); });
+    nextBtn.addEventListener('click',  (e) => { e.stopPropagation(); show(index + 1); });
+    img.addEventListener('click',       (e) => { e.stopPropagation(); show(index + 1); });
     document.addEventListener('keydown', onKey);
 
-    // focus sur le bouton de fermeture pour l'accessibilité clavier
-    requestAnimationFrame(() => close.focus());
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    show(index);
+
+    requestAnimationFrame(() => closeBtn.focus());
 }

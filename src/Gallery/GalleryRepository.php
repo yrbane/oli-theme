@@ -24,6 +24,19 @@ final class GalleryRepository
 
     public const DEFAULT_CHANNEL = 'https://www.youtube.com/@OliKalari';
 
+    /**
+     * Vidéos par défaut affichées tant que l'admin n'a rien saisi ET que le
+     * fetch RSS YouTube ne renvoie rien (réseau bloqué, chaîne supprimée…).
+     * Garantit que la page Vidéos n'est jamais vide.
+     *
+     * @var list<array{video_id: string, caption: string}>
+     */
+    private const DEFAULT_VIDEOS = [
+        ['video_id' => 'M85A64fB4Yo', 'caption' => 'Kalaripayattu Goa 2019 - Kalari Body Forms - Meypayattu'],
+        ['video_id' => 'dYQUEd9Em38', 'caption' => 'Kalaripayattu Goa 2019 - Kalari Body Conditioning'],
+        ['video_id' => 'QAkfWz32YiY', 'caption' => 'Kalari Urumi - Kalaripayattu Flexible Sword'],
+    ];
+
     public function __construct(private readonly ?YoutubeChannelFetcher $fetcher = null)
     {
     }
@@ -123,10 +136,42 @@ final class GalleryRepository
         }
 
         if ($this->fetcher !== null) {
-            return $this->fetcher->fetchVideos($this->getYoutubeChannel());
+            $fetched = $this->fetcher->fetchVideos($this->getYoutubeChannel());
+            if ($fetched !== []) {
+                return $fetched;
+            }
         }
 
-        return [];
+        // Fallback final : quelques vidéos par défaut pour ne jamais avoir
+        // une page vide (utile en dev local quand le réseau bloque YouTube,
+        // ou quand la chaîne renvoie 404 sur son flux RSS).
+        return $this->hydrateVideos(self::DEFAULT_VIDEOS);
+    }
+
+    /**
+     * Enrichit une liste minimale `[{video_id, caption}, ...]` en list complète
+     * avec embed_url / thumb / watch_url.
+     *
+     * @param list<array{video_id: string, caption: string}> $videos
+     * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
+     */
+    private function hydrateVideos(array $videos): array
+    {
+        $out = [];
+        foreach ($videos as $v) {
+            $vid = $this->sanitizeVideoId($v['video_id']);
+            if ($vid === '') {
+                continue;
+            }
+            $out[] = [
+                'video_id'  => $vid,
+                'caption'   => $v['caption'],
+                'embed_url' => 'https://www.youtube-nocookie.com/embed/' . $vid . '?rel=0',
+                'thumb'     => 'https://i.ytimg.com/vi/' . $vid . '/hqdefault.jpg',
+                'watch_url' => 'https://www.youtube.com/watch?v=' . $vid,
+            ];
+        }
+        return $out;
     }
 
     /**

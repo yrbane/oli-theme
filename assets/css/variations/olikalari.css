@@ -1090,7 +1090,10 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
 }
 
 /* ==========================================================================
-   Lightbox photo : overlay plein écran, sombre, image centrée.
+   Lightbox photo : overlay plein écran avec navigation prev/next.
+   Tous les boutons sont isolés (appearance:none + reset font) pour ne pas
+   hériter des styles globaux d'Olikalari (Manrope, font-size, underline,
+   text-decoration sur a/button, etc.).
    ========================================================================== */
 .oli-lightbox {
   position: fixed;
@@ -1100,58 +1103,119 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  cursor: zoom-out;
-  /* Fade-in */
+  padding: 4rem 5rem;
   animation: oli-lightbox-fade 180ms ease-out;
 }
 @keyframes oli-lightbox-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-.oli-lightbox__image {
+
+.oli-lightbox__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
   max-width: 100%;
   max-height: 100%;
+}
+
+.oli-lightbox__image {
+  max-width: 100%;
+  max-height: calc(100vh - 8rem);
   object-fit: contain;
-  cursor: default;
+  cursor: pointer;
   box-shadow: 0 16px 48px -16px rgba(0, 0, 0, 0.6);
   border-radius: 4px;
+  display: block;
 }
+
 .oli-lightbox__caption {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
   margin: 0;
-  padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  font-size: 0.9rem;
-  border-radius: 999px;
-  max-width: 80vw;
-  text-align: center;
-  pointer-events: none;
-}
-.oli-lightbox__close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 50%;
+  padding: 0.4rem 0.9rem;
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  font-size: 1.75rem;
-  line-height: 1;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  border-radius: 999px;
+  max-width: 80vw;
+  pointer-events: none;
+}
+
+.oli-lightbox__counter {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* Boutons : reset complet, on n'hérite d'AUCUN style du thème. */
+.oli-lightbox__close,
+.oli-lightbox__nav {
+  position: absolute;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   cursor: pointer;
-  transition: background 120ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  text-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 120ms ease, transform 120ms ease;
+  user-select: none;
 }
 .oli-lightbox__close:hover,
-.oli-lightbox__close:focus-visible {
-  background: rgba(255, 255, 255, 0.24);
+.oli-lightbox__close:focus-visible,
+.oli-lightbox__nav:hover,
+.oli-lightbox__nav:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
   outline: 2px solid #ffffff;
   outline-offset: 2px;
+}
+
+.oli-lightbox__close {
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.oli-lightbox__nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  font-size: 2rem;
+  line-height: 1;
+}
+.oli-lightbox__nav--prev { left: 1.25rem; }
+.oli-lightbox__nav--next { right: 1.25rem; }
+.oli-lightbox__nav:active { transform: translateY(-50%) scale(0.95); }
+.oli-lightbox__close:active { transform: scale(0.95); }
+
+@media (max-width: 640px) {
+  .oli-lightbox { padding: 3rem 0.75rem; }
+  .oli-lightbox__nav { width: 2.5rem; height: 2.5rem; font-size: 1.5rem; }
+  .oli-lightbox__nav--prev { left: 0.5rem; }
+  .oli-lightbox__nav--next { right: 0.5rem; }
 }
 
 /* ==========================================================================
