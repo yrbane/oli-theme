@@ -230,6 +230,15 @@ header.site-header {
   min-width: 11rem;
   overflow: hidden;
   margin-top: 0;
+  /* Override des règles flex de `.site-header nav ul` plus haut, qui étaient
+     prévues pour le menu horizontal (flex-row + center). En sublist on veut :
+       - empilement vertical
+       - items en pleine largeur (align-items: stretch, pas center)
+       - aucun gap interne (les hovers se touchent visuellement) */
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
 }
 
 /* Zone-pont invisible au-dessus du sous-menu : couvre l'espace entre le
