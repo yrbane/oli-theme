@@ -1038,7 +1038,9 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   aspect-ratio: 1;
   transition: border-color 120ms ease, transform 120ms ease;
 }
-.gallery--videos .gallery__thumb-button { aspect-ratio: 16 / 9; }
+/* Note : pas d'override aspect-ratio ici pour `.gallery--videos` ; sa propre
+   règle plus haut force `aspect-ratio: auto` (liste verticale compacte de
+   titres). */
 .gallery__thumb-button:hover {
   border-color: rgba(0, 0, 0, 0.18);
   transform: scale(1.02);
