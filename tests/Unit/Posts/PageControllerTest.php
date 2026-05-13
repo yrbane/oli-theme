@@ -13,6 +13,7 @@ use OliTheme\I18n\Language;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\LanguageSwitcherViewModel;
+use OliTheme\I18n\TranslationModelInterface;
 use OliTheme\Navigation\MenuControllerInterface;
 use OliTheme\Posts\PageController;
 use OliTheme\Posts\PostEntity;
@@ -209,6 +210,76 @@ final class PageControllerTest extends TestCase
         );
 
         self::assertSame('<html>home</html>', $controller->renderSingular());
+    }
+
+    public function testRenderSingularInjectsCarouselForTranslatedFrontPage(): void
+    {
+        $english = new Language('en', 'English', 'English', '🇬🇧', 'en_GB', 'ltr');
+
+        $entity = new PostEntity(
+            id: 8,
+            type: 'page',
+            title: 'Home',
+            content: '<p>Welcome</p>',
+            excerpt: null,
+            slug: 'home',
+            language: $english,
+            featuredImageUrl: null,
+            featuredImageAlt: null,
+            permalink: 'https://example.com/en/home',
+            publishedAt: new DateTimeImmutable('2026-01-01', new DateTimeZone('UTC')),
+            updatedAt: null,
+            author: null,
+        );
+
+        $model = $this->createMock(PostModelInterface::class);
+        $model->method('find')->with(8)->willReturn($entity);
+
+        $resolver = $this->createMock(LanguageResolverInterface::class);
+        $resolver->method('current')->willReturn($english);
+
+        $switcherVm = new LanguageSwitcherViewModel(current: $english, items: []);
+        $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
+        $switcher->method('build')->with(8)->willReturn($switcherVm);
+
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
+        $carouselVm = new HomeCarouselViewModel(slides: [], autoplay: true, intervalMs: 5000, loop: true);
+        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
+        $carousel->expects(self::once())->method('build')->willReturn($carouselVm);
+
+        $translations = $this->createMock(TranslationModelInterface::class);
+        $translations->method('getTranslations')->with(7)->willReturn(['fr' => 7, 'en' => 8]);
+
+        $renderer = $this->createMock(RendererInterface::class);
+        $renderer->expects(self::once())
+            ->method('render')
+            ->with(
+                'pages/page.html',
+                self::callback(fn (array $vm): bool => isset($vm['carousel']) && $vm['carousel'] === $carouselVm),
+            )
+            ->willReturn('<html>en-home</html>');
+
+        Functions\when('get_queried_object_id')->justReturn(8);
+        Functions\when('get_option')->justReturn(7);
+
+        $controller = new PageController(
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $carousel,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
+            new \OliTheme\Posts\CoverExtractor(),
+            null,
+            $translations,
+        );
+
+        self::assertSame('<html>en-home</html>', $controller->renderSingular());
     }
 
     private function buildSeoMock(): SeoControllerInterface

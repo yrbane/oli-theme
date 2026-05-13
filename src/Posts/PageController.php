@@ -8,6 +8,7 @@ use OliTheme\Core\RendererInterface;
 use OliTheme\Gallery\GalleryRepository;
 use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageSwitcherControllerInterface;
+use OliTheme\I18n\TranslationModelInterface;
 use OliTheme\Seo\BreadcrumbsControllerInterface;
 use OliTheme\Seo\SeoControllerInterface;
 use OliTheme\Slides\HomeCarouselControllerInterface;
@@ -38,6 +39,7 @@ final class PageController
         private readonly RendererInterface $renderer,
         private readonly CoverExtractor $coverExtractor = new CoverExtractor(),
         private readonly ?GalleryRepository $gallery = null,
+        private readonly ?TranslationModelInterface $translations = null,
     ) {
     }
 
@@ -91,11 +93,25 @@ final class PageController
     }
 
     /**
-     * Indique si le post courant est la page d'accueil statique.
+     * Indique si le post courant est la page d'accueil statique — y compris
+     * pour ses traductions. WordPress stocke un seul ID dans `page_on_front`
+     * (typiquement la langue par défaut), donc une simple égalité d'ID ne
+     * couvre pas les traductions. On considère toute page liée au même
+     * groupe de traduction que `page_on_front` comme front page de sa langue.
      */
     private function isFrontPage(int $postId): bool
     {
-        return (int) get_option('page_on_front', 0) === $postId;
+        $frontId = (int) get_option('page_on_front', 0);
+        if ($frontId <= 0) {
+            return false;
+        }
+        if ($frontId === $postId) {
+            return true;
+        }
+        if ($this->translations === null) {
+            return false;
+        }
+        return \in_array($postId, $this->translations->getTranslations($frontId), true);
     }
 
     /**

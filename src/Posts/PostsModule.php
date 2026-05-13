@@ -65,6 +65,9 @@ final class PostsModule implements ModuleInterface
                     $c->has(\OliTheme\Gallery\GalleryRepository::class)
                         ? $c->get(\OliTheme\Gallery\GalleryRepository::class)
                         : null,
+                    $c->has(\OliTheme\I18n\TranslationModelInterface::class)
+                        ? $c->get(\OliTheme\I18n\TranslationModelInterface::class)
+                        : null,
                 ),
             );
         }
