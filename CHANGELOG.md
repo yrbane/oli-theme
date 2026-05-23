@@ -4,6 +4,23 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+### Added
+
+- **Design & accessibilité (variation Olikalari)** :
+  - Menu : passe proprement sur plusieurs lignes (`flex-wrap`, fin du débordement), soulignement glissant au survol, item actif marqué.
+  - Cartes de contenu : hover *lift* + léger zoom image + flèche de lien animée.
+  - Largeur de lecture confortable (~60ch) sur le contenu rédactionnel.
+  - **Mode sombre automatique** via `prefers-color-scheme`.
+  - Skip-link visible au focus clavier, `:focus-visible` homogène, respect de `prefers-reduced-motion`.
+- **Styles de l'éditeur de blocs** (`add_editor_style`) : l'éditeur reflète la typographie front.
+- **Carousel plein écran livré avec le thème** : porté d'un mu-plugin de test vers `assets/js/home-carousel.js` + `Slides\SlidesModule` (filtre REST `lang`, enqueue sur la home et ses traductions, image à la une réelle via `_embed`, navigation clavier, titres en `<p>`).
+
+### Changed
+
+- **Performance** : la police Manrope est chargée via `wp_enqueue_style` + `preconnect` (fin du `@import` bloquant et sériel dans la variation).
+- **Galerie photos** : images responsives (`srcset`/`sizes`) sur l'image principale et les vignettes (swap JS mis à jour).
+- **i18n** : `TranslationModel::getTranslations()` reconnaît désormais les traductions des CPT non-publics (slides, événements) — corrige aussi le sélecteur de langue.
+
 ### Changed
 
 - **Consolidation des pages d'administration** (ADR 0014). Les 6 pages d'admin du thème (Identité du site, Réseaux sociaux, Galerie, Variations CSS, SEO Dashboard, Redirections) sont rassemblées sur **une seule page à onglets** : `Apparence > Réglages du thème` (`themes.php?page=oli-theme-settings`), groupées par thème (Identité & Marque, Apparence, Contenu, Contact, SEO). Architecture page hôte (`Admin\ThemeAdminPage`) + registre d'onglets (`Admin\AdminTabRegistry`, contrat `Admin\AdminTabInterface`) ; chaque module publie ses onglets sur `admin_menu`. Les anciens slugs (`oli-social-links`, `oli-gallery`, `oli-theme-variations`, `oli-seo-dashboard`, `oli-seo-redirects`) sont **redirigés en 301** vers le bon onglet via `Admin\LegacySlugRedirector` (hook `admin_page_access_denied`). Les entrées de menu redondantes (4 sous Apparence, 2 sous Outils) sont retirées au profit de l'item unique.
