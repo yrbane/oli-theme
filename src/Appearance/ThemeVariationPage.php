@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OliTheme\Appearance;
 
+use OliTheme\Admin\AdminTabInterface;
+
 /**
- * Sous-page d'administration « Apparence > Variations CSS ».
+ * Onglet « Variations CSS » de la page d'administration unifiée du thème.
  *
  * Permet à l'utilisateur de :
  *   - choisir une variation parmi celles déposées dans `assets/css/variations/` ;
@@ -17,7 +19,7 @@ namespace OliTheme\Appearance;
  *
  * @since 1.0.0
  */
-final class ThemeVariationPage
+final class ThemeVariationPage implements AdminTabInterface
 {
     public const OPTION = 'oli_theme_variation';
 
@@ -27,26 +29,30 @@ final class ThemeVariationPage
 
     public const GROUP = 'oli_theme_variation_group';
 
-    public const PAGE_SLUG = 'oli-theme-variations';
-
     public function __construct(
         private readonly ThemeVariationRegistry $registry,
         private readonly GoogleFontsLibrary $fonts = new GoogleFontsLibrary(),
     ) {
     }
 
-    /**
-     * À brancher sur `admin_menu`.
-     */
-    public function register(): void
+    public function id(): string
     {
-        add_theme_page(
-            __('Variations CSS', 'oli-theme'),
-            __('Variations CSS', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'variations';
+    }
+
+    public function group(): string
+    {
+        return 'apparence';
+    }
+
+    public function label(): string
+    {
+        return __('Variations CSS', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
     }
 
     /**
@@ -114,7 +120,7 @@ final class ThemeVariationPage
         return $this->fonts->has($value) ? $value : '';
     }
 
-    public function render(): void
+    public function renderPanel(): void
     {
         // Charge le media uploader WP nécessaire au picker d'image (bouton
         // « Choisir une image »). Appelé ici plutôt que sur admin_enqueue_scripts
@@ -142,8 +148,6 @@ final class ThemeVariationPage
             ? __('Image personnalisée', 'oli-theme')
             : __('Image par défaut du thème', 'oli-theme');
 
-        echo '<div class="wrap oli-variations">';
-        echo '<h1>' . esc_html__('Variations CSS du thème', 'oli-theme') . '</h1>';
         echo '<p class="description">';
         echo esc_html__(
             'Déposez vos variations dans le dossier assets/css/variations/ du thème (un fichier .css par variation). Le CSS sélectionné est chargé après main.css pour l\'overrider.',
@@ -250,8 +254,6 @@ final class ThemeVariationPage
 
         // JS : ouvre le media uploader WP au clic.
         $this->renderMediaUploaderScript();
-
-        echo '</div>';
     }
 
     /**
