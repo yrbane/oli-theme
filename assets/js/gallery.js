@@ -34,6 +34,15 @@ export function initGallery() {
                 }
             } else if (mainImg) {
                 mainImg.src = btn.getAttribute('data-url') || '';
+                // Met à jour le srcset au swap, sinon l'ancien resterait
+                // prioritaire sur le nouveau src (le navigateur préfère srcset).
+                const srcset = btn.getAttribute('data-srcset') || '';
+                if (srcset) {
+                    mainImg.srcset = srcset;
+                    mainImg.sizes = '(max-width: 900px) 100vw, 720px';
+                } else {
+                    mainImg.removeAttribute('srcset');
+                }
                 mainImg.alt = btn.getAttribute('data-alt') || '';
                 if (mainCaption) {
                     mainCaption.textContent = btn.getAttribute('data-caption') || '';

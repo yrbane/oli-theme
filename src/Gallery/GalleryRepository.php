@@ -42,9 +42,9 @@ final class GalleryRepository
     }
 
     /**
-     * Retourne les photos enrichies (URL + alt résolus depuis WP).
+     * Retourne les photos enrichies (URL + alt + srcset résolus depuis WP).
      *
-     * @return list<array{id: int, caption: string, url: string, thumb: string, alt: string}>
+     * @return list<array{id: int, caption: string, url: string, thumb: string, alt: string, srcset: string}>
      */
     public function getPhotos(): array
     {
@@ -64,12 +64,18 @@ final class GalleryRepository
             if (\function_exists('get_post_meta')) {
                 $alt = (string) get_post_meta($id, '_wp_attachment_image_alt', true);
             }
+            // Jeu de sources responsives (toutes tailles WP), commun à l'image
+            // principale et aux vignettes — seul `sizes` diffère côté template.
+            $srcset = \function_exists('wp_get_attachment_image_srcset')
+                ? wp_get_attachment_image_srcset($id, 'large')
+                : false;
             $out[] = [
                 'id'      => $id,
                 'caption' => (string) ($entry['caption'] ?? ''),
                 'url'     => $url,
                 'thumb'   => \is_string($thb) && $thb !== '' ? $thb : $url,
                 'alt'     => $alt,
+                'srcset'  => \is_string($srcset) ? $srcset : '',
             ];
         }
         return $out;

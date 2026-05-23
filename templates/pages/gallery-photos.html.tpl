@@ -13,7 +13,7 @@
         <section class="gallery gallery--photos" data-gallery-photos>
             <div class="gallery__main" data-gallery-main>
                 <figure class="gallery__main-figure">
-                    <img class="gallery__main-image" src="[[ photos[0].url ]]" alt="[[ photos[0].alt ]]" data-gallery-main-image>
+                    <img class="gallery__main-image" src="[[ photos[0].url ]]"[% if photos[0].srcset %] srcset="[[ photos[0].srcset ]]" sizes="(max-width: 900px) 100vw, 720px"[% endif %] alt="[[ photos[0].alt ]]" data-gallery-main-image>
                     <figcaption class="gallery__main-caption" data-gallery-main-caption>[[ photos[0].caption ]]</figcaption>
                 </figure>
             </div>
@@ -24,9 +24,10 @@
                                 class="gallery__thumb-button"
                                 data-gallery-thumb
                                 data-url="[[ photo.url ]]"
+                                data-srcset="[[ photo.srcset ]]"
                                 data-alt="[[ photo.alt ]]"
                                 data-caption="[[ photo.caption ]]">
-                            <img class="gallery__thumb-image" src="[[ photo.thumb ]]" alt="[[ photo.alt ]]" loading="lazy">
+                            <img class="gallery__thumb-image" src="[[ photo.thumb ]]"[% if photo.srcset %] srcset="[[ photo.srcset ]]" sizes="160px"[% endif %] alt="[[ photo.alt ]]" loading="lazy">
                         </button>
                     </li>
                 [% endfor %]
