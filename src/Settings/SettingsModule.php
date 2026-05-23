@@ -57,7 +57,9 @@ final class SettingsModule implements ModuleInterface
             \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
 
             $registry->add(new SettingsTab($page, 'banner', 'identite', 'banner', __('Identité visuelle', 'oli-theme')));
-            $registry->add(new SettingsTab($page, 'languages', 'identite', 'languages', __('Langues', 'oli-theme')));
+            // L'onglet « Langues » est fourni par I18n\TranslationAuditPage : il
+            // compose les réglages des langues (renderPanelFor('languages')) et
+            // l'audit de couverture des traductions.
             $registry->add(new SettingsTab($page, 'footer', 'identite', 'footer', __('Pied de page', 'oli-theme')));
             $registry->add(new SettingsTab($page, 'contact', 'contact', 'contact', __('Contact', 'oli-theme')));
             $registry->add(new SettingsTab($page, 'seo', 'seo', 'reglages', __('Réglages SEO', 'oli-theme')));

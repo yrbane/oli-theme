@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace OliTheme\I18n;
 
 use OliTheme\Admin\AdminTabInterface;
+use OliTheme\Settings\ThemeSettingsPage;
 
 /**
- * Onglet « Traductions » : audite la couverture des traductions du contenu et
- * permet de créer les brouillons manquants.
+ * Onglet « Langues » : réglages des langues (formulaire Settings API) suivis de
+ * l'audit de couverture des traductions et de la création de brouillons.
  *
  * @package OliTheme\I18n
  *
@@ -16,13 +17,15 @@ use OliTheme\Admin\AdminTabInterface;
  */
 final class TranslationAuditPage implements AdminTabInterface
 {
-    public function __construct(private readonly TranslationAuditor $auditor)
-    {
+    public function __construct(
+        private readonly TranslationAuditor $auditor,
+        private readonly ThemeSettingsPage $settings,
+    ) {
     }
 
     public function id(): string
     {
-        return 'translations';
+        return 'languages';
     }
 
     public function group(): string
@@ -32,7 +35,7 @@ final class TranslationAuditPage implements AdminTabInterface
 
     public function label(): string
     {
-        return __('Traductions', 'oli-theme');
+        return __('Langues', 'oli-theme');
     }
 
     public function capability(): string
@@ -46,6 +49,11 @@ final class TranslationAuditPage implements AdminTabInterface
             $this->handleCreateDrafts();
         }
 
+        // 1. Réglages des langues (langues activées, défaut, repli).
+        $this->settings->renderPanelFor('languages');
+
+        // 2. Audit de couverture des traductions.
+        echo '<hr style="margin:2rem 0 1rem;">';
         $rows = $this->auditor->audit();
         ?>
         <h2 class="title" style="margin-top:0.5rem;"><?php esc_html_e('Couverture des traductions', 'oli-theme'); ?></h2>

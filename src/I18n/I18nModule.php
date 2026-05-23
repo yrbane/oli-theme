@@ -124,6 +124,7 @@ final class I18nModule implements ModuleInterface
                 TranslationAuditPage::class,
                 static fn (Container $c): TranslationAuditPage => new TranslationAuditPage(
                     $c->get(TranslationAuditor::class),
+                    $c->get(\OliTheme\Settings\ThemeSettingsPage::class),
                 ),
             );
         }
