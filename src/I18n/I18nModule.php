@@ -108,5 +108,33 @@ final class I18nModule implements ModuleInterface
             $postData = $_POST;
             $metabox->save($postId, $postData);
         });
+
+        if (!$this->container->has(TranslationAuditor::class)) {
+            $this->container->factory(
+                TranslationAuditor::class,
+                static fn (Container $c): TranslationAuditor => new TranslationAuditor(
+                    $c->get(LanguageRegistryInterface::class),
+                    $c->get(TranslationModelInterface::class),
+                ),
+            );
+        }
+
+        if (!$this->container->has(TranslationAuditPage::class)) {
+            $this->container->factory(
+                TranslationAuditPage::class,
+                static fn (Container $c): TranslationAuditPage => new TranslationAuditPage(
+                    $c->get(TranslationAuditor::class),
+                ),
+            );
+        }
+
+        // Publie l'onglet « Traductions » dans la page de réglages unifiée.
+        add_action('admin_menu', function (): void {
+            $registry = $this->container->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+            $page = $this->container->get(TranslationAuditPage::class);
+            \assert($page instanceof TranslationAuditPage);
+            $registry->add($page);
+        }, 10);
     }
 }
