@@ -48,5 +48,21 @@ final class AdminModule implements ModuleInterface
             \assert($page instanceof ThemeAdminPage);
             $page->register();
         }, 20);
+
+        add_action('admin_init', function (): void {
+            if (!isset($_GET['page']) || !\is_string($_GET['page'])) {
+                return;
+            }
+            $slug  = sanitize_key((string) $_GET['page']);
+            $extra = array_map(
+                static fn ($v): string => \is_scalar($v) ? (string) $v : '',
+                $_GET,
+            );
+            $target = (new LegacySlugRedirector())->targetFor($slug, $extra);
+            if ($target !== null) {
+                wp_safe_redirect($target, 301);
+                exit;
+            }
+        });
     }
 }
