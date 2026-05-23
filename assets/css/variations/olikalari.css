@@ -176,10 +176,10 @@ header.site-header {
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2px;
-  flex-wrap: nowrap;
+  gap: 0.1rem 0.25rem;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .site-header .nav__item,
@@ -304,24 +304,24 @@ header.site-header {
   margin-left: 0.15em;
 }
 
-/* Quand le menu s'étoffe : compresse padding et gap pour rester sur 1 ligne
-   sans casser l'alignement. */
+/* Menu étoffé : on autorise le passage à la ligne (2 lignes max en pratique)
+   plutôt que de comprimer/déborder. Lisibilité conservée. */
 .site-header .nav__list {
-  gap: 0;
-  flex-wrap: nowrap;
+  gap: 0.1rem 0.25rem;
+  flex-wrap: wrap;
   overflow: visible; /* le sublist peut sortir verticalement */
 }
 .site-header .nav--desktop .nav__list > .nav__item > .nav__link {
-  padding: 0.4rem 0.45rem;
-  font-size: 0.72rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
   letter-spacing: -0.005em;
 }
 
-/* Compression supplémentaire sur viewport ≤ 1280px (laptop standard). */
+/* Sur viewport ≤ 1280px : légère réduction, le wrap fait le reste. */
 @media (max-width: 1280px) {
   .site-header .nav--desktop .nav__list > .nav__item > .nav__link {
-    padding: 0.35rem 0.35rem;
-    font-size: 0.68rem;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.76rem;
   }
 }
 
@@ -1253,4 +1253,103 @@ body:not(:has(.carousel-fullscreen))::before {
   background-size: contain;
   background-position: center center;
   background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+   Raffinements design (menu + cartes + accessibilité) — 2026-05
+   ========================================================================== */
+
+/* --- Menu : soulignement animé au survol (remplace la pastille de fond) --- */
+.site-header .nav__link,
+.site-header nav a:not(.banner__home):not([class*="language-switcher"]) {
+  border-radius: 0;
+  background-color: transparent;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: left 0.15rem bottom 0.18rem;
+  background-size: 0% 2px;
+  transition: background-size 200ms ease, color 150ms ease, opacity 150ms ease;
+}
+.site-header .nav__link:hover,
+.site-header nav a:not(.banner__home):not([class*="language-switcher"]):hover {
+  color: #000000;
+  background-color: transparent;
+  background-size: calc(100% - 0.3rem) 2px;
+}
+
+/* Item courant : soulignement permanent + accent, sans encadrement. */
+.site-header .nav__item--current > .nav__link,
+.site-header .nav__item--ancestor > .nav__link,
+.site-header nav .current-menu-item > a,
+.site-header nav .current-menu-ancestor > a,
+.site-header nav a[aria-current] {
+  color: #000000;
+  font-weight: 700;
+  background-color: transparent;
+  border: none;
+  background-size: calc(100% - 0.3rem) 2px;
+}
+
+/* Le sous-menu garde son style propre (pas de soulignement glissant dedans). */
+.site-header .nav--desktop .nav__sublist .nav__link {
+  background-image: none;
+}
+
+/* --- Cartes de contenu : hover lift + léger zoom image --- */
+.feature-card {
+  transition: transform 220ms ease;
+}
+.feature-card__media img {
+  transition: transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+}
+.feature-card:hover .feature-card__media img {
+  transform: scale(1.045);
+}
+.feature-card__title {
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+/* Flèche du lien qui glisse au survol de la carte. */
+.feature-card__link {
+  text-decoration-color: #00000040;
+  transition: text-decoration-color 150ms ease;
+}
+.feature-card__link::after {
+  content: ' →';
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+.feature-card:hover .feature-card__link {
+  text-decoration-color: currentColor;
+}
+.feature-card:hover .feature-card__link::after {
+  transform: translateX(0.25rem);
+}
+
+/* --- Accessibilité : focus visible homogène (clavier) --- */
+.site-header a:focus-visible,
+.feature-card__link:focus-visible,
+.carousel-fullscreen__dot:focus-visible,
+a.btn:focus-visible,
+.oli-lightbox__nav:focus-visible,
+.oli-lightbox__close:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Respecte les préférences de mouvement réduit. */
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .feature-card__media img,
+  .feature-card__link::after,
+  .site-header .nav__link {
+    transition: none;
+  }
+  .feature-card:hover { transform: none; }
+  .feature-card:hover .feature-card__media img { transform: none; }
 }
