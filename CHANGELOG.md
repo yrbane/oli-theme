@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versi
 
 ## [Unreleased]
 
+### Changed
+
+- **Consolidation des pages d'administration** (ADR 0014). Les 6 pages d'admin du thème (Identité du site, Réseaux sociaux, Galerie, Variations CSS, SEO Dashboard, Redirections) sont rassemblées sur **une seule page à onglets** : `Apparence > Réglages du thème` (`themes.php?page=oli-theme-settings`), groupées par thème (Identité & Marque, Apparence, Contenu, Contact, SEO). Architecture page hôte (`Admin\ThemeAdminPage`) + registre d'onglets (`Admin\AdminTabRegistry`, contrat `Admin\AdminTabInterface`) ; chaque module publie ses onglets sur `admin_menu`. Les anciens slugs (`oli-social-links`, `oli-gallery`, `oli-theme-variations`, `oli-seo-dashboard`, `oli-seo-redirects`) sont **redirigés en 301** vers le bon onglet via `Admin\LegacySlugRedirector` (hook `admin_page_access_denied`). Les entrées de menu redondantes (4 sous Apparence, 2 sous Outils) sont retirées au profit de l'item unique.
+
+### Removed
+
+- **Doublon « réseaux sociaux » mort** : l'onglet « Réseaux sociaux » de l'ancienne page « Identité du site » (option `oli_theme_settings[social]`, 5 réseaux sans icônes, jamais lu au front) est supprimé, ainsi que son code de rendu/sanitize. La page dédiée `SocialAdminPage` (10 plateformes + icônes, option `oli_social_links`) reste la seule source, désormais sous l'onglet `Identité & Marque > Réseaux sociaux`.
+
 ### Added
 
 - **Module Galerie : pages Photos & Vidéos** (ADR 0012, [`docs/gallery.md`](docs/gallery.md)). Deux pages spéciales avec layout vignettes/principal :
