@@ -41,21 +41,7 @@ final class ThemeSettingsPage
     }
 
     /**
-     * Enregistre la page sous Apparence > Identité du site.
-     */
-    public function register(): void
-    {
-        add_theme_page(
-            __('Identité du site', 'oli-theme'),
-            __('Identité du site', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
-    }
-
-    /**
-     * Enregistre l'option, les six sections (une page par onglet) et leurs champs.
+     * Enregistre l'option, les cinq sections (une page par onglet) et leurs champs.
      */
     public function registerSettings(): void
     {
@@ -88,22 +74,6 @@ final class ThemeSettingsPage
     }
 
     /**
-     * Affiche la page de réglages : délègue au rendu d'un onglet.
-     */
-    public function render(): void
-    {
-        $activeTab = isset($_GET['tab']) && \is_string($_GET['tab'])
-            ? sanitize_key((string) $_GET['tab'])
-            : self::DEFAULT_TAB;
-
-        if (!\in_array($activeTab, $this->tabIds(), true)) {
-            $activeTab = self::DEFAULT_TAB;
-        }
-
-        $this->renderPanelFor($activeTab);
-    }
-
-    /**
      * Imprime le formulaire Settings API d'un onglet donné, sans wrapper de page.
      * Appelé par la page hôte unifiée via l'adaptateur {@see SettingsTab}.
      */
@@ -114,6 +84,7 @@ final class ThemeSettingsPage
         }
 
         echo '<form method="post" action="options.php">';
+        // settings_fields() émet le nonce et les champs cachés requis par la Settings API.
         settings_fields(self::GROUP);
         do_settings_sections(self::PAGE_SLUG . '-' . $tab);
         printf('<input type="hidden" name="_oli_active_tab" value="%s" />', esc_attr($tab));

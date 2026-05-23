@@ -32,28 +32,6 @@ final class ThemeSettingsPageTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterAddsThemePage(): void
-    {
-        Functions\when('__')->returnArg(1);
-
-        $capturedSlug       = null;
-        $capturedCapability = null;
-
-        Functions\when('add_theme_page')->alias(
-            static function (string $pageTitle, string $menuTitle, string $capability, string $menuSlug) use (&$capturedSlug, &$capturedCapability): void {
-                $capturedSlug       = $menuSlug;
-                $capturedCapability = $capability;
-            },
-        );
-
-        $settings = $this->createMock(ThemeSettingsModelInterface::class);
-
-        (new ThemeSettingsPage($settings))->register();
-
-        self::assertSame('oli-theme-settings', $capturedSlug);
-        self::assertSame('manage_options', $capturedCapability);
-    }
-
     public function testRegisterSettingsCallsRegisterSettingAndAddsSections(): void
     {
         Functions\when('__')->returnArg(1);
