@@ -49,7 +49,10 @@ final class AdminModule implements ModuleInterface
             $page->register();
         }, 20);
 
-        add_action('admin_init', function (): void {
+        // Les anciens slugs d'admin ne sont plus enregistrés : WordPress lève un
+        // 403 dans menu.php (avant admin_init) via admin_page_access_denied. On
+        // intercepte ce hook pour rediriger 301 vers le nouvel onglet équivalent.
+        add_action('admin_page_access_denied', function (): void {
             if (!isset($_GET['page']) || !\is_string($_GET['page'])) {
                 return;
             }
