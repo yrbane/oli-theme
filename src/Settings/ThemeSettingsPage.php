@@ -35,6 +35,9 @@ final class ThemeSettingsPage
     /** Onglet actif par défaut quand `?tab=` est absent. */
     public const DEFAULT_TAB = 'banner';
 
+    /** Garde : le script du sélecteur de médiathèque n'est imprimé qu'une fois. */
+    private bool $mediaScriptPrinted = false;
+
     public function __construct(
         private readonly ThemeSettingsModelInterface $settings,
     ) {
@@ -81,6 +84,12 @@ final class ThemeSettingsPage
     {
         if (!\in_array($tab, $this->tabIds(), true)) {
             $tab = self::DEFAULT_TAB;
+        }
+
+        // Les onglets contenant des champs média ont besoin de wp.media (sélecteur
+        // de médiathèque). Enqueue ici car la page hôte n'a pas de hook dédié.
+        if (\in_array($tab, ['banner', 'seo'], true) && \function_exists('wp_enqueue_media')) {
+            wp_enqueue_media();
         }
 
         echo '<form method="post" action="options.php">';
@@ -566,18 +575,99 @@ final class ThemeSettingsPage
 
     private function renderMediaIdField(string $section, string $key, ?int $value): void
     {
-        $name = $this->fieldName($section, $key);
-        $id   = $this->fieldId($section, $key);
+        $name       = $this->fieldName($section, $key);
+        $id         = $this->fieldId($section, $key);
+        $hasValue   = $value !== null && $value > 0;
+        $previewUrl = $hasValue && \function_exists('wp_get_attachment_image_url')
+            ? (string) wp_get_attachment_image_url($value, 'thumbnail')
+            : '';
+
+        echo '<div class="oli-media-field">';
         printf(
-            '<input type="number" id="%s" name="%s" value="%s" class="small-text" min="0" />',
+            '<input type="hidden" id="%s" name="%s" value="%s" class="oli-media-id" />',
             esc_attr($id),
             esc_attr($name),
             esc_attr((string) ($value ?? '')),
         );
+        echo '<div class="oli-media-preview">';
+        if ($previewUrl !== '') {
+            printf(
+                '<img src="%s" alt="" style="max-width:140px;height:auto;display:block;'
+                . 'border:1px solid #dcdcde;border-radius:3px;margin-bottom:0.4rem;" />',
+                esc_url($previewUrl),
+            );
+        }
+        echo '</div>';
         printf(
-            '<p class="description">%s</p>',
-            esc_html__('ID numérique du média dans la médiathèque WP. (Uploader visuel — cycle 2.)', 'oli-theme'),
+            '<button type="button" class="button oli-media-pick" data-title="%s">%s</button> '
+            . '<button type="button" class="button-link oli-media-remove" '
+            . 'style="color:#b32d2e;margin-left:0.5rem;%s">%s</button>',
+            esc_attr__('Choisir une image', 'oli-theme'),
+            esc_html__('Choisir une image', 'oli-theme'),
+            $hasValue ? '' : 'display:none;',
+            esc_html__('Retirer', 'oli-theme'),
         );
+        echo '</div>';
+
+        $this->printMediaPickerScriptOnce();
+    }
+
+    /**
+     * Imprime une seule fois le script générique du sélecteur de médiathèque.
+     * Délégation d'événements sur `.oli-media-pick` / `.oli-media-remove` dans
+     * un conteneur `.oli-media-field`, donc valable pour tous les champs média.
+     */
+    private function printMediaPickerScriptOnce(): void
+    {
+        if ($this->mediaScriptPrinted) {
+            return;
+        }
+        $this->mediaScriptPrinted = true;
+
+        $unavailable = esc_js(__('Médiathèque indisponible. Rechargez la page.', 'oli-theme'));
+        $useLabel    = esc_js(__('Utiliser cette image', 'oli-theme'));
+        ?>
+        <script>
+        (function () {
+            if (window.__oliMediaPicker) { return; }
+            window.__oliMediaPicker = true;
+            document.addEventListener('click', function (e) {
+                var pick = e.target.closest('.oli-media-pick');
+                var remove = e.target.closest('.oli-media-remove');
+                if (pick) {
+                    e.preventDefault();
+                    var field = pick.closest('.oli-media-field');
+                    if (typeof wp === 'undefined' || !wp.media) {
+                        window.alert('<?php echo $unavailable; ?>');
+                        return;
+                    }
+                    var frame = wp.media({
+                        title: pick.getAttribute('data-title') || '',
+                        button: { text: '<?php echo $useLabel; ?>' },
+                        library: { type: 'image' },
+                        multiple: false
+                    });
+                    frame.on('select', function () {
+                        var att = frame.state().get('selection').first().toJSON();
+                        var url = (att.sizes && att.sizes.thumbnail) ? att.sizes.thumbnail.url : att.url;
+                        field.querySelector('.oli-media-id').value = att.id;
+                        field.querySelector('.oli-media-preview').innerHTML =
+                            '<img src="' + url + '" alt="" style="max-width:140px;height:auto;display:block;'
+                            + 'border:1px solid #dcdcde;border-radius:3px;margin-bottom:0.4rem;" />';
+                        field.querySelector('.oli-media-remove').style.display = '';
+                    });
+                    frame.open();
+                } else if (remove) {
+                    e.preventDefault();
+                    var f = remove.closest('.oli-media-field');
+                    f.querySelector('.oli-media-id').value = '';
+                    f.querySelector('.oli-media-preview').innerHTML = '';
+                    remove.style.display = 'none';
+                }
+            });
+        })();
+        </script>
+        <?php
     }
 
     private function renderTextarea(string $section, string $key, string $value, string $description): void
