@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OliTheme\Admin;
 
 use OliTheme\Container;
+use OliTheme\Core\ModuleInterface;
 
 /**
  * Module d'administration unifiée : enregistre la page hôte unique et le
@@ -17,7 +18,7 @@ use OliTheme\Container;
  *
  * @since 1.1.0
  */
-final class AdminModule
+final class AdminModule implements ModuleInterface
 {
     public function __construct(private readonly Container $container)
     {
@@ -41,6 +42,7 @@ final class AdminModule
             );
         }
 
+        // Priorité 20 : après les modules qui publient leurs onglets (priorité 10).
         add_action('admin_menu', function (): void {
             $page = $this->container->get(ThemeAdminPage::class);
             \assert($page instanceof ThemeAdminPage);
