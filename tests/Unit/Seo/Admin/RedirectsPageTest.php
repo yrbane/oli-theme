@@ -38,25 +38,26 @@ final class RedirectsPageTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterAddsAdminPage(): void
+    public function testImplementsAdminTabInterface(): void
+    {
+        $redirects = $this->createMock(RedirectModelInterface::class);
+        $renderer  = $this->createMock(RendererInterface::class);
+
+        $page = new RedirectsPage($redirects, $renderer);
+
+        self::assertSame('redirections', $page->id());
+        self::assertSame('seo', $page->group());
+        self::assertSame('manage_options', $page->capability());
+    }
+
+    public function testLabelIsTranslated(): void
     {
         Functions\when('__')->returnArg(1);
-        Functions\when('add_action')->justReturn(null);
-
-        $capturedSlug = null;
-
-        Functions\when('add_management_page')->alias(
-            static function (string $pageTitle, string $menuTitle, string $capability, string $menuSlug) use (&$capturedSlug): void {
-                $capturedSlug = $menuSlug;
-            },
-        );
 
         $redirects = $this->createMock(RedirectModelInterface::class);
         $renderer  = $this->createMock(RendererInterface::class);
 
-        (new RedirectsPage($redirects, $renderer))->register();
-
-        self::assertSame('oli-seo-redirects', $capturedSlug);
+        self::assertSame('Redirections', (new RedirectsPage($redirects, $renderer))->label());
     }
 
     /**

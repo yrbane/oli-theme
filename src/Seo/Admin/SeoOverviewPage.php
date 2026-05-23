@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OliTheme\Seo\Admin;
 
+use OliTheme\Admin\AdminTabInterface;
 use OliTheme\Core\RendererInterface;
 use OliTheme\Posts\PostEntity;
 use OliTheme\Posts\PostModelInterface;
@@ -23,7 +24,7 @@ use OliTheme\Seo\SeoMetaModelInterface;
  *
  * @since 1.0.0
  */
-final class SeoOverviewPage
+final class SeoOverviewPage implements AdminTabInterface
 {
     public const PAGE_SLUG = 'oli-seo-dashboard';
 
@@ -42,15 +43,24 @@ final class SeoOverviewPage
     ) {
     }
 
-    public function register(): void
+    public function id(): string
     {
-        add_management_page(
-            __('SEO Dashboard', 'oli-theme'),
-            __('SEO Dashboard', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'dashboard';
+    }
+
+    public function group(): string
+    {
+        return 'seo';
+    }
+
+    public function label(): string
+    {
+        return __('Dashboard', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
     }
 
     /**
@@ -62,7 +72,7 @@ final class SeoOverviewPage
         add_action('admin_post_' . self::ACTION_EXPORT_CSV, [$this, 'handleExportCsv']);
     }
 
-    public function render(): void
+    public function renderPanel(): void
     {
         $filters = $this->parseFilters();
         $items   = $this->fetchItems($filters);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OliTheme\Seo\Admin;
 
+use OliTheme\Admin\AdminTabInterface;
 use OliTheme\Core\RendererInterface;
 use OliTheme\Seo\RedirectModelInterface;
 
@@ -18,7 +19,7 @@ use OliTheme\Seo\RedirectModelInterface;
  *
  * @since 1.0.0
  */
-final class RedirectsPage
+final class RedirectsPage implements AdminTabInterface
 {
     public const PAGE_SLUG = 'oli-seo-redirects';
 
@@ -41,20 +42,29 @@ final class RedirectsPage
     ) {
     }
 
-    public function register(): void
+    public function id(): string
     {
-        add_management_page(
-            __('Redirections', 'oli-theme'),
-            __('Redirections', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'redirections';
+    }
+
+    public function group(): string
+    {
+        return 'seo';
+    }
+
+    public function label(): string
+    {
+        return __('Redirections', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
     }
 
     /**
      * Enregistre les handlers admin-post.php (admin_init).
-     * Séparé de register() car admin-post.php ne déclenche pas admin_menu.
+     * Séparé du rendu car admin-post.php ne déclenche pas admin_menu.
      */
     public function registerActions(): void
     {
@@ -62,7 +72,7 @@ final class RedirectsPage
         add_action('admin_post_' . self::ACTION_DELETE, [$this, 'handleDelete']);
     }
 
-    public function render(): void
+    public function renderPanel(): void
     {
         $page   = isset($_GET['paged']) && \is_string($_GET['paged']) ? max(1, (int) $_GET['paged']) : 1;
         $offset = ($page - 1) * self::PER_PAGE;

@@ -325,9 +325,17 @@ final class SeoModule implements ModuleInterface
         });
 
         add_action('admin_menu', function (): void {
-            $this->container->get(SeoOverviewPage::class)->register();
-            $this->container->get(RedirectsPage::class)->register();
-        });
+            $registry = $this->container->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+
+            $overview = $this->container->get(SeoOverviewPage::class);
+            \assert($overview instanceof SeoOverviewPage);
+            $registry->add($overview);
+
+            $redirects = $this->container->get(RedirectsPage::class);
+            \assert($redirects instanceof RedirectsPage);
+            $registry->add($redirects);
+        }, 10);
 
         // Hooks admin-post.php (CRUD redirections + export CSV SEO) : admin_menu n'est pas
         // appelé sur admin-post.php, on doit donc les brancher via admin_init.
