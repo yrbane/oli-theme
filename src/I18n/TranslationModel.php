@@ -87,9 +87,11 @@ final class TranslationModel implements TranslationModelInterface
             return [];
         }
 
+        // `post_type => 'any'` exclut les CPT non-publics (oli_slide, oli_event) :
+        // on cible explicitement tous les types portant le taxon `language`.
         /** @var array<int, int> $postIds */
         $postIds = get_posts([
-            'post_type'   => 'any',
+            'post_type'   => LanguageTaxonomy::OBJECT_TYPES,
             'numberposts' => -1,
             'post_status' => 'any',
             'fields'      => 'ids',

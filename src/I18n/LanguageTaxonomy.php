@@ -18,6 +18,9 @@ final class LanguageTaxonomy
 {
     public const NAME = 'language';
 
+    /** Types de contenu portant le taxon `language`. */
+    public const OBJECT_TYPES = ['post', 'page', 'oli_slide', 'oli_event', 'oli_contact_log'];
+
     public function __construct(private readonly LanguageRegistry $registry)
     {
     }
@@ -30,7 +33,7 @@ final class LanguageTaxonomy
     {
         register_taxonomy(
             self::NAME,
-            ['post', 'page', 'oli_slide', 'oli_event', 'oli_contact_log'],
+            self::OBJECT_TYPES,
             [
                 'label' => 'Langues',
                 'public' => false,
