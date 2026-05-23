@@ -19,6 +19,16 @@ namespace OliTheme\Core;
 final class AssetManager
 {
     /**
+     * Police Google Fonts requise par une variation (slug => spec `family`).
+     * Chargée via wp_enqueue_style (parallèle) plutôt qu'un @import bloquant.
+     *
+     * @var array<string, string>
+     */
+    private const VARIATION_FONTS = [
+        'olikalari' => 'Manrope:wght@400;500;700',
+    ];
+
+    /**
      * @param string $themePath Chemin absolu du thème (sans slash final).
      * @param string $themeUri URL absolue du thème (sans slash final).
      */
@@ -139,7 +149,34 @@ final class AssetManager
             $this->version($relative),
         );
 
+        // Police Google Fonts de la variation : enqueue parallèle + preconnect
+        // (remplace l'ancien @import bloquant et sériel dans le CSS).
+        if (isset(self::VARIATION_FONTS[$variation]) && \function_exists('wp_enqueue_style')) {
+            $url = 'https://fonts.googleapis.com/css2?family='
+                . self::VARIATION_FONTS[$variation] . '&display=swap';
+            wp_enqueue_style('oli-theme-variation-font', $url, [], null);
+            $this->preconnectGoogleFonts();
+        }
+
         return true;
+    }
+
+    /**
+     * Ajoute des resource hints `preconnect` vers les hôtes Google Fonts pour
+     * réduire la latence de chargement de la police.
+     */
+    private function preconnectGoogleFonts(): void
+    {
+        if (!\function_exists('add_filter')) {
+            return;
+        }
+        add_filter('wp_resource_hints', static function (array $hints, string $relation): array {
+            if ($relation === 'preconnect') {
+                $hints[] = 'https://fonts.googleapis.com';
+                $hints[] = ['href' => 'https://fonts.gstatic.com', 'crossorigin'];
+            }
+            return $hints;
+        }, 10, 2);
     }
 
     /**

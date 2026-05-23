@@ -5,7 +5,8 @@
    Sur la home : carousel plein écran + menu en bandeau bas → sticky top.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap');
+/* Police Manrope : chargée par AssetManager (wp_enqueue_style + preconnect),
+   plus de @import bloquant ici. Fallback system-ui si non chargée. */
 
 :root {
   --c-bg:           #ffffff;
