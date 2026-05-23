@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace OliTheme\Settings;
 
-use OliTheme\Core\RendererInterface;
-
 /**
  * Page d'administration "Identité du site" sous Apparence.
  *
  * Implémente la Settings API native de WordPress :
  * `register_setting` / `add_settings_section` / `add_settings_field` /
- * `do_settings_sections`. Les six onglets (banner, languages, social,
- * footer, contact, seo) sont chacun rendus sur une **page de settings
+ * `do_settings_sections`. Les cinq onglets (banner, languages, footer,
+ * contact, seo) sont chacun rendus sur une **page de settings
  * distincte** (`oli-theme-settings-banner`, `-languages`, etc.) afin que
  * `do_settings_sections($activePage)` ne rende que la section de l'onglet
  * actif. La sauvegarde utilise un seul groupe d'options
@@ -38,7 +36,6 @@ final class ThemeSettingsPage
     public const DEFAULT_TAB = 'banner';
 
     public function __construct(
-        private readonly RendererInterface $renderer,
         private readonly ThemeSettingsModelInterface $settings,
     ) {
     }
@@ -91,7 +88,7 @@ final class ThemeSettingsPage
     }
 
     /**
-     * Affiche la page de réglages via le moteur de templates.
+     * Affiche la page de réglages : délègue au rendu d'un onglet.
      */
     public function render(): void
     {
@@ -103,20 +100,25 @@ final class ThemeSettingsPage
             $activeTab = self::DEFAULT_TAB;
         }
 
-        ob_start();
-        settings_fields(self::GROUP);
-        do_settings_sections(self::PAGE_SLUG . '-' . $activeTab);
-        // On préserve l'onglet actif après redirection post-save.
-        printf('<input type="hidden" name="_oli_active_tab" value="%s" />', esc_attr($activeTab));
-        submit_button();
-        $form = (string) ob_get_clean();
+        $this->renderPanelFor($activeTab);
+    }
 
-        echo $this->renderer->render('admin/settings-page.html', [
-            'title'     => __('Identité du site', 'oli-theme'),
-            'tabs'      => $this->tabsFor($activeTab),
-            'form'      => $form,
-            'activeTab' => $activeTab,
-        ]);
+    /**
+     * Imprime le formulaire Settings API d'un onglet donné, sans wrapper de page.
+     * Appelé par la page hôte unifiée via l'adaptateur {@see SettingsTab}.
+     */
+    public function renderPanelFor(string $tab): void
+    {
+        if (!\in_array($tab, $this->tabIds(), true)) {
+            $tab = self::DEFAULT_TAB;
+        }
+
+        echo '<form method="post" action="options.php">';
+        settings_fields(self::GROUP);
+        do_settings_sections(self::PAGE_SLUG . '-' . $tab);
+        printf('<input type="hidden" name="_oli_active_tab" value="%s" />', esc_attr($tab));
+        submit_button();
+        echo '</form>';
     }
 
     /**
@@ -137,9 +139,6 @@ final class ThemeSettingsPage
         }
         if (isset($input['languages']) && \is_array($input['languages'])) {
             $clean['languages'] = $this->sanitizeLanguages($input['languages']);
-        }
-        if (isset($input['social']) && \is_array($input['social'])) {
-            $clean['social'] = $this->sanitizeSocial($input['social']);
         }
         if (isset($input['footer']) && \is_array($input['footer'])) {
             $clean['footer'] = $this->sanitizeFooter($input['footer']);
@@ -301,49 +300,7 @@ final class ThemeSettingsPage
     }
 
     // ---------------------------------------------------------------------
-    // Section 3 : Réseaux sociaux (social)
-    // ---------------------------------------------------------------------
-
-    private function registerSocialFields(string $page, string $section, SettingsBag $current): void
-    {
-        $networks = [
-            'facebook'  => 'Facebook',
-            'instagram' => 'Instagram',
-            'youtube'   => 'YouTube',
-            'linkedin'  => 'LinkedIn',
-            'twitter'   => 'Twitter / X',
-        ];
-
-        foreach ($networks as $key => $label) {
-            $value = (string) ($current->social->{$key} ?? '');
-            add_settings_field(
-                'oli_social_' . $key,
-                $label,
-                fn () => $this->renderUrlField('social', $key, $value, \sprintf(__('URL complète du profil %s.', 'oli-theme'), $label)),
-                $page,
-                $section,
-            );
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $input
-     *
-     * @return array<string, mixed>
-     */
-    private function sanitizeSocial(array $input): array
-    {
-        $clean = [];
-        foreach (['facebook', 'instagram', 'youtube', 'linkedin', 'twitter'] as $key) {
-            $value         = (string) ($input[$key] ?? '');
-            $clean[$key]   = $value === '' ? null : esc_url_raw($value);
-        }
-
-        return $clean;
-    }
-
-    // ---------------------------------------------------------------------
-    // Section 4 : Pied de page (footer)
+    // Section 3 : Pied de page (footer)
     // ---------------------------------------------------------------------
 
     private function registerFooterFields(string $page, string $section, SettingsBag $current): void
@@ -431,7 +388,7 @@ final class ThemeSettingsPage
     }
 
     // ---------------------------------------------------------------------
-    // Section 5 : Contact (contact)
+    // Section 4 : Contact (contact)
     // ---------------------------------------------------------------------
 
     private function registerContactFields(string $page, string $section, SettingsBag $current): void
@@ -494,7 +451,7 @@ final class ThemeSettingsPage
     }
 
     // ---------------------------------------------------------------------
-    // Section 6 : SEO global (seo)
+    // Section 5 : SEO global (seo)
     // ---------------------------------------------------------------------
 
     private function registerSeoFields(string $page, string $section, SettingsBag $current): void
@@ -785,7 +742,6 @@ final class ThemeSettingsPage
         return [
             ['id' => 'banner',    'title' => __('Identité visuelle', 'oli-theme')],
             ['id' => 'languages', 'title' => __('Langues', 'oli-theme')],
-            ['id' => 'social',    'title' => __('Réseaux sociaux', 'oli-theme')],
             ['id' => 'footer',    'title' => __('Pied de page', 'oli-theme')],
             ['id' => 'contact',   'title' => __('Contact', 'oli-theme')],
             ['id' => 'seo',       'title' => __('SEO global', 'oli-theme')],
@@ -797,7 +753,7 @@ final class ThemeSettingsPage
      */
     private function tabIds(): array
     {
-        return ['banner', 'languages', 'social', 'footer', 'contact', 'seo'];
+        return ['banner', 'languages', 'footer', 'contact', 'seo'];
     }
 
     /**
@@ -808,7 +764,6 @@ final class ThemeSettingsPage
         $tabs = [
             ['id' => 'banner',    'label' => __('Identité', 'oli-theme')],
             ['id' => 'languages', 'label' => __('Langues', 'oli-theme')],
-            ['id' => 'social',    'label' => __('Réseaux', 'oli-theme')],
             ['id' => 'footer',    'label' => __('Footer', 'oli-theme')],
             ['id' => 'contact',   'label' => __('Contact', 'oli-theme')],
             ['id' => 'seo',       'label' => __('SEO', 'oli-theme')],
