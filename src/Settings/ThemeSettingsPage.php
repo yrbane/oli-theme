@@ -726,31 +726,4 @@ final class ThemeSettingsPage
     {
         return ['banner', 'languages', 'footer', 'contact', 'seo'];
     }
-
-    /**
-     * @return array<int, array{id: string, label: string, isActive: bool, url: string}>
-     */
-    private function tabsFor(string $activeId): array
-    {
-        $tabs = [
-            ['id' => 'banner',    'label' => __('Identité', 'oli-theme')],
-            ['id' => 'languages', 'label' => __('Langues', 'oli-theme')],
-            ['id' => 'footer',    'label' => __('Footer', 'oli-theme')],
-            ['id' => 'contact',   'label' => __('Contact', 'oli-theme')],
-            ['id' => 'seo',       'label' => __('SEO', 'oli-theme')],
-        ];
-
-        return array_map(
-            static fn (array $tab): array => [
-                'id'       => $tab['id'],
-                'label'    => $tab['label'],
-                'isActive' => $tab['id'] === $activeId,
-                'url'      => add_query_arg(
-                    ['page' => self::PAGE_SLUG, 'tab' => $tab['id']],
-                    admin_url('themes.php'),
-                ),
-            ],
-            $tabs,
-        );
-    }
 }

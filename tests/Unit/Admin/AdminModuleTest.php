@@ -6,7 +6,6 @@ namespace OliTheme\Tests\Unit\Admin;
 
 use Brain\Monkey;
 use Brain\Monkey\Actions;
-use Brain\Monkey\Functions;
 use OliTheme\Admin\AdminModule;
 use OliTheme\Container;
 use PHPUnit\Framework\TestCase;
