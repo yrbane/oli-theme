@@ -6,7 +6,6 @@ namespace OliTheme\Tests\Unit\Settings;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
-use OliTheme\Core\RendererInterface;
 use OliTheme\Settings\SettingsBag;
 use OliTheme\Settings\ThemeSettingsModelInterface;
 use OliTheme\Settings\ThemeSettingsPage;
@@ -33,29 +32,6 @@ final class ThemeSettingsPageTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterAddsThemePage(): void
-    {
-        Functions\when('__')->returnArg(1);
-
-        $capturedSlug       = null;
-        $capturedCapability = null;
-
-        Functions\when('add_theme_page')->alias(
-            static function (string $pageTitle, string $menuTitle, string $capability, string $menuSlug) use (&$capturedSlug, &$capturedCapability): void {
-                $capturedSlug       = $menuSlug;
-                $capturedCapability = $capability;
-            },
-        );
-
-        $renderer = $this->createMock(RendererInterface::class);
-        $settings = $this->createMock(ThemeSettingsModelInterface::class);
-
-        (new ThemeSettingsPage($renderer, $settings))->register();
-
-        self::assertSame('oli-theme-settings', $capturedSlug);
-        self::assertSame('manage_options', $capturedCapability);
-    }
-
     public function testRegisterSettingsCallsRegisterSettingAndAddsSections(): void
     {
         Functions\when('__')->returnArg(1);
@@ -78,15 +54,14 @@ final class ThemeSettingsPageTest extends TestCase
             },
         );
 
-        $renderer = $this->createMock(RendererInterface::class);
         $settings = $this->createMock(ThemeSettingsModelInterface::class);
         $settings->method('all')->willReturn(SettingsBag::default());
 
-        (new ThemeSettingsPage($renderer, $settings))->registerSettings();
+        (new ThemeSettingsPage($settings))->registerSettings();
 
         self::assertSame('oli_theme_settings_group', $capturedGroup);
         self::assertSame('oli_theme_settings', $capturedOptionKey);
-        self::assertSame(6, $addSectionCount);
+        self::assertSame(5, $addSectionCount);
     }
 
     /**
@@ -109,16 +84,14 @@ final class ThemeSettingsPageTest extends TestCase
             },
         );
 
-        $renderer = $this->createMock(RendererInterface::class);
         $settings = $this->createMock(ThemeSettingsModelInterface::class);
         $settings->method('all')->willReturn(SettingsBag::default());
 
-        (new ThemeSettingsPage($renderer, $settings))->registerSettings();
+        (new ThemeSettingsPage($settings))->registerSettings();
 
         // Une page distincte par onglet pour que do_settings_sections puisse filtrer par tab.
         self::assertArrayHasKey('oli-theme-settings-banner', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-languages', $fieldsPerPage);
-        self::assertArrayHasKey('oli-theme-settings-social', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-footer', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-contact', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-seo', $fieldsPerPage);
@@ -137,48 +110,14 @@ final class ThemeSettingsPageTest extends TestCase
         Functions\when('esc_url_raw')->returnArg(1);
         Functions\when('wp_kses_post')->returnArg(1);
 
-        $renderer = $this->createMock(RendererInterface::class);
         $settings = $this->createMock(ThemeSettingsModelInterface::class);
 
-        $page   = new ThemeSettingsPage($renderer, $settings);
-        $result = $page->sanitize(['social' => ['facebook' => 'https://facebook.com/oli']]);
+        $page   = new ThemeSettingsPage($settings);
+        $result = $page->sanitize(['contact' => ['email' => 'hello@example.com']]);
 
+        // La section banner non soumise est préservée par le merge de premier niveau.
         self::assertSame(['logoId' => 7], $result['banner']);
-        self::assertSame('https://facebook.com/oli', $result['social']['facebook']);
-    }
-
-    /**
-     * Les URLs des réseaux sociaux doivent passer par esc_url_raw.
-     */
-    public function testSanitizeFiltersSocialUrls(): void
-    {
-        Functions\when('get_option')->justReturn([]);
-        Functions\when('sanitize_text_field')->returnArg(1);
-        Functions\when('sanitize_email')->returnArg(1);
-        Functions\when('wp_kses_post')->returnArg(1);
-
-        $passedUrls = [];
-        Functions\when('esc_url_raw')->alias(
-            static function (string $url) use (&$passedUrls): string {
-                $passedUrls[] = $url;
-
-                return $url;
-            },
-        );
-
-        $renderer = $this->createMock(RendererInterface::class);
-        $settings = $this->createMock(ThemeSettingsModelInterface::class);
-
-        $page = new ThemeSettingsPage($renderer, $settings);
-        $page->sanitize([
-            'social' => [
-                'facebook'  => 'https://facebook.com/oli',
-                'instagram' => 'https://instagram.com/oli',
-            ],
-        ]);
-
-        self::assertContains('https://facebook.com/oli', $passedUrls);
-        self::assertContains('https://instagram.com/oli', $passedUrls);
+        self::assertSame('hello@example.com', $result['contact']['email']);
     }
 
     /**
@@ -200,10 +139,9 @@ final class ThemeSettingsPageTest extends TestCase
             },
         );
 
-        $renderer = $this->createMock(RendererInterface::class);
         $settings = $this->createMock(ThemeSettingsModelInterface::class);
 
-        $page = new ThemeSettingsPage($renderer, $settings);
+        $page = new ThemeSettingsPage($settings);
         $page->sanitize([
             'contact' => ['email' => 'hello@example.com'],
         ]);
@@ -223,10 +161,9 @@ final class ThemeSettingsPageTest extends TestCase
         Functions\when('esc_url_raw')->returnArg(1);
         Functions\when('wp_kses_post')->returnArg(1);
 
-        $renderer = $this->createMock(RendererInterface::class);
         $settings = $this->createMock(ThemeSettingsModelInterface::class);
 
-        $page   = new ThemeSettingsPage($renderer, $settings);
+        $page   = new ThemeSettingsPage($settings);
         $result = $page->sanitize(['contact' => ['email' => 'a@b.fr']]);
 
         self::assertFalse($result['contact']['autoreplyEnabled']);

@@ -305,6 +305,7 @@ final class Theme
         );
 
         // Modules fonctionnels.
+        (new \OliTheme\Admin\AdminModule($container))->register();
         (new \OliTheme\Settings\SettingsModule($container))->register();
         (new \OliTheme\I18n\I18nModule($container))->register();
         (new \OliTheme\Navigation\NavigationModule($container))->register();

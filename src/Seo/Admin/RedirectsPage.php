@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace OliTheme\Seo\Admin;
 
+use OliTheme\Admin\AdminTabInterface;
 use OliTheme\Core\RendererInterface;
 use OliTheme\Seo\RedirectModelInterface;
 
 /**
  * Page d'administration des redirections HTTP.
  *
- * Sous-menu sous Outils (`tools.php`) : liste, formulaire create/edit et suppression
- * des règles enregistrées dans la table `oli_redirects`. Les actions de soumission
- * passent par `admin-post.php` avec nonce + capability check.
+ * Onglet « Redirections » sous Apparence › Oli Theme (themes.php). Les actions de
+ * soumission passent par `admin-post.php` avec nonce + capability check.
  *
  * @package OliTheme\Seo\Admin
  *
  * @since 1.0.0
  */
-final class RedirectsPage
+final class RedirectsPage implements AdminTabInterface
 {
-    public const PAGE_SLUG = 'oli-seo-redirects';
-
     public const NONCE_SAVE = 'oli_redirect_save';
 
     public const NONCE_DELETE = 'oli_redirect_delete';
@@ -41,20 +39,29 @@ final class RedirectsPage
     ) {
     }
 
-    public function register(): void
+    public function id(): string
     {
-        add_management_page(
-            __('Redirections', 'oli-theme'),
-            __('Redirections', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'redirections';
+    }
+
+    public function group(): string
+    {
+        return 'seo';
+    }
+
+    public function label(): string
+    {
+        return __('Redirections', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
     }
 
     /**
      * Enregistre les handlers admin-post.php (admin_init).
-     * Séparé de register() car admin-post.php ne déclenche pas admin_menu.
+     * Séparé du rendu car admin-post.php ne déclenche pas admin_menu.
      */
     public function registerActions(): void
     {
@@ -62,7 +69,7 @@ final class RedirectsPage
         add_action('admin_post_' . self::ACTION_DELETE, [$this, 'handleDelete']);
     }
 
-    public function render(): void
+    public function renderPanel(): void
     {
         $page   = isset($_GET['paged']) && \is_string($_GET['paged']) ? max(1, (int) $_GET['paged']) : 1;
         $offset = ($page - 1) * self::PER_PAGE;
@@ -95,10 +102,7 @@ final class RedirectsPage
                 'target'     => $r->target,
                 'code'       => $r->code,
                 'hits'       => $r->hits,
-                'edit_url'   => add_query_arg(
-                    ['page' => self::PAGE_SLUG, 'edit' => $r->id],
-                    admin_url('tools.php'),
-                ),
+                'edit_url'   => $this->listUrl(['edit' => $r->id]),
                 'delete_url' => add_query_arg(
                     [
                         'action'   => self::ACTION_DELETE,
@@ -126,12 +130,12 @@ final class RedirectsPage
             'total_pages'  => $totalPages,
             'total'        => $total,
             'has_pages'    => $totalPages > 1,
-            'prev_page'    => $page > 1 ? add_query_arg(['page' => self::PAGE_SLUG, 'paged' => $page - 1], admin_url('tools.php')) : '',
-            'next_page'    => $page < $totalPages ? add_query_arg(['page' => self::PAGE_SLUG, 'paged' => $page + 1], admin_url('tools.php')) : '',
+            'prev_page'    => $page > 1 ? $this->listUrl(['paged' => $page - 1]) : '',
+            'next_page'    => $page < $totalPages ? $this->listUrl(['paged' => $page + 1]) : '',
             'save_url'     => admin_url('admin-post.php'),
             'nonce_save'   => wp_create_nonce(self::NONCE_SAVE),
             'action_save'  => self::ACTION_SAVE,
-            'cancel_url'   => add_query_arg(['page' => self::PAGE_SLUG], admin_url('tools.php')),
+            'cancel_url'   => $this->listUrl(),
             'list_empty'   => $rows === [],
         ]);
     }
@@ -216,15 +220,27 @@ final class RedirectsPage
     }
 
     /**
+     * URL de la liste des redirections (onglet SEO unifié), avec params additionnels.
+     *
+     * @param array<string, scalar> $extra
+     */
+    private function listUrl(array $extra = []): string
+    {
+        return add_query_arg(
+            ['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections'] + $extra,
+            admin_url('themes.php'),
+        );
+    }
+
+    /**
      * Redirige vers la liste avec des paramètres de query string.
      *
      * @param array<string, mixed> $args
      */
     private function redirectToList(array $args): void
     {
-        $base = admin_url('tools.php');
-        $args = array_filter(['page' => self::PAGE_SLUG] + $args, static fn ($v) => $v !== null && $v !== '');
+        $extra = array_filter($args, static fn ($v) => $v !== null && $v !== '');
 
-        wp_safe_redirect(add_query_arg($args, $base));
+        wp_safe_redirect($this->listUrl($extra));
     }
 }

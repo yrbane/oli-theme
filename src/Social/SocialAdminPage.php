@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OliTheme\Social;
 
+use OliTheme\Admin\AdminTabInterface;
+
 /**
- * Page d'administration « Apparence > Réseaux sociaux ».
+ * Onglet « Réseaux sociaux » de la page d'administration unifiée du thème.
  *
  * Liste les plateformes supportées avec leur icône à côté du champ URL.
  *
@@ -13,26 +15,33 @@ namespace OliTheme\Social;
  *
  * @since 1.0.0
  */
-final class SocialAdminPage
+final class SocialAdminPage implements AdminTabInterface
 {
-    public const PAGE_SLUG = 'oli-social-links';
-
     public function __construct(private readonly SocialLinksRepository $repo)
     {
     }
 
-    public function register(): void
+    public function id(): string
     {
-        add_theme_page(
-            __('Réseaux sociaux', 'oli-theme'),
-            __('Réseaux sociaux', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'social';
     }
 
-    public function render(): void
+    public function group(): string
+    {
+        return 'identite';
+    }
+
+    public function label(): string
+    {
+        return __('Réseaux sociaux', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
+    }
+
+    public function renderPanel(): void
     {
         if (!empty($_POST['oli_social_save'])) {
             $this->handleSave();
@@ -44,48 +53,44 @@ final class SocialAdminPage
             : '/assets/img/icons/social';
 
         ?>
-        <div class="wrap oli-social-admin">
-            <h1><?php esc_html_e('Réseaux sociaux', 'oli-theme'); ?></h1>
-
-            <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
-                <p style="margin:0 0 0.5rem;"><strong><?php esc_html_e('Comment ça apparaît sur le site', 'oli-theme'); ?></strong></p>
-                <ul style="margin:0 0 0 1.25rem;list-style:disc;line-height:1.6;">
-                    <li><?php esc_html_e('Les icônes des réseaux sociaux renseignés s\'affichent automatiquement dans le pied de page de toutes les pages du site.', 'oli-theme'); ?></li>
-                    <li><?php esc_html_e('Les plateformes laissées vides ne sont PAS affichées (pas d\'icône grisée ou inactive).', 'oli-theme'); ?></li>
-                    <li><?php esc_html_e('Pour retirer un réseau du widget, il suffit d\'effacer son URL et d\'enregistrer.', 'oli-theme'); ?></li>
-                </ul>
-            </div>
-
-            <form method="post" action="">
-                <?php wp_nonce_field('oli_social_save', '_oli_social_nonce'); ?>
-                <input type="hidden" name="oli_social_save" value="1">
-
-                <table class="form-table" role="presentation"><tbody>
-                    <?php foreach (SocialLinksRepository::PLATFORMS as $p): ?>
-                        <?php $iconUrl = $iconsBaseUri . '/' . $p['icon']; ?>
-                        <tr>
-                            <th scope="row" style="width:14rem;">
-                                <label for="oli-social-<?php echo esc_attr($p['id']); ?>" style="display:inline-flex;align-items:center;gap:0.5rem;">
-                                    <img src="<?php echo esc_attr($iconUrl); ?>" alt="" width="20" height="20" style="vertical-align:middle;flex:0 0 auto;">
-                                    <span><?php echo esc_html($p['label']); ?></span>
-                                </label>
-                            </th>
-                            <td>
-                                <input type="text"
-                                       id="oli-social-<?php echo esc_attr($p['id']); ?>"
-                                       name="oli_social[<?php echo esc_attr($p['id']); ?>]"
-                                       value="<?php echo esc_attr($values[$p['id']] ?? ''); ?>"
-                                       placeholder="<?php echo esc_attr($p['placeholder']); ?>"
-                                       class="regular-text code"
-                                       style="max-width:32rem;width:100%;">
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody></table>
-
-                <?php submit_button(); ?>
-            </form>
+        <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
+            <p style="margin:0 0 0.5rem;"><strong><?php esc_html_e('Comment ça apparaît sur le site', 'oli-theme'); ?></strong></p>
+            <ul style="margin:0 0 0 1.25rem;list-style:disc;line-height:1.6;">
+                <li><?php esc_html_e('Les icônes des réseaux sociaux renseignés s\'affichent automatiquement dans le pied de page de toutes les pages du site.', 'oli-theme'); ?></li>
+                <li><?php esc_html_e('Les plateformes laissées vides ne sont PAS affichées (pas d\'icône grisée ou inactive).', 'oli-theme'); ?></li>
+                <li><?php esc_html_e('Pour retirer un réseau du widget, il suffit d\'effacer son URL et d\'enregistrer.', 'oli-theme'); ?></li>
+            </ul>
         </div>
+
+        <form method="post" action="">
+            <?php wp_nonce_field('oli_social_save', '_oli_social_nonce'); ?>
+            <input type="hidden" name="oli_social_save" value="1">
+
+            <table class="form-table" role="presentation"><tbody>
+                <?php foreach (SocialLinksRepository::PLATFORMS as $p): ?>
+                    <?php $iconUrl = $iconsBaseUri . '/' . $p['icon']; ?>
+                    <tr>
+                        <th scope="row" style="width:14rem;">
+                            <label for="oli-social-<?php echo esc_attr($p['id']); ?>" style="display:inline-flex;align-items:center;gap:0.5rem;">
+                                <img src="<?php echo esc_attr($iconUrl); ?>" alt="" width="20" height="20" style="vertical-align:middle;flex:0 0 auto;">
+                                <span><?php echo esc_html($p['label']); ?></span>
+                            </label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   id="oli-social-<?php echo esc_attr($p['id']); ?>"
+                                   name="oli_social[<?php echo esc_attr($p['id']); ?>]"
+                                   value="<?php echo esc_attr($values[$p['id']] ?? ''); ?>"
+                                   placeholder="<?php echo esc_attr($p['placeholder']); ?>"
+                                   class="regular-text code"
+                                   style="max-width:32rem;width:100%;">
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody></table>
+
+            <?php submit_button(); ?>
+        </form>
         <?php
     }
 

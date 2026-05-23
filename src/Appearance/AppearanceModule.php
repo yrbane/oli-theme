@@ -57,8 +57,12 @@ final class AppearanceModule implements ModuleInterface
         }
 
         add_action('admin_menu', function (): void {
-            $this->container->get(ThemeVariationPage::class)->register();
-        });
+            $registry = $this->container->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+            $page = $this->container->get(ThemeVariationPage::class);
+            \assert($page instanceof ThemeVariationPage);
+            $registry->add($page);
+        }, 10);
 
         add_action('admin_init', function (): void {
             $this->container->get(ThemeVariationPage::class)->registerSettings();

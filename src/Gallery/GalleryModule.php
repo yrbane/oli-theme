@@ -49,8 +49,12 @@ final class GalleryModule implements ModuleInterface
             );
         }
 
-        add_action('admin_menu', function (): void {
-            $this->container->get(GalleryAdminPage::class)->register();
-        });
+        add_action('admin_menu', function () use ($c): void {
+            $registry = $c->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+            $page = $c->get(GalleryAdminPage::class);
+            \assert($page instanceof GalleryAdminPage);
+            $registry->add($page);
+        }, 10);
     }
 }

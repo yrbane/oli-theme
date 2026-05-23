@@ -4,36 +4,45 @@ declare(strict_types=1);
 
 namespace OliTheme\Gallery;
 
+use OliTheme\Admin\AdminTabInterface;
+
 /**
- * Page d'administration « Apparence > Galerie ».
+ * Onglet « Galerie » de la page d'administration unifiée du thème.
  *
- * Une seule page pour gérer photos (upload via media library + caption) et
+ * Gère photos (upload via media library + caption) et
  * vidéos (URL chaîne YouTube + IDs/URLs vidéos avec captions).
  *
  * @package OliTheme\Gallery
  *
  * @since 1.0.0
  */
-final class GalleryAdminPage
+final class GalleryAdminPage implements AdminTabInterface
 {
-    public const PAGE_SLUG = 'oli-gallery';
-
     public function __construct(private readonly GalleryRepository $repo)
     {
     }
 
-    public function register(): void
+    public function id(): string
     {
-        add_theme_page(
-            __('Galerie', 'oli-theme'),
-            __('Galerie', 'oli-theme'),
-            'manage_options',
-            self::PAGE_SLUG,
-            [$this, 'render'],
-        );
+        return 'galerie';
     }
 
-    public function render(): void
+    public function group(): string
+    {
+        return 'contenu';
+    }
+
+    public function label(): string
+    {
+        return __('Galerie', 'oli-theme');
+    }
+
+    public function capability(): string
+    {
+        return 'manage_options';
+    }
+
+    public function renderPanel(): void
     {
         if (\function_exists('wp_enqueue_media')) {
             wp_enqueue_media();
@@ -49,10 +58,7 @@ final class GalleryAdminPage
         $videos  = $this->repo->getVideos();
 
         ?>
-        <div class="wrap oli-gallery-admin">
-            <h1><?php esc_html_e('Galerie', 'oli-theme'); ?></h1>
-
-            <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
+        <div class="notice notice-info inline" style="margin:1rem 0;padding:0.75rem 1rem;">
                 <p style="margin:0 0 0.5rem;"><strong><?php esc_html_e('Comment afficher les galeries sur le site', 'oli-theme'); ?></strong></p>
                 <ul style="margin:0 0 0 1.25rem;list-style:disc;line-height:1.6;">
                     <li>
@@ -65,7 +71,7 @@ final class GalleryAdminPage
                             '<code>photos-en</code>',
                             '<code>videos-en</code>',
                         );
-                        ?>
+        ?>
                     </li>
                     <li>
                         <?php esc_html_e('Si ces pages n\'existent pas, créez-les dans Pages > Ajouter (le contenu est libre, le thème injectera le layout galerie automatiquement). Ajoutez-les ensuite à votre menu via Apparence > Menus.', 'oli-theme'); ?>
@@ -141,7 +147,6 @@ final class GalleryAdminPage
 
                 <?php submit_button(); ?>
             </form>
-        </div>
 
         <?php $this->renderScript(); ?>
         <?php

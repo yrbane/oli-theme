@@ -42,25 +42,20 @@ final class SeoOverviewPageTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRegisterAddsAdminPage(): void
+    public function testImplementsAdminTabInterface(): void
+    {
+        $page = $this->makePage();
+
+        self::assertSame('dashboard', $page->id());
+        self::assertSame('seo', $page->group());
+        self::assertSame('manage_options', $page->capability());
+    }
+
+    public function testLabelIsTranslated(): void
     {
         Functions\when('__')->returnArg(1);
 
-        $capturedSlug       = null;
-        $capturedCapability = null;
-
-        Functions\when('add_management_page')->alias(
-            static function (string $pageTitle, string $menuTitle, string $capability, string $menuSlug) use (&$capturedSlug, &$capturedCapability): void {
-                $capturedSlug       = $menuSlug;
-                $capturedCapability = $capability;
-            },
-        );
-
-        $page = $this->makePage();
-        $page->register();
-
-        self::assertSame('oli-seo-dashboard', $capturedSlug);
-        self::assertSame('manage_options', $capturedCapability);
+        self::assertSame('Dashboard', $this->makePage()->label());
     }
 
     /**
@@ -103,7 +98,7 @@ final class SeoOverviewPageTest extends TestCase
             )
             ->willReturn('');
 
-        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->render();
+        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->renderPanel();
 
         self::assertCount(2, $captured['items']);
         self::assertSame(1, $captured['items'][0]['id']);
@@ -146,7 +141,7 @@ final class SeoOverviewPageTest extends TestCase
             },
         );
 
-        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->render();
+        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->renderPanel();
 
         self::assertCount(1, $captured['items']);
         self::assertSame(1, $captured['items'][0]['id']);
@@ -178,7 +173,7 @@ final class SeoOverviewPageTest extends TestCase
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->method('render')->willReturn('');
 
-        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->render();
+        (new SeoOverviewPage($renderer, $postModel, $metaModel, $score))->renderPanel();
 
         self::assertNotNull($capturedArgs);
         self::assertSame(['oli_event'], $capturedArgs['post_type']);

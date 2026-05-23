@@ -44,7 +44,6 @@ final class SettingsModule implements ModuleInterface
             $this->container->factory(
                 ThemeSettingsPage::class,
                 static fn (Container $c): ThemeSettingsPage => new ThemeSettingsPage(
-                    $c->get(\OliTheme\Core\RendererInterface::class),
                     $c->get(ThemeSettingsModelInterface::class),
                 ),
             );
@@ -53,8 +52,16 @@ final class SettingsModule implements ModuleInterface
         add_action('admin_menu', function (): void {
             $page = $this->container->get(ThemeSettingsPage::class);
             \assert($page instanceof ThemeSettingsPage);
-            $page->register();
-        });
+
+            $registry = $this->container->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+
+            $registry->add(new SettingsTab($page, 'banner', 'identite', 'banner', __('Identité visuelle', 'oli-theme')));
+            $registry->add(new SettingsTab($page, 'languages', 'identite', 'languages', __('Langues', 'oli-theme')));
+            $registry->add(new SettingsTab($page, 'footer', 'identite', 'footer', __('Pied de page', 'oli-theme')));
+            $registry->add(new SettingsTab($page, 'contact', 'contact', 'contact', __('Contact', 'oli-theme')));
+            $registry->add(new SettingsTab($page, 'seo', 'seo', 'reglages', __('Réglages SEO', 'oli-theme')));
+        }, 10);
 
         add_action('admin_init', function (): void {
             $page = $this->container->get(ThemeSettingsPage::class);

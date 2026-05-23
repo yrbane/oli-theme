@@ -41,7 +41,11 @@ final class SocialModule implements ModuleInterface
         }
 
         add_action('admin_menu', function (): void {
-            $this->container->get(SocialAdminPage::class)->register();
-        });
+            $registry = $this->container->get(\OliTheme\Admin\AdminTabRegistry::class);
+            \assert($registry instanceof \OliTheme\Admin\AdminTabRegistry);
+            $page = $this->container->get(SocialAdminPage::class);
+            \assert($page instanceof SocialAdminPage);
+            $registry->add($page);
+        }, 10);
     }
 }

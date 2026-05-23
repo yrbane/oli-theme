@@ -25,3 +25,9 @@ Thumbs.db
 # Cache compilé Lunar — on garde le dossier (.gitkeep) mais on ignore son contenu
 /.cache/templates/*
 !/.cache/templates/.gitkeep
+
+# Artefacts générés par la suite de tests / PHPStan
+oli-theme-*/
+oli-variations-*/
+phpstan/cache/
+phpstan/resultCache.php

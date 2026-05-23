@@ -1,17 +1,29 @@
 # Settings (Identité du site)
 
-Le thème expose une page d'options sous **Apparence > Identité du site** permettant à l'admin de configurer 6 sections sans toucher au code.
+> **Depuis le Cycle 2 (ADR 0014)**, toute la configuration du thème est rassemblée
+> sur une **page unique à onglets** : **Apparence > Réglages du thème**
+> (`themes.php?page=oli-theme-settings`), groupée par thème (Identité & Marque,
+> Apparence, Contenu, Contact, SEO). Les réglages décrits ici correspondent aux
+> sous-onglets des groupes **Identité & Marque**, **Contact** et **SEO**. Les
+> anciennes URLs sont redirigées en 301 vers le bon onglet.
 
-## Sections (onglets)
+Le thème expose ces options sans toucher au code.
 
-| Onglet | Contenu |
-|--------|---------|
-| Identité visuelle | Logo, bannière desktop, bannière mobile, alt text par langue |
-| Langues | Liste des langues activées, langue par défaut, comportement de fallback (`home` / `show_source` / `message`) |
-| Réseaux sociaux | Facebook, Instagram, YouTube, LinkedIn, Twitter |
-| Pied de page | Mentions légales par langue, template copyright, toggles `showLegal`/`showSocial`/`showMenu` |
-| Contact | Email destinataire, auto-réponse, logging |
-| SEO global | Image OG par défaut, Twitter handle, Organisation Schema.org, sitemap, robots.txt custom |
+## Sections (sous-onglets)
+
+| Sous-onglet | Groupe | Contenu |
+|-------------|--------|---------|
+| Identité visuelle | Identité & Marque | Logo, bannière desktop, bannière mobile, alt text par langue |
+| Langues | Identité & Marque | Liste des langues activées, langue par défaut, comportement de fallback (`home` / `show_source` / `message`) |
+| Réseaux sociaux | Identité & Marque | Géré par le module dédié (`SocialAdminPage`, 10 plateformes + icônes, option `oli_social_links`) — voir [`docs/social.md`](social.md) |
+| Pied de page | Identité & Marque | Mentions légales par langue, template copyright, toggles `showLegal`/`showSocial`/`showMenu` |
+| Contact | Contact | Email destinataire, auto-réponse, logging |
+| Réglages SEO | SEO | Image OG par défaut, Twitter handle, Organisation Schema.org, sitemap, robots.txt custom |
+
+> ⚠️ L'ancien onglet « Réseaux sociaux » de cette page (5 réseaux sans icônes,
+> stocké dans `oli_theme_settings[social]`) était du code mort non affiché au
+> front : il a été **supprimé** (ADR 0014). La saisie des réseaux se fait
+> désormais uniquement via le module dédié.
 
 ## Stockage
 
