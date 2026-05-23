@@ -231,6 +231,71 @@ final class RedirectsPageTest extends TestCase
     }
 
     /**
+     * Après un save réussi, la redirection pointe vers l'onglet SEO unifié.
+     */
+    public function testHandleSaveRedirectsToUnifiedSeoTab(): void
+    {
+        $this->stubCommonFunctions(false);
+
+        $captured = null;
+        Functions\when('wp_safe_redirect')->alias(static function (string $url) use (&$captured): bool {
+            $captured = $url;
+            return true;
+        });
+
+        $_POST = [
+            '_wpnonce' => 'valid-nonce',
+            'id'       => '',
+            'source'   => '/old-page',
+            'target'   => 'https://example.com/new',
+            'code'     => '301',
+        ];
+
+        $redirects = $this->createMock(RedirectModelInterface::class);
+        $redirects->method('save')->willReturn($this->makeEntity());
+
+        (new RedirectsPage($redirects, $this->createMock(RendererInterface::class)))->handleSave();
+
+        self::assertIsString($captured, 'wp_safe_redirect aurait dû être appelé');
+        self::assertStringContainsString('themes.php', $captured);
+        self::assertStringContainsString('page=oli-theme-settings', $captured);
+        self::assertStringContainsString('tab=seo', $captured);
+        self::assertStringContainsString('sub=redirections', $captured);
+        self::assertStringNotContainsString('tools.php', $captured);
+    }
+
+    /**
+     * Après une suppression, la redirection pointe vers l'onglet SEO unifié.
+     */
+    public function testHandleDeleteRedirectsToUnifiedSeoTab(): void
+    {
+        $this->stubCommonFunctions(false);
+
+        $captured = null;
+        Functions\when('wp_safe_redirect')->alias(static function (string $url) use (&$captured): bool {
+            $captured = $url;
+            return true;
+        });
+
+        $_REQUEST = [
+            '_wpnonce' => 'valid-nonce',
+            'id'       => '7',
+        ];
+
+        $redirects = $this->createMock(RedirectModelInterface::class);
+        $redirects->method('delete');
+
+        (new RedirectsPage($redirects, $this->createMock(RendererInterface::class)))->handleDelete();
+
+        self::assertIsString($captured, 'wp_safe_redirect aurait dû être appelé');
+        self::assertStringContainsString('themes.php', $captured);
+        self::assertStringContainsString('page=oli-theme-settings', $captured);
+        self::assertStringContainsString('tab=seo', $captured);
+        self::assertStringContainsString('sub=redirections', $captured);
+        self::assertStringNotContainsString('tools.php', $captured);
+    }
+
+    /**
      * handleDelete avec id=0 ne supprime rien.
      */
     public function testHandleDeleteIgnoresZeroId(): void
@@ -267,8 +332,10 @@ final class RedirectsPageTest extends TestCase
 
     /**
      * Stubs des fonctions WP communes : auth + sanitize + redirect.
+     *
+     * @param bool $stubRedirect Inclure le stub de wp_safe_redirect (false quand le test le définit lui-même).
      */
-    private function stubCommonFunctions(): void
+    private function stubCommonFunctions(bool $stubRedirect = true): void
     {
         Functions\when('__')->returnArg(1);
         Functions\when('current_user_can')->justReturn(true);
@@ -281,9 +348,18 @@ final class RedirectsPageTest extends TestCase
             static fn (string $path = ''): string => 'http://example.test/wp-admin/' . ltrim($path, '/'),
         );
         Functions\when('add_query_arg')->alias(
-            static fn (array|string $key, string $value = '', string $url = ''): string => \is_array($key) ? $url . '?' . http_build_query($key) : $url . '?' . $key . '=' . $value,
+            static function (array|string $key, string $value = '', string $url = ''): string {
+                // Forme à 2 args : add_query_arg(array $args, string $url)
+                if (\is_array($key)) {
+                    return $value . '?' . http_build_query($key);
+                }
+                // Forme à 3 args : add_query_arg(string $key, string $value, string $url)
+                return $url . '?' . $key . '=' . $value;
+            },
         );
-        Functions\when('wp_safe_redirect')->justReturn(true);
+        if ($stubRedirect) {
+            Functions\when('wp_safe_redirect')->justReturn(true);
+        }
         Functions\when('wp_die')->justReturn(null);
     }
 }

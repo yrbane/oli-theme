@@ -26,8 +26,6 @@ use OliTheme\Seo\SeoMetaModelInterface;
  */
 final class SeoOverviewPage implements AdminTabInterface
 {
-    public const PAGE_SLUG = 'oli-seo-dashboard';
-
     public const ACTION_EXPORT_CSV = 'oli_seo_export_csv';
 
     public const PER_PAGE = 25;
