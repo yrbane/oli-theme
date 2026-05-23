@@ -107,24 +107,27 @@ final class ThemeAdminPage
 
     private function renderSubNav(string $group, AdminTabInterface $active): void
     {
-        echo '<ul class="subsubsub" style="margin:0.5rem 0 1rem;">';
-        $tabs = $this->registry->forGroup($group);
-        $last = \count($tabs) - 1;
-        foreach ($tabs as $i => $tab) {
-            $url     = add_query_arg(
+        // Barre de sous-onglets en flex (et non en float comme `.subsubsub`),
+        // afin que le panneau s'affiche bien en dessous, à la ligne suivante.
+        echo '<nav class="oli-subnav" style="display:flex;flex-wrap:wrap;gap:0.25rem;'
+            . 'margin:1rem 0 1.5rem;border-bottom:1px solid #c3c4c7;">';
+        foreach ($this->registry->forGroup($group) as $tab) {
+            $url      = add_query_arg(
                 ['page' => self::PAGE_SLUG, 'tab' => $group, 'sub' => $tab->id()],
                 admin_url('themes.php'),
             );
-            $current = $tab->id() === $active->id() ? ' class="current"' : '';
-            $sep     = $i < $last ? ' | ' : '';
+            $isActive = $tab->id() === $active->id();
+            $style    = $isActive
+                ? 'border:1px solid #c3c4c7;border-bottom-color:#f0f0f1;background:#f0f0f1;font-weight:600;color:#1d2327;'
+                : 'border:1px solid transparent;color:#2271b1;';
             printf(
-                '<li><a href="%s"%s>%s</a>%s</li>',
+                '<a href="%s" style="%spadding:0.45rem 0.9rem;margin-bottom:-1px;'
+                . 'text-decoration:none;border-radius:3px 3px 0 0;">%s</a>',
                 esc_url($url),
-                $current,
+                $style,
                 esc_html($tab->label()),
-                $sep,
             );
         }
-        echo '</ul>';
+        echo '</nav>';
     }
 }
