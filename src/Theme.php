@@ -289,6 +289,12 @@ final class Theme
             $assets->enqueueAdmin();
         });
 
+        add_action('after_setup_theme', static function () use ($container): void {
+            $assets = $container->get(AssetManager::class);
+            \assert($assets instanceof AssetManager);
+            $assets->registerEditorStyles();
+        });
+
         add_action('after_switch_theme', [self::class, 'onActivation']);
         add_action('switch_theme', [self::class, 'onDeactivation']);
         add_action('admin_notices', [self::class, 'renderCacheAdminNotice']);

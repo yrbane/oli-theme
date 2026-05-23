@@ -113,6 +113,19 @@ final class AssetManager
     }
 
     /**
+     * Active les styles de l'éditeur de blocs (typographie front reflétée).
+     * À brancher sur `after_setup_theme`.
+     */
+    public function registerEditorStyles(): void
+    {
+        if (!\function_exists('add_theme_support') || !\function_exists('add_editor_style')) {
+            return;
+        }
+        add_theme_support('editor-styles');
+        add_editor_style('assets/css/editor-style.css');
+    }
+
+    /**
      * Enqueue la variation CSS sélectionnée (après main.css pour l'overrider).
      * Retourne true si une variation a été enqueuée, false sinon — utilisé
      * par {@see self::enqueueFront()} pour calculer les bonnes dépendances.
