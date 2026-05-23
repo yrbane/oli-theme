@@ -11,9 +11,8 @@ use OliTheme\Seo\RedirectModelInterface;
 /**
  * Page d'administration des redirections HTTP.
  *
- * Sous-menu sous Outils (`tools.php`) : liste, formulaire create/edit et suppression
- * des règles enregistrées dans la table `oli_redirects`. Les actions de soumission
- * passent par `admin-post.php` avec nonce + capability check.
+ * Onglet « Redirections » sous Apparence › Oli Theme (themes.php). Les actions de
+ * soumission passent par `admin-post.php` avec nonce + capability check.
  *
  * @package OliTheme\Seo\Admin
  *
@@ -106,8 +105,8 @@ final class RedirectsPage implements AdminTabInterface
                 'code'       => $r->code,
                 'hits'       => $r->hits,
                 'edit_url'   => add_query_arg(
-                    ['page' => self::PAGE_SLUG, 'edit' => $r->id],
-                    admin_url('tools.php'),
+                    ['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections', 'edit' => $r->id],
+                    admin_url('themes.php'),
                 ),
                 'delete_url' => add_query_arg(
                     [
@@ -136,12 +135,12 @@ final class RedirectsPage implements AdminTabInterface
             'total_pages'  => $totalPages,
             'total'        => $total,
             'has_pages'    => $totalPages > 1,
-            'prev_page'    => $page > 1 ? add_query_arg(['page' => self::PAGE_SLUG, 'paged' => $page - 1], admin_url('tools.php')) : '',
-            'next_page'    => $page < $totalPages ? add_query_arg(['page' => self::PAGE_SLUG, 'paged' => $page + 1], admin_url('tools.php')) : '',
+            'prev_page'    => $page > 1 ? add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections', 'paged' => $page - 1], admin_url('themes.php')) : '',
+            'next_page'    => $page < $totalPages ? add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections', 'paged' => $page + 1], admin_url('themes.php')) : '',
             'save_url'     => admin_url('admin-post.php'),
             'nonce_save'   => wp_create_nonce(self::NONCE_SAVE),
             'action_save'  => self::ACTION_SAVE,
-            'cancel_url'   => add_query_arg(['page' => self::PAGE_SLUG], admin_url('tools.php')),
+            'cancel_url'   => add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections'], admin_url('themes.php')),
             'list_empty'   => $rows === [],
         ]);
     }
@@ -232,8 +231,8 @@ final class RedirectsPage implements AdminTabInterface
      */
     private function redirectToList(array $args): void
     {
-        $base = admin_url('tools.php');
-        $args = array_filter(['page' => self::PAGE_SLUG] + $args, static fn ($v) => $v !== null && $v !== '');
+        $base = admin_url('themes.php');
+        $args = array_filter(['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'redirections'] + $args, static fn ($v) => $v !== null && $v !== '');
 
         wp_safe_redirect(add_query_arg($args, $base));
     }

@@ -285,6 +285,6 @@ final class SeoOverviewPage implements AdminTabInterface
      */
     private function buildUrl(array $args): string
     {
-        return add_query_arg(['page' => self::PAGE_SLUG] + $args, admin_url('tools.php'));
+        return add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'seo', 'sub' => 'dashboard'] + $args, admin_url('themes.php'));
     }
 }
