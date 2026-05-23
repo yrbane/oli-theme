@@ -18,8 +18,10 @@ use OliTheme\Admin\AdminTabInterface;
  */
 final class GalleryAdminPage implements AdminTabInterface
 {
-    public function __construct(private readonly GalleryRepository $repo)
-    {
+    public function __construct(
+        private readonly GalleryRepository $repo,
+        private readonly GalleryPagesInstaller $pages,
+    ) {
     }
 
     public function id(): string
@@ -51,6 +53,11 @@ final class GalleryAdminPage implements AdminTabInterface
         // Sauvegarde via $_POST (nonce + capability).
         if (!empty($_POST['oli_gallery_save'])) {
             $this->handleSave();
+        }
+
+        // Création des pages galerie manquantes (nonce + capability).
+        if (!empty($_POST['oli_gallery_create_pages'])) {
+            $this->handleCreatePages();
         }
 
         $photos  = $this->repo->getPhotos();
@@ -86,6 +93,8 @@ final class GalleryAdminPage implements AdminTabInterface
                     </li>
                 </ul>
             </div>
+
+            <?php $this->renderPagesStatus(); ?>
 
             <form method="post" action="">
                 <?php wp_nonce_field('oli_gallery_save', '_oli_gallery_nonce'); ?>
@@ -183,6 +192,88 @@ final class GalleryAdminPage implements AdminTabInterface
             </button>
         </div>
         <?php
+    }
+
+    /**
+     * Affiche l'état des pages galerie attendues et, le cas échéant, un bouton
+     * pour créer automatiquement les pages manquantes.
+     */
+    private function renderPagesStatus(): void
+    {
+        $status  = $this->pages->status();
+        if ($status === []) {
+            return;
+        }
+        $missing = array_filter($status, static fn (array $row): bool => !$row['exists']);
+        ?>
+        <div class="card" style="max-width:none;margin:1rem 0;padding:0.5rem 1rem 1rem;">
+            <h2 class="title" style="margin-top:0.5rem;"><?php esc_html_e('État des pages de galerie', 'oli-theme'); ?></h2>
+            <p class="description"><?php esc_html_e('Le thème rend automatiquement le layout galerie sur les pages dont le slug correspond. Voici leur état :', 'oli-theme'); ?></p>
+            <table class="widefat striped" style="max-width:560px;margin:0.5rem 0 1rem;">
+                <thead><tr>
+                    <th><?php esc_html_e('Page', 'oli-theme'); ?></th>
+                    <th><?php esc_html_e('Slug', 'oli-theme'); ?></th>
+                    <th><?php esc_html_e('Langue', 'oli-theme'); ?></th>
+                    <th><?php esc_html_e('État', 'oli-theme'); ?></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($status as $row): ?>
+                    <tr>
+                        <td><?php echo esc_html('photos' === $row['kind'] ? __('Photos', 'oli-theme') : __('Vidéos', 'oli-theme')); ?></td>
+                        <td><code><?php echo esc_html($row['slug']); ?></code></td>
+                        <td><?php echo esc_html(strtoupper($row['lang'])); ?></td>
+                        <td>
+                            <?php if ($row['exists']): ?>
+                                <span style="color:#007017;font-weight:600;">&#10004; <?php esc_html_e('Publiée', 'oli-theme'); ?></span>
+                            <?php else: ?>
+                                <span style="color:#b32d2e;font-weight:600;">&#10008; <?php esc_html_e('Manquante', 'oli-theme'); ?></span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php if ($missing !== []): ?>
+                <form method="post" action="" style="margin:0;">
+                    <?php wp_nonce_field('oli_gallery_create_pages', '_oli_gallery_pages_nonce'); ?>
+                    <input type="hidden" name="oli_gallery_create_pages" value="1">
+                    <button type="submit" class="button button-primary">
+                        <?php
+                        printf(
+                            /* translators: %d: nombre de pages manquantes */
+                            esc_html(_n('Créer la page manquante (%d)', 'Créer les pages manquantes (%d)', \count($missing), 'oli-theme')),
+                            (int) \count($missing),
+                        );
+                ?>
+                    </button>
+                    <span class="description" style="margin-left:0.5rem;">
+                        <?php esc_html_e('Crée les pages publiées, avec la bonne langue et la liaison de traduction FR↔EN.', 'oli-theme'); ?>
+                    </span>
+                </form>
+            <?php else: ?>
+                <p style="color:#007017;font-weight:600;margin:0;">&#10004; <?php esc_html_e('Toutes les pages de galerie sont en place.', 'oli-theme'); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    private function handleCreatePages(): void
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        check_admin_referer('oli_gallery_create_pages', '_oli_gallery_pages_nonce');
+
+        $created = $this->pages->installMissing();
+
+        printf(
+            '<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+            esc_html(\sprintf(
+                /* translators: %d: nombre de pages créées */
+                _n('%d page de galerie créée.', '%d pages de galerie créées.', $created, 'oli-theme'),
+                $created,
+            )),
+        );
     }
 
     private function handleSave(): void

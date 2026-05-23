@@ -19,4 +19,10 @@ interface TranslationModelInterface
      * @return array<string, int>
      */
     public function getTranslations(int $postId): array;
+
+    /**
+     * Lie deux posts dans un même groupe de traduction (réutilise le groupe
+     * existant de la source, sinon en crée un).
+     */
+    public function link(int $sourcePostId, int $targetPostId): void;
 }

@@ -40,11 +40,22 @@ final class GalleryModule implements ModuleInterface
             );
         }
 
+        if (!$c->has(GalleryPagesInstaller::class)) {
+            $c->factory(
+                GalleryPagesInstaller::class,
+                static fn (Container $c): GalleryPagesInstaller => new GalleryPagesInstaller(
+                    $c->get(\OliTheme\I18n\LanguageRegistryInterface::class),
+                    $c->get(\OliTheme\I18n\TranslationModelInterface::class),
+                ),
+            );
+        }
+
         if (!$c->has(GalleryAdminPage::class)) {
             $c->factory(
                 GalleryAdminPage::class,
                 static fn (Container $c): GalleryAdminPage => new GalleryAdminPage(
                     $c->get(GalleryRepository::class),
+                    $c->get(GalleryPagesInstaller::class),
                 ),
             );
         }
