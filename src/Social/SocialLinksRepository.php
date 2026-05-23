@@ -21,19 +21,6 @@ final class SocialLinksRepository
     public const OPTION = 'oli_social_links';
 
     /**
-     * URLs par défaut tant que l'admin n'a rien enregistré.
-     * Une fois l'option sauvegardée (même partiellement), ces valeurs ne
-     * s'appliquent plus — l'utilisateur a la main.
-     *
-     * @var array<string, string>
-     */
-    private const DEFAULTS = [
-        'facebook'  => 'https://www.facebook.com/oli.kalari/',
-        'instagram' => 'https://www.instagram.com/oli_kalari/?hl=en',
-        'youtube'   => 'https://www.youtube.com/channel/UCfR1dfixUpEzBsFW81N6qsQ?view_as=subscriber',
-    ];
-
-    /**
      * Plateformes supportées, dans l'ordre d'affichage.
      *
      * Chaque entrée :
@@ -55,6 +42,19 @@ final class SocialLinksRepository
         ['id' => 'whatsapp',  'label' => 'WhatsApp',  'icon' => 'whatsapp.svg',  'placeholder' => 'https://wa.me/33612345678'],
         ['id' => 'telegram',  'label' => 'Telegram',  'icon' => 'telegram.svg',  'placeholder' => 'https://t.me/monpseudo'],
         ['id' => 'email',     'label' => 'Email',     'icon' => 'email.svg',    'placeholder' => 'mailto:contact@example.com'],
+    ];
+
+    /**
+     * URLs par défaut tant que l'admin n'a rien enregistré.
+     * Une fois l'option sauvegardée (même partiellement), ces valeurs ne
+     * s'appliquent plus — l'utilisateur a la main.
+     *
+     * @var array<string, string>
+     */
+    private const DEFAULTS = [
+        'facebook'  => 'https://www.facebook.com/oli.kalari/',
+        'instagram' => 'https://www.instagram.com/oli_kalari/?hl=en',
+        'youtube'   => 'https://www.youtube.com/channel/UCfR1dfixUpEzBsFW81N6qsQ?view_as=subscriber',
     ];
 
     /**

@@ -116,35 +116,6 @@ final class BreadcrumbsController implements BreadcrumbsControllerInterface
     }
 
     /**
-     * Construit la liste des ancêtres d'une page (du plus haut au plus proche).
-     *
-     * @return BreadcrumbItemEntity[]
-     */
-    private function ancestorsFor(int $postId): array
-    {
-        if (!\function_exists('get_post_ancestors')) {
-            return [];
-        }
-
-        // get_post_ancestors retourne du plus proche au plus lointain → on inverse.
-        /** @var int[] $ids */
-        $ids = (array) get_post_ancestors($postId);
-        $ids = array_reverse($ids);
-
-        $crumbs = [];
-        foreach ($ids as $aid) {
-            $title = \function_exists('get_the_title') ? (string) get_the_title($aid) : '';
-            $url   = \function_exists('get_permalink') ? (string) get_permalink($aid) : '';
-            if ($title === '') {
-                continue;
-            }
-            $crumbs[] = new BreadcrumbItemEntity(label: $title, url: $url, isCurrent: false);
-        }
-
-        return $crumbs;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function buildForEvent(EventEntity $event): array
@@ -227,6 +198,35 @@ final class BreadcrumbsController implements BreadcrumbsControllerInterface
                 isCurrent: true,
             ),
         ];
+    }
+
+    /**
+     * Construit la liste des ancêtres d'une page (du plus haut au plus proche).
+     *
+     * @return BreadcrumbItemEntity[]
+     */
+    private function ancestorsFor(int $postId): array
+    {
+        if (!\function_exists('get_post_ancestors')) {
+            return [];
+        }
+
+        // get_post_ancestors retourne du plus proche au plus lointain → on inverse.
+        /** @var int[] $ids */
+        $ids = (array) get_post_ancestors($postId);
+        $ids = array_reverse($ids);
+
+        $crumbs = [];
+        foreach ($ids as $aid) {
+            $title = \function_exists('get_the_title') ? (string) get_the_title($aid) : '';
+            $url   = \function_exists('get_permalink') ? (string) get_permalink($aid) : '';
+            if ($title === '') {
+                continue;
+            }
+            $crumbs[] = new BreadcrumbItemEntity(label: $title, url: $url, isCurrent: false);
+        }
+
+        return $crumbs;
     }
 
     /**

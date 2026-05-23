@@ -149,32 +149,6 @@ final class GalleryRepository
     }
 
     /**
-     * Enrichit une liste minimale `[{video_id, caption}, ...]` en list complète
-     * avec embed_url / thumb / watch_url.
-     *
-     * @param list<array{video_id: string, caption: string}> $videos
-     * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
-     */
-    private function hydrateVideos(array $videos): array
-    {
-        $out = [];
-        foreach ($videos as $v) {
-            $vid = $this->sanitizeVideoId($v['video_id']);
-            if ($vid === '') {
-                continue;
-            }
-            $out[] = [
-                'video_id'  => $vid,
-                'caption'   => $v['caption'],
-                'embed_url' => 'https://www.youtube-nocookie.com/embed/' . $vid . '?rel=0',
-                'thumb'     => 'https://i.ytimg.com/vi/' . $vid . '/hqdefault.jpg',
-                'watch_url' => 'https://www.youtube.com/watch?v=' . $vid,
-            ];
-        }
-        return $out;
-    }
-
-    /**
      * Lit la liste de vidéos saisies manuellement (option `oli_gallery_videos`).
      *
      * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
@@ -252,6 +226,33 @@ final class GalleryRepository
         }
 
         return '';
+    }
+
+    /**
+     * Enrichit une liste minimale `[{video_id, caption}, ...]` en list complète
+     * avec embed_url / thumb / watch_url.
+     *
+     * @param list<array{video_id: string, caption: string}> $videos
+     *
+     * @return list<array{video_id: string, caption: string, embed_url: string, thumb: string, watch_url: string}>
+     */
+    private function hydrateVideos(array $videos): array
+    {
+        $out = [];
+        foreach ($videos as $v) {
+            $vid = $this->sanitizeVideoId($v['video_id']);
+            if ($vid === '') {
+                continue;
+            }
+            $out[] = [
+                'video_id'  => $vid,
+                'caption'   => $v['caption'],
+                'embed_url' => 'https://www.youtube-nocookie.com/embed/' . $vid . '?rel=0',
+                'thumb'     => 'https://i.ytimg.com/vi/' . $vid . '/hqdefault.jpg',
+                'watch_url' => 'https://www.youtube.com/watch?v=' . $vid,
+            ];
+        }
+        return $out;
     }
 
     /**

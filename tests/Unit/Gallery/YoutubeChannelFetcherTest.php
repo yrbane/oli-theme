@@ -71,18 +71,18 @@ final class YoutubeChannelFetcherTest extends TestCase
     public function testFetchVideosParsesRssAndReturnsEnrichedList(): void
     {
         $rss = <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">
-  <entry>
-    <yt:videoId>dQw4w9WgXcQ</yt:videoId>
-    <title>Demo video #1</title>
-  </entry>
-  <entry>
-    <yt:videoId>abcdefghijk</yt:videoId>
-    <title>Demo video #2</title>
-  </entry>
-</feed>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">
+              <entry>
+                <yt:videoId>dQw4w9WgXcQ</yt:videoId>
+                <title>Demo video #1</title>
+              </entry>
+              <entry>
+                <yt:videoId>abcdefghijk</yt:videoId>
+                <title>Demo video #2</title>
+              </entry>
+            </feed>
+            XML;
         // resolveChannelId extrait depuis HTML, fetchVideos appelle httpGet sur le RSS.
         $callCount = 0;
         Functions\when('wp_remote_get')->alias(static function (string $url) use (&$callCount, $rss) {
@@ -116,7 +116,7 @@ XML;
         Functions\when('get_transient')->justReturn($cached);
 
         // Aucun appel HTTP attendu
-        Functions\when('wp_remote_get')->alias(static function () {
+        Functions\when('wp_remote_get')->alias(static function (): void {
             throw new \RuntimeException('should not be called when cache hit');
         });
 
