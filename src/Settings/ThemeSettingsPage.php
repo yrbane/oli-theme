@@ -214,17 +214,27 @@ final class ThemeSettingsPage
 
     private function registerLanguagesFields(string $page, string $section, SettingsBag $current): void
     {
+        // Affiche l'état RÉEL des langues activées : le registre runtime lit
+        // l'option `oli_languages`, qui est la source de vérité (cf. sanitize
+        // qui la synchronise). La lecture est paresseuse (dans les callbacks de
+        // rendu) pour ne pas toucher get_option hors contexte d'affichage.
         add_settings_field(
             'oli_languages_enabled',
             __('Langues activées', 'oli-theme'),
-            fn () => $this->renderLanguagesCheckboxes($current->languages->enabled),
+            function () use ($current): void {
+                [$enabled] = $this->liveLanguages($current);
+                $this->renderLanguagesCheckboxes($enabled);
+            },
             $page,
             $section,
         );
         add_settings_field(
             'oli_languages_default',
             __('Langue par défaut', 'oli-theme'),
-            fn () => $this->renderLanguagesDefault($current->languages->default, $current->languages->enabled),
+            function () use ($current): void {
+                [$enabled, $default] = $this->liveLanguages($current);
+                $this->renderLanguagesDefault($default, $enabled);
+            },
             $page,
             $section,
         );
@@ -272,11 +282,47 @@ final class ThemeSettingsPage
             $fallback = LanguagesSettings::FALLBACK_HOME;
         }
 
+        $enabled = array_values(array_unique($enabled));
+
+        // Synchronise l'option `oli_languages` lue par LanguageRegistry (source
+        // de vérité runtime pour le routing et le sélecteur de langue). Sans ça,
+        // cocher/décocher une langue ici resterait sans effet sur le front.
+        if (\function_exists('update_option')) {
+            update_option('oli_languages', ['enabled' => $enabled, 'default' => $default]);
+        }
+
         return [
-            'enabled'          => array_values(array_unique($enabled)),
+            'enabled'          => $enabled,
             'default'          => $default,
             'fallbackBehavior' => $fallback,
         ];
+    }
+
+    /**
+     * État réel des langues : lit l'option `oli_languages` (source runtime),
+     * avec repli sur les valeurs du SettingsBag si l'option est absente.
+     *
+     * @return array{0: list<string>, 1: string}
+     */
+    private function liveLanguages(SettingsBag $current): array
+    {
+        $enabled = $current->languages->enabled;
+        $default = $current->languages->default;
+
+        $stored = \function_exists('get_option') ? get_option('oli_languages', null) : null;
+        if (\is_array($stored)) {
+            if (\is_array($stored['enabled'] ?? null) && $stored['enabled'] !== []) {
+                $enabled = array_values(array_filter(
+                    $stored['enabled'],
+                    static fn ($c): bool => \is_string($c),
+                ));
+            }
+            if (\is_string($stored['default'] ?? null) && $stored['default'] !== '') {
+                $default = $stored['default'];
+            }
+        }
+
+        return [$enabled, $default];
     }
 
     // ---------------------------------------------------------------------

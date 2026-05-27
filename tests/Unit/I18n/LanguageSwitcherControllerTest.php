@@ -40,6 +40,17 @@ final class LanguageSwitcherControllerTest extends TestCase
         self::assertSame('fr', $vm->current->code);
     }
 
+    public function test_view_model_is_empty_when_single_language_enabled(): void
+    {
+        Functions\when('get_option')->justReturn(['enabled' => ['fr'], 'default' => 'fr']);
+
+        $controller = $this->buildController('fr');
+        $vm = $controller->build(0);
+
+        // Une seule langue activée → aucun item (sélecteur masqué côté template).
+        self::assertSame([], $vm->items);
+    }
+
     public function test_view_model_marks_current_language(): void
     {
         $controller = $this->buildController('en');

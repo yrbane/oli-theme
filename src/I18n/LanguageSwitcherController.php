@@ -29,7 +29,13 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
      */
     public function build(int $currentPostId): LanguageSwitcherViewModel
     {
-        $current      = $this->resolver->current();
+        $current = $this->resolver->current();
+
+        // Une seule langue activée → aucun sélecteur (pas de drapeau du tout).
+        if (\count($this->registry->all()) <= 1) {
+            return new LanguageSwitcherViewModel($current, []);
+        }
+
         $default      = $this->registry->default();
         $translations = $currentPostId > 0
             ? $this->translations->getTranslations($currentPostId)
