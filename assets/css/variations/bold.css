@@ -777,9 +777,9 @@ body.has-fullscreen-hero > nav.breadcrumbs { display: none; }
 body.has-fullscreen-hero article.page--accueil > .page__content { padding-top: 5rem; padding-bottom: 5rem; }
 
 /* ==========================================================================
-   Bannière hors-home
+   Bannière hors-home (la home porte la classe `body.home`)
    ========================================================================== */
-body:not(:has(.carousel-fullscreen))::before {
+body:not(.home)::before {
     display: block !important;
     content: '' !important;
     width: 100%;

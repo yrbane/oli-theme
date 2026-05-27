@@ -11,7 +11,6 @@ use OliTheme\I18n\LanguageSwitcherControllerInterface;
 use OliTheme\I18n\TranslationModelInterface;
 use OliTheme\Seo\BreadcrumbsControllerInterface;
 use OliTheme\Seo\SeoControllerInterface;
-use OliTheme\Slides\HomeCarouselControllerInterface;
 
 /**
  * Controller pour le rendu d'une page WordPress (singular `page`).
@@ -33,7 +32,6 @@ final class PageController
         private readonly LanguageResolverInterface $resolver,
         private readonly LanguageSwitcherControllerInterface $switcher,
         private readonly \OliTheme\Navigation\MenuControllerInterface $menus,
-        private readonly HomeCarouselControllerInterface $carousel,
         private readonly SeoControllerInterface $seo,
         private readonly BreadcrumbsControllerInterface $breadcrumbs,
         private readonly RendererInterface $renderer,
@@ -63,15 +61,22 @@ final class PageController
         $vm['post'] = $entity;
         $vm['seo'] = $this->seo->buildForPost($entity);
         $vm['crumbs'] = $this->breadcrumbs->buildForPost($entity);
-        $vm['bodyClasses'] = \sprintf('page page-id-%d lang-%s', $entity->id, $entity->language->code);
+
+        // La classe `home` distingue la page d'accueil des pages internes :
+        // elle pilote la bannière `--oli-internal-banner-url`, masquée sur la
+        // home (qui affiche déjà le carousel plein écran JS) via `body:not(.home)`
+        // côté CSS. Le carousel d'accueil est rendu côté client par
+        // assets/js/home-carousel.js (variation Olikalari) ; aucun rendu serveur.
+        $vm['bodyClasses'] = \sprintf(
+            '%spage page-id-%d lang-%s',
+            $this->isFrontPage($entity->id) ? 'home ' : '',
+            $entity->id,
+            $entity->language->code,
+        );
 
         $split = $this->coverExtractor->split($entity->content);
         $vm['coverHtml'] = $split['cover'];
         $vm['bodyHtml']  = $split['body'];
-
-        if ($this->isFrontPage($entity->id)) {
-            $vm['carousel'] = $this->carousel->build();
-        }
 
         // Routing spécial pour les pages galerie : on rend un template dédié
         // avec la liste de photos ou vidéos passée en plus du contenu normal.

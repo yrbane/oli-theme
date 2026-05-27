@@ -7,7 +7,6 @@ namespace OliTheme\Slides;
 use OliTheme\Container;
 use OliTheme\Core\ModuleInterface;
 use OliTheme\I18n\LanguageRegistryInterface;
-use OliTheme\I18n\LanguageResolverInterface;
 use OliTheme\I18n\LanguageTaxonomy;
 use OliTheme\I18n\TranslationModel;
 
@@ -55,23 +54,6 @@ final class SlidesModule implements ModuleInterface
             $container->factory(
                 SlideModelInterface::class,
                 static fn (Container $c): SlideModelInterface => $c->get(SlideModel::class),
-            );
-        }
-
-        if (! $container->has(HomeCarouselController::class)) {
-            $container->factory(
-                HomeCarouselController::class,
-                static fn (Container $c): HomeCarouselController => new HomeCarouselController(
-                    $c->get(SlideModelInterface::class),
-                    $c->get(LanguageResolverInterface::class),
-                ),
-            );
-        }
-
-        if (! $container->has(HomeCarouselControllerInterface::class)) {
-            $container->factory(
-                HomeCarouselControllerInterface::class,
-                static fn (Container $c): HomeCarouselControllerInterface => $c->get(HomeCarouselController::class),
             );
         }
 

@@ -21,8 +21,6 @@ use OliTheme\Posts\PostModelInterface;
 use OliTheme\Seo\BreadcrumbsControllerInterface;
 use OliTheme\Seo\SeoControllerInterface;
 use OliTheme\Seo\SeoHeadViewModel;
-use OliTheme\Slides\HomeCarouselControllerInterface;
-use OliTheme\Slides\HomeCarouselViewModel;
 use PHPUnit\Framework\TestCase;
 
 final class PageControllerTest extends TestCase
@@ -87,15 +85,11 @@ final class PageControllerTest extends TestCase
         Functions\when('get_queried_object_id')->justReturn(7);
         Functions\when('get_option')->justReturn(0);
 
-        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
-        $carousel->expects(self::never())->method('build');
-
         $controller = new PageController(
             $model,
             $resolver,
             $switcher,
             $menus,
-            $carousel,
             $this->buildSeoMock(),
             $this->buildBreadcrumbsMock(),
             $renderer,
@@ -130,14 +124,11 @@ final class PageControllerTest extends TestCase
         Functions\when('get_queried_object_id')->justReturn(0);
         Functions\when('get_option')->justReturn(0);
 
-        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
-
         $controller = new PageController(
             $model,
             $resolver,
             $switcher,
             $menus,
-            $carousel,
             $this->buildSeoMock(),
             $this->buildBreadcrumbsMock(),
             $renderer,
@@ -146,7 +137,7 @@ final class PageControllerTest extends TestCase
         self::assertSame('<html>404</html>', $controller->renderSingular());
     }
 
-    public function testRenderSingularInjectsCarouselWhenFrontPage(): void
+    public function testRenderSingularAddsHomeBodyClassWhenFrontPage(): void
     {
         $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
 
@@ -180,18 +171,13 @@ final class PageControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
-        $carouselVm = new HomeCarouselViewModel(slides: [], autoplay: true, intervalMs: 5000, loop: true);
-        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
-        $carousel->expects(self::once())->method('build')->willReturn($carouselVm);
-
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
             ->method('render')
             ->with(
                 'pages/page.html',
                 self::callback(fn (array $vm): bool => $vm['post'] === $entity
-                    && isset($vm['carousel'])
-                    && $vm['carousel'] === $carouselVm),
+                    && \str_starts_with((string) $vm['bodyClasses'], 'home ')),
             )
             ->willReturn('<html>home</html>');
 
@@ -203,7 +189,6 @@ final class PageControllerTest extends TestCase
             $resolver,
             $switcher,
             $menus,
-            $carousel,
             $this->buildSeoMock(),
             $this->buildBreadcrumbsMock(),
             $renderer,
@@ -212,7 +197,7 @@ final class PageControllerTest extends TestCase
         self::assertSame('<html>home</html>', $controller->renderSingular());
     }
 
-    public function testRenderSingularInjectsCarouselForTranslatedFrontPage(): void
+    public function testRenderSingularAddsHomeBodyClassForTranslatedFrontPage(): void
     {
         $english = new Language('en', 'English', 'English', '🇬🇧', 'en_GB', 'ltr');
 
@@ -246,10 +231,6 @@ final class PageControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
-        $carouselVm = new HomeCarouselViewModel(slides: [], autoplay: true, intervalMs: 5000, loop: true);
-        $carousel = $this->createMock(HomeCarouselControllerInterface::class);
-        $carousel->expects(self::once())->method('build')->willReturn($carouselVm);
-
         $translations = $this->createMock(TranslationModelInterface::class);
         $translations->method('getTranslations')->with(7)->willReturn(['fr' => 7, 'en' => 8]);
 
@@ -258,7 +239,7 @@ final class PageControllerTest extends TestCase
             ->method('render')
             ->with(
                 'pages/page.html',
-                self::callback(fn (array $vm): bool => isset($vm['carousel']) && $vm['carousel'] === $carouselVm),
+                self::callback(fn (array $vm): bool => \str_starts_with((string) $vm['bodyClasses'], 'home ')),
             )
             ->willReturn('<html>en-home</html>');
 
@@ -270,7 +251,6 @@ final class PageControllerTest extends TestCase
             $resolver,
             $switcher,
             $menus,
-            $carousel,
             $this->buildSeoMock(),
             $this->buildBreadcrumbsMock(),
             $renderer,

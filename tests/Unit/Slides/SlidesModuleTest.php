@@ -9,8 +9,6 @@ use Brain\Monkey\Actions;
 use OliTheme\Container;
 use OliTheme\I18n\LanguageRegistryInterface;
 use OliTheme\I18n\LanguageResolverInterface;
-use OliTheme\Slides\HomeCarouselController;
-use OliTheme\Slides\HomeCarouselControllerInterface;
 use OliTheme\Slides\SlideCpt;
 use OliTheme\Slides\SlideModel;
 use OliTheme\Slides\SlideModelInterface;
@@ -52,14 +50,10 @@ final class SlidesModuleTest extends TestCase
         self::assertTrue($this->container->has(SlideCpt::class));
         self::assertTrue($this->container->has(SlideModel::class));
         self::assertTrue($this->container->has(SlideModelInterface::class));
-        self::assertTrue($this->container->has(HomeCarouselController::class));
-        self::assertTrue($this->container->has(HomeCarouselControllerInterface::class));
 
         self::assertInstanceOf(SlideCpt::class, $this->container->get(SlideCpt::class));
         self::assertInstanceOf(SlideModel::class, $this->container->get(SlideModel::class));
         self::assertInstanceOf(SlideModelInterface::class, $this->container->get(SlideModelInterface::class));
-        self::assertInstanceOf(HomeCarouselController::class, $this->container->get(HomeCarouselController::class));
-        self::assertInstanceOf(HomeCarouselControllerInterface::class, $this->container->get(HomeCarouselControllerInterface::class));
     }
 
     public function testRegisterHooksInit(): void

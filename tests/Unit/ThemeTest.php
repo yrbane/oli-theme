@@ -154,8 +154,8 @@ final class ThemeTest extends TestCase
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
         $container = \OliTheme\Theme::container();
-        self::assertTrue($container->has(\OliTheme\Slides\HomeCarouselController::class));
-        self::assertTrue($container->has(\OliTheme\Slides\HomeCarouselControllerInterface::class));
+        self::assertTrue($container->has(\OliTheme\Slides\SlideCpt::class));
+        self::assertTrue($container->has(\OliTheme\Slides\SlideModelInterface::class));
     }
 
     public function testBootRegistersEventsModule(): void
