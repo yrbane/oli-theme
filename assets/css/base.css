@@ -148,9 +148,23 @@ h6 { font-size: var(--font-size-h6, 1rem); }
    OliTheme\Editor\JustifyAlignment via block_type_metadata). */
 .has-text-align-justify { text-align: justify; hyphens: auto; }
 
-/* Cartes d'article (archive home, archives blog). Vignette à gauche + titre
-   moyen + excerpt, cliquable dans son ensemble. */
-.archive__list--cards { display: grid; gap: var(--space-4); list-style: none; padding: 0; margin: 0; }
+/* Cartes d'article (archive home, archives blog) en grille responsive
+   auto-fill : le navigateur fait tenir autant de cartes que la largeur
+   le permet, chaque carte ayant une largeur minimale lisible.
+   - Viewport ≥ 1400 px → 4 colonnes
+   - ~1000 px         → 3 colonnes
+   - ~640 px          → 2 colonnes
+   - mobile           → 1 colonne pleine largeur
+   La logique est portée par `minmax(min(100%, 18rem), 1fr)` qui empêche
+   les cartes de dépasser de l'écran sur très petit. */
+.archive__list--cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
 /* Compacte le haut de la home en mode `show_on_front=posts` : on a juste
    le fil d'ariane puis les vignettes — pas besoin de l'air par défaut
@@ -159,17 +173,88 @@ body.archive-post .site-main { padding-top: var(--space-2); }
 body.archive-post .breadcrumbs { padding-bottom: 0.15rem; }
 body.archive-post .archive-post { margin-top: 0; }
 body.archive-post .archive-post > .archive__list { margin-top: 0; }
-.post-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
-.post-card:hover, .post-card:focus-within { border-color: var(--color-accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-1px); }
-.post-card__link { display: grid; grid-template-columns: 160px 1fr; gap: var(--space-4); padding: var(--space-3); color: inherit; text-decoration: none; align-items: center; }
-.post-card__thumb { display: block; width: 160px; height: 120px; overflow: hidden; border-radius: 4px; background: var(--color-border); }
-.post-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.post-card__thumb--empty { background: linear-gradient(135deg, var(--color-border), var(--color-bg)); }
-.post-card__body { display: flex; flex-direction: column; gap: 0.35rem; }
-.post-card__title { font-size: clamp(1rem, 0.85rem + 0.35vw, 1.35rem); margin: 0; line-height: 1.25; }
-.post-card__meta { color: var(--color-muted); font-size: 0.875rem; margin: 0; }
-.post-card__excerpt { color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; }
-@media (max-width: 35rem) {
-    .post-card__link { grid-template-columns: 1fr; }
-    .post-card__thumb { width: 100%; height: 180px; }
+
+/* Cartes empilées verticalement : grande vignette en haut, texte dessous.
+   `display: flex` + `height: 100%` pour aligner les hauteurs si plusieurs
+   cartes sont sur la même ligne avec excerpts de longueurs différentes. */
+.post-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 180ms ease, box-shadow 220ms ease, transform 220ms ease;
+    height: 100%;
+}
+.post-card:hover,
+.post-card:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 14px 32px -12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+.post-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+.post-card__thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-border);
+    position: relative;
+}
+.post-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 500ms ease;
+}
+.post-card:hover .post-card__thumb img,
+.post-card:focus-within .post-card__thumb img {
+    transform: scale(1.04);
+}
+.post-card__thumb--empty {
+    background: linear-gradient(135deg, var(--color-border), var(--color-bg));
+}
+.post-card__thumb--empty::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.04), transparent 50%);
+}
+.post-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: var(--space-4) var(--space-4) var(--space-5);
+    flex: 1 1 auto;
+}
+.post-card__title {
+    font-size: clamp(1rem, 0.85rem + 0.45vw, 1.35rem);
+    margin: 0;
+    line-height: 1.25;
+    color: var(--color-text);
+}
+.post-card__meta {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    margin: 0;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+.post-card__excerpt {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
