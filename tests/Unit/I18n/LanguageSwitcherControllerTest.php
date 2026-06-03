@@ -171,6 +171,68 @@ final class LanguageSwitcherControllerTest extends TestCase
         self::assertSame('https://example.test/en/post-20', $en->url);
     }
 
+    /**
+     * Sur /en/ avec un post sans traduction en IT/ES, les drapeaux IT/ES ne
+     * doivent PAS hériter du préfixe /en/. Bug observé : home_url('/it/') est
+     * filtré par LanguageUrlFilter qui préfixe avec la langue active → /en/it/.
+     */
+    public function test_target_url_for_missing_translation_strips_active_lang_prefix(): void
+    {
+        Functions\when('get_post_meta')->justReturn('group-A');
+        Functions\when('get_posts')->justReturn([20]);
+        Functions\when('wp_get_post_terms')->alias(static function () {
+            $term = new \stdClass();
+            $term->slug = 'en';
+
+            return [$term];
+        });
+        Functions\when('get_permalink')->alias(static fn (int $id) => "https://example.test/en/post-{$id}");
+        // Simule LanguageUrlFilter en production : home_url() préfixe la langue active.
+        Functions\when('home_url')->alias(static fn (string $path = '') => 'https://example.test/en' . $path);
+
+        $controller = $this->buildController('en');
+        $vm = $controller->build(20);
+        $it = $this->itemByCode($vm, 'it');
+        $fr = $this->itemByCode($vm, 'fr');
+
+        // IT : pas de traduction → home racine IT, sans préfixe /en/ parasite.
+        self::assertSame('https://example.test/it/', $it->url);
+        // FR (défaut) : pas de traduction → home racine, sans préfixe /en/ ni /fr/.
+        self::assertSame('https://example.test/', $fr->url);
+    }
+
+    /**
+     * Quand la traduction cible est la page d'accueil (page_on_front) de sa langue,
+     * l'URL doit pointer vers la home racine, pas vers le permalien /accueil/.
+     */
+    public function test_target_url_uses_home_root_when_translation_is_front_page(): void
+    {
+        Functions\when('get_post_meta')->justReturn('group-A');
+        Functions\when('get_posts')->justReturn([76, 77]);
+        Functions\when('wp_get_post_terms')->alias(static function (int $postId) {
+            $term = new \stdClass();
+            $term->slug = $postId === 76 ? 'fr' : 'en';
+
+            return [$term];
+        });
+        Functions\when('get_option')->alias(static function (string $key, $default = false) {
+            return match ($key) {
+                'show_on_front' => 'page',
+                'page_on_front' => 76,
+                default => $default,
+            };
+        });
+        Functions\when('get_permalink')->alias(static fn (int $id) => "https://example.test/en/accueil");
+        Functions\when('home_url')->alias(static fn (string $path = '') => 'https://example.test/en' . $path);
+
+        $controller = $this->buildController('en');
+        $vm = $controller->build(77);
+        $fr = $this->itemByCode($vm, 'fr');
+
+        // FR pointe vers la page d'accueil FR (page 76 = page_on_front) → racine.
+        self::assertSame('https://example.test/', $fr->url);
+    }
+
     private function buildController(string $current): LanguageSwitcherController
     {
         $request = new RequestContext(query: ['oli_lang' => $current]);

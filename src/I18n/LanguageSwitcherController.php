@@ -46,18 +46,25 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
             $hasTranslation = isset($translations[$language->code]);
 
             if ($hasTranslation) {
-                // get_permalink passe par notre filtre et préfixe avec la langue
-                // active ; on relocalise vers la langue cible pour le switcher.
-                $url = $this->relocateUrl(
-                    (string) get_permalink($translations[$language->code]),
-                    $current,
-                    $language,
-                    $default,
-                );
+                $translationId = (int) $translations[$language->code];
+
+                // Cas spécial : si la traduction cible est la page d'accueil
+                // (page_on_front) de sa langue, on pointe vers la home racine
+                // de cette langue plutôt que vers le permalien /accueil/.
+                if ($this->isFrontPageInLanguage($translationId, $language, $default)) {
+                    $url = $this->homeUrlForLanguage($language, $default);
+                } else {
+                    // get_permalink passe par notre filtre et préfixe avec la langue
+                    // active ; on relocalise vers la langue cible pour le switcher.
+                    $url = $this->relocateUrl(
+                        (string) get_permalink($translationId),
+                        $current,
+                        $language,
+                        $default,
+                    );
+                }
             } else {
-                $url = $language->equals($default)
-                    ? (string) home_url('/')
-                    : (string) home_url('/' . $language->code . '/');
+                $url = $this->homeUrlForLanguage($language, $default);
             }
 
             $items[] = new LanguageSwitcherItem(
@@ -99,6 +106,68 @@ final class LanguageSwitcherController implements LanguageSwitcherControllerInte
         }
 
         return null;
+    }
+
+    /**
+     * URL racine d'une langue cible, indépendamment de la langue ACTIVE.
+     *
+     * `home_url()` est filtré par {@see LanguageUrlFilter} pour préfixer la
+     * langue active : sur /en/, `home_url('/it/')` retourne `/en/it/`. Ici
+     * on construit l'URL pour la langue *cible* du switcher, donc on strippe
+     * d'abord tout préfixe de langue (autre que le défaut) dans la base, puis
+     * on rajoute le préfixe de la cible si non-défaut.
+     */
+    private function homeUrlForLanguage(Language $target, Language $default): string
+    {
+        $base = $this->siteRootUrl();
+
+        return $target->equals($default)
+            ? $base
+            : $base . $target->code . '/';
+    }
+
+    /**
+     * URL racine du site, sans préfixe de langue active.
+     */
+    private function siteRootUrl(): string
+    {
+        $url = (string) home_url('/');
+        $default = $this->registry->default();
+        foreach ($this->registry->all() as $lang) {
+            if ($lang->equals($default)) {
+                continue;
+            }
+            $prefix = '/' . $lang->code . '/';
+            if (str_ends_with($url, $prefix)) {
+                return substr($url, 0, -\strlen($prefix)) . '/';
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * Indique si `$postId` est la page d'accueil (`page_on_front`) de la langue
+     * `$target`. Pour le défaut, comparaison directe ; sinon on regarde la
+     * traduction de `page_on_front` dans la langue cible.
+     */
+    private function isFrontPageInLanguage(int $postId, Language $target, Language $default): bool
+    {
+        if ((string) get_option('show_on_front') !== 'page') {
+            return false;
+        }
+        $front = (int) get_option('page_on_front', 0);
+        if ($front <= 0) {
+            return false;
+        }
+        if ($target->equals($default)) {
+            return $postId === $front;
+        }
+
+        $frontTranslations = $this->translations->getTranslations($front);
+
+        return isset($frontTranslations[$target->code])
+            && (int) $frontTranslations[$target->code] === $postId;
     }
 
     /**
