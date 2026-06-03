@@ -17,7 +17,7 @@ use OliTheme\Seo\SeoControllerInterface;
  *
  * @since 1.0.0
  */
-final class PostController
+final class PostController implements ArchiveRendererInterface
 {
     public function __construct(
         private readonly PostModelInterface $posts,
