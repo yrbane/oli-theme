@@ -41,6 +41,7 @@ final class PageController implements PageRendererInterface
         private readonly ?\OliTheme\Gabarits\GabaritResolver $gabarits = null,
         private readonly ?\OliTheme\Gabarits\ZoneContentRepository $gabaritZones = null,
         private readonly ?\OliTheme\Gabarits\GabaritRenderer $gabaritRenderer = null,
+        private readonly ?\OliTheme\MediaFolders\MediaFolderQuery $folderQuery = null,
     ) {
     }
 
@@ -99,8 +100,12 @@ final class PageController implements PageRendererInterface
         // avec la liste de photos ou vidéos passée en plus du contenu normal.
         if ($this->gallery !== null) {
             if (\in_array($entity->slug, self::PHOTO_SLUGS, true)) {
-                $vm['photos'] = $this->gallery->getPhotos();
+                $vm['photos']    = $this->gallery->getPhotos();
                 $vm['hasPhotos'] = $vm['photos'] !== [];
+                // Galeries par dossier (aggregation de toutes les folders) :
+                // chaque dossier devient une section avec ses photos.
+                $vm['folderGalleries'] = $this->buildFolderGalleries();
+                $vm['hasFolderGalleries'] = $vm['folderGalleries'] !== [];
                 return $this->renderer->render('pages/gallery-photos.html', $vm);
             }
             if (\in_array($entity->slug, self::VIDEO_SLUGS, true)) {
@@ -112,6 +117,37 @@ final class PageController implements PageRendererInterface
         }
 
         return $this->renderer->render('pages/page.html', $vm);
+    }
+
+    /**
+     * Construit la liste des galeries par dossier (chaque dossier non vide
+     * et de premier niveau = une section avec ses photos et ses sous-dossiers).
+     *
+     * @return list<array{slug:string, name:string, photos:list<array<string, mixed>>}>
+     */
+    private function buildFolderGalleries(): array
+    {
+        if ($this->folderQuery === null) {
+            return [];
+        }
+        $out = [];
+        foreach ($this->folderQuery->allFolders() as $folder) {
+            // On rend uniquement les dossiers racine ; leurs sous-dossiers
+            // sont inclus par include_children dans photosInFolder().
+            if ($folder['parent'] !== 0) {
+                continue;
+            }
+            $photos = $this->folderQuery->photosInFolder($folder['slug'], includeChildren: true);
+            if (empty($photos)) {
+                continue;
+            }
+            $out[] = [
+                'slug'   => $folder['slug'],
+                'name'   => $folder['name'],
+                'photos' => $photos,
+            ];
+        }
+        return $out;
     }
 
     /**

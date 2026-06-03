@@ -1,5 +1,6 @@
 [# Page Galerie Photos : layout vignettes-gauche / grande-droite.
-   Variables : post (PostEntity), photos (array), hasPhotos (bool), + base. #]
+   Variables : post (PostEntity), photos (array), hasPhotos (bool),
+               folderGalleries (array), hasFolderGalleries (bool), + base. #]
 [% extends 'layouts/base.html.tpl' %]
 
 [% block main %]
@@ -33,8 +34,41 @@
                 [% endfor %]
             </ol>
         </section>
-        [% else %]
-        <p class="gallery__empty">Aucune photo n'a encore été ajoutée. Configurez la galerie depuis Apparence &gt; Galerie.</p>
+        [% endif %]
+
+        [% if hasFolderGalleries %]
+            <section class="folder-galleries">
+                [% for folder in folderGalleries %]
+                    <section class="folder-galleries__section" id="folder-[[ folder.slug ]]">
+                        <header class="folder-galleries__header">
+                            <h2 class="folder-galleries__title">[[ folder.name ]]</h2>
+                        </header>
+                        <ul class="oli-folder-gallery__list">
+                            [% for photo in folder.photos %]
+                                <li class="oli-folder-gallery__item">
+                                    <a class="oli-folder-gallery__link"
+                                       href="[[ photo.url ]]"
+                                       data-oli-lightbox="folder-[[ folder.slug ]]"
+                                       data-caption="[[ photo.caption ]]">
+                                        <img class="oli-folder-gallery__img"
+                                             src="[[ photo.thumb ]]"
+                                             [% if photo.srcset %]srcset="[[ photo.srcset ]]" sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 33vw"[% endif %]
+                                             alt="[[ photo.alt ]]"
+                                             loading="lazy" decoding="async">
+                                    </a>
+                                    [% if photo.caption %]
+                                        <figcaption class="oli-folder-gallery__caption">[[ photo.caption ]]</figcaption>
+                                    [% endif %]
+                                </li>
+                            [% endfor %]
+                        </ul>
+                    </section>
+                [% endfor %]
+            </section>
+        [% endif %]
+
+        [% if not hasPhotos and not hasFolderGalleries %]
+            <p class="gallery__empty">Aucune photo n'a encore été ajoutée. Configurez la galerie depuis Apparence &gt; Galerie ou via Médias &gt; Dossiers.</p>
         [% endif %]
 
         [% if bodyHtml %]

@@ -6,6 +6,7 @@ namespace OliTheme\MediaFolders;
 
 use OliTheme\Container;
 use OliTheme\Core\ModuleInterface;
+use OliTheme\MediaFolders\Frontend\FolderGalleryShortcode;
 
 /**
  * Module Dossiers médiathèque — organise les attachments en arborescence.
@@ -40,5 +41,27 @@ final class MediaFoldersModule implements ModuleInterface
         if (\function_exists('is_admin') && is_admin()) {
             $c->get(MediaFoldersAdmin::class)->register();
         }
+
+        // Services frontend (shortcode + bloc Gutenberg).
+        if (!$c->has(MediaFolderQuery::class)) {
+            $c->factory(MediaFolderQuery::class, static fn (): MediaFolderQuery => new MediaFolderQuery());
+        }
+        if (!$c->has(FolderGalleryShortcode::class)) {
+            $c->factory(
+                FolderGalleryShortcode::class,
+                static fn (Container $cc): FolderGalleryShortcode => new FolderGalleryShortcode(
+                    $cc->get(MediaFolderQuery::class),
+                ),
+            );
+        }
+        add_action('init', static function () use ($c): void {
+            $c->get(FolderGalleryShortcode::class)->register();
+        });
+
+        // CSS du shortcode/bloc en frontend (uniquement quand le contenu en a besoin).
+        add_action('wp_enqueue_scripts', static function (): void {
+            $themeUri = \function_exists('get_template_directory_uri') ? (string) get_template_directory_uri() : '';
+            wp_enqueue_style('oli-folder-gallery', $themeUri . '/assets/css/folder-gallery.css', [], '1.5.0');
+        });
     }
 }

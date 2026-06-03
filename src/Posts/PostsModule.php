@@ -76,6 +76,9 @@ final class PostsModule implements ModuleInterface
                     $c->has(\OliTheme\Gabarits\GabaritRenderer::class)
                         ? $c->get(\OliTheme\Gabarits\GabaritRenderer::class)
                         : null,
+                    $c->has(\OliTheme\MediaFolders\MediaFolderQuery::class)
+                        ? $c->get(\OliTheme\MediaFolders\MediaFolderQuery::class)
+                        : null,
                 ),
             );
         }
