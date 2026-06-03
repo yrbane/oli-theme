@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OliTheme\Calendar;
 
+use OliTheme\Calendar\Cpt\AvailabilityCpt;
+use OliTheme\Calendar\Cpt\BookingCpt;
 use OliTheme\Container;
 use OliTheme\Core\ModuleInterface;
 
@@ -48,5 +50,21 @@ final class CalendarModule implements ModuleInterface
                 static fn (Container $cc): SlotGenerator => new SlotGenerator($cc->get(CalendarSettings::class)),
             );
         }
+        if (!$c->has(ServiceRepository::class)) {
+            $c->factory(ServiceRepository::class, static fn (): ServiceRepository => new ServiceRepository());
+        }
+        if (!$c->has(AvailabilityRepository::class)) {
+            $c->factory(AvailabilityRepository::class, static fn (): AvailabilityRepository => new AvailabilityRepository());
+        }
+        if (!$c->has(BookingRepository::class)) {
+            $c->factory(BookingRepository::class, static fn (): BookingRepository => new BookingRepository());
+        }
+
+        // Enregistrement des CPTs sur init (priorité 0 pour précéder les filtres
+        // qui dépendent de leur existence).
+        add_action('init', static function (): void {
+            (new AvailabilityCpt())->register();
+            (new BookingCpt())->register();
+        }, 0);
     }
 }
