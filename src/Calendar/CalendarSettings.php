@@ -37,6 +37,10 @@ final readonly class CalendarSettings
      * @param string $notificationEmail Adresse e-mail qui reçoit les nouvelles réservations.
      * @param bool $autoConfirm Réservation directement `confirmed` (true) ou `pending` (false).
      */
+    /**
+     * @param list<int>    $workingDays
+     * @param list<string> $icsImportUrls URLs HTTPS d'agendas externes à importer.
+     */
     public function __construct(
         public int $slotDurationMinutes = 60,
         public array $workingDays = [1, 2, 3, 4, 5],
@@ -45,6 +49,9 @@ final readonly class CalendarSettings
         public string $defaultState = self::STATE_AVAILABLE,
         public string $notificationEmail = '',
         public bool $autoConfirm = false,
+        public string $icsExportToken = '',
+        public array $icsImportUrls = [],
+        public string $icsPullInterval = 'hourly',
     ) {
     }
 
@@ -89,6 +96,23 @@ final readonly class CalendarSettings
             $defaultState = self::STATE_AVAILABLE;
         }
 
+        $importUrls = [];
+        $rawUrls = $input['icsImportUrls'] ?? [];
+        if (\is_array($rawUrls)) {
+            foreach ($rawUrls as $url) {
+                $url = trim((string) $url);
+                if ($url === '' || stripos($url, 'https://') !== 0) {
+                    continue;
+                }
+                $importUrls[] = $url;
+            }
+        }
+
+        $interval = (string) ($input['icsPullInterval'] ?? 'hourly');
+        if (!\in_array($interval, ['hourly', 'twicedaily', 'daily'], true)) {
+            $interval = 'hourly';
+        }
+
         return new self(
             slotDurationMinutes: $duration,
             workingDays: $cleanDays,
@@ -97,6 +121,9 @@ final readonly class CalendarSettings
             defaultState: $defaultState,
             notificationEmail: (string) ($input['notificationEmail'] ?? ''),
             autoConfirm: (bool) ($input['autoConfirm'] ?? false),
+            icsExportToken: preg_replace('/[^a-zA-Z0-9]/', '', (string) ($input['icsExportToken'] ?? '')) ?? '',
+            icsImportUrls: $importUrls,
+            icsPullInterval: $interval,
         );
     }
 
