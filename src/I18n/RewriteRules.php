@@ -60,4 +60,43 @@ final class RewriteRules
 
         return $vars;
     }
+
+    /**
+     * Filtre `rewrite_rules_array` : garantit que nos rules de langue
+     * `^<code>/?$ → oli_lang=<code>` et `^<code>/(.+)/?$ → oli_lang=...&pagename=...`
+     * restent en tête et ne sont pas écrasées par les verbose page rules
+     * que WordPress génère pour chaque slug de page (ex. une page slugée
+     * « en » ou « fr » introduit `^en/?$ → pagename=en`).
+     *
+     * @param array<string, string> $rules Rules WP collectées avant écriture.
+     *
+     * @return array<string, string> Rules avec nos préfixes de langue garantis en tête.
+     */
+    public function filter(array $rules): array
+    {
+        $default = $this->registry->default();
+        $ours    = [];
+
+        foreach ($this->registry->all() as $language) {
+            // La langue par défaut ne préfixe pas l'URL : on ne crée pas de
+            // rule `^<code>/?$` pour elle (la racine `/` reste canonique).
+            if ($language->equals($default)) {
+                continue;
+            }
+
+            $code = $language->code;
+            $ours['^' . $code . '/?$']       = 'index.php?oli_lang=' . $code;
+            $ours['^' . $code . '/(.+)/?$']  = 'index.php?oli_lang=' . $code . '&pagename=$matches[1]';
+        }
+
+        // Supprime les rules existantes ayant les MÊMES patterns que les nôtres
+        // (verbose page rules conflictuelles), puis fusionne en mettant les
+        // nôtres en tête : la première rule qui match dans WP_Rewrite::match()
+        // l'emporte.
+        foreach (array_keys($ours) as $pattern) {
+            unset($rules[$pattern]);
+        }
+
+        return $ours + $rules;
+    }
 }

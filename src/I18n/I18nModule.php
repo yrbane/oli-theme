@@ -60,6 +60,21 @@ final class I18nModule implements ModuleInterface
             return $rules->addQueryVar($vars);
         });
 
+        // Filtre rewrite_rules_array : empêche les « verbose page rules » que
+        // WordPress génère automatiquement à partir des slugs de pages (ex.
+        // page slugée « en » → `^en/?$ → pagename=en`) d'écraser nos rules de
+        // langue. Replace systématiquement nos `^<code>/?$ → oli_lang=<code>`
+        // en tête de l'array à chaque flush.
+        add_filter('rewrite_rules_array', function ($rules) {
+            if (!\is_array($rules)) {
+                return $rules;
+            }
+            $rewrite = $this->container->get(RewriteRules::class);
+            \assert($rewrite instanceof RewriteRules);
+
+            return $rewrite->filter($rules);
+        }, 99);
+
         // Filtre `home_url` UNIQUEMENT après le hook `wp` (= après parse_request).
         // Sinon WP utilise home_url() filtrée pour calculer le `$home_path` qu'il
         // retire de REQUEST_URI ; en préfixant /en/, on ferait sauter la rewrite
