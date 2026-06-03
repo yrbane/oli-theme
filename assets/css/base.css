@@ -135,3 +135,9 @@ h6 { font-size: var(--font-size-h6, 1rem); }
     .site-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); }
     .site-nav__list { margin-top: 0; }
 }
+
+/* Footer : logo personnalisé + texte libre. */
+.site-footer__brand { margin: 0 0 var(--space-3); text-align: center; }
+.site-footer__logo { max-width: 180px; height: auto; display: inline-block; }
+.site-footer__text { max-width: 60ch; margin: var(--space-3) auto; font-size: var(--font-size-footer, 0.875rem); line-height: 1.5; color: var(--color-muted); }
+.site-footer__text a { color: inherit; text-decoration: underline; }

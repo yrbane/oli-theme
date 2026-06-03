@@ -337,14 +337,30 @@ final class Theme
         \assert($renderer instanceof ViewRenderer);
 
         // Variables disponibles dès le boot (fonctions WP synchrones).
+        $footerLogoUrl = '';
+        $footerText    = '';
+        $rawSettings   = function_exists('get_option') ? get_option('oli_theme_settings', []) : [];
+        if (is_array($rawSettings) && isset($rawSettings['footer']) && is_array($rawSettings['footer'])) {
+            $logoId = isset($rawSettings['footer']['logoId']) ? (int) $rawSettings['footer']['logoId'] : 0;
+            if ($logoId > 0 && function_exists('wp_get_attachment_image_url')) {
+                $url = wp_get_attachment_image_url($logoId, 'medium');
+                if (is_string($url)) {
+                    $footerLogoUrl = $url;
+                }
+            }
+            $footerText = (string) ($rawSettings['footer']['text'] ?? '');
+        }
+
         $renderer->setDefaultVariables([
-            'siteName'    => get_bloginfo('name'),
-            'siteTagline' => get_bloginfo('description'),
-            'siteUrl'     => home_url(),
-            'homeUrl'     => home_url(),
-            'themeUri'    => get_template_directory_uri(),
-            'charset'     => get_bloginfo('charset'),
-            'currentYear' => date('Y'),
+            'siteName'      => get_bloginfo('name'),
+            'siteTagline'   => get_bloginfo('description'),
+            'siteUrl'       => home_url(),
+            'homeUrl'       => home_url(),
+            'themeUri'      => get_template_directory_uri(),
+            'charset'       => get_bloginfo('charset'),
+            'currentYear'   => date('Y'),
+            'footerLogoUrl' => $footerLogoUrl,
+            'footerText'    => $footerText,
         ]);
 
         // Macros lazy : wp_head() et wp_footer() sont capturés au moment du rendu

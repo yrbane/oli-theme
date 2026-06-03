@@ -421,6 +421,25 @@ final class ThemeSettingsPage
             $page,
             $section,
         );
+        add_settings_field(
+            'oli_footer_logo_id',
+            __('Logo footer', 'oli-theme') . $helpFooter,
+            fn () => $this->renderMediaIdField('footer', 'logoId', $current->footer->logoId),
+            $page,
+            $section,
+        );
+        add_settings_field(
+            'oli_footer_text',
+            __('Texte libre du footer', 'oli-theme') . $helpFooter,
+            fn () => $this->renderTextarea(
+                'footer',
+                'text',
+                $current->footer->text,
+                __('HTML autorisé (liens, gras, paragraphes). Affiché tout en bas du pied de page.', 'oli-theme'),
+            ),
+            $page,
+            $section,
+        );
     }
 
     /**
@@ -437,12 +456,17 @@ final class ThemeSettingsPage
             }
         }
 
+        $logoIdRaw = $input['logoId'] ?? null;
+        $logoId    = ($logoIdRaw !== null && $logoIdRaw !== '') ? absint((int) $logoIdRaw) : null;
+
         return [
             'legalByLanguage'   => $legal,
             'copyrightTemplate' => sanitize_text_field((string) ($input['copyrightTemplate'] ?? '© {year} {site}')),
             'showLegal'         => !empty($input['showLegal']),
             'showSocial'        => !empty($input['showSocial']),
             'showMenu'          => !empty($input['showMenu']),
+            'logoId'            => $logoId,
+            'text'              => wp_kses_post((string) ($input['text'] ?? '')),
         ];
     }
 

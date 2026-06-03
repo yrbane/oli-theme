@@ -7,8 +7,8 @@ namespace OliTheme\Settings;
 /**
  * DTO immuable pour les paramètres du pied de page.
  *
- * Contient les mentions légales par langue, le modèle de copyright
- * et les indicateurs d'affichage des blocs footer.
+ * Contient les mentions légales par langue, le modèle de copyright,
+ * les indicateurs d'affichage des blocs, et le logo + texte libre du footer.
  *
  * @package OliTheme\Settings
  *
@@ -22,6 +22,8 @@ final readonly class FooterSettings
      * @param bool $showLegal Afficher le bloc mentions légales.
      * @param bool $showSocial Afficher le bloc réseaux sociaux.
      * @param bool $showMenu Afficher le menu footer.
+     * @param int|null $logoId Identifiant d'attachment du logo footer (null = pas de logo).
+     * @param string $text Texte libre (HTML autorisé) affiché en bas du pied de page.
      */
     public function __construct(
         public array $legalByLanguage,
@@ -29,6 +31,8 @@ final readonly class FooterSettings
         public bool $showLegal,
         public bool $showSocial,
         public bool $showMenu,
+        public ?int $logoId = null,
+        public string $text = '',
     ) {
     }
 }
