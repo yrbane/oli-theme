@@ -12,21 +12,33 @@
             </h1>
         </header>
         [% if posts %]
-            <ul class="archive__list">
+            <ul class="archive__list archive__list--cards">
                 [% for post in posts %]
                     <li class="archive__item">
-                        <article class="post post--card">
-                            <h2 class="post__title">
-                                <a href="[[ post.permalink ]]">[[ post.title ]]</a>
-                            </h2>
-                            <p class="post__meta">
-                                <time datetime="[[ post.publishedAt.format('c') ]]">
-                                    [[ post.publishedAt.format('d/m/Y') ]]
-                                </time>
-                            </p>
-                            [% if post.excerpt %]
-                                <div class="post__excerpt">[[! post.excerpt !]]</div>
-                            [% endif %]
+                        <article class="post-card">
+                            <a class="post-card__link" href="[[ post.permalink ]]" aria-label="[[ post.title ]]">
+                                [% if post.featuredImageUrl %]
+                                    <span class="post-card__thumb">
+                                        <img src="[[ post.featuredImageUrl ]]"
+                                             alt="[% if post.featuredImageAlt %][[ post.featuredImageAlt ]][% else %][[ post.title ]][% endif %]"
+                                             loading="lazy"
+                                             decoding="async" />
+                                    </span>
+                                [% else %]
+                                    <span class="post-card__thumb post-card__thumb--empty" aria-hidden="true"></span>
+                                [% endif %]
+                                <span class="post-card__body">
+                                    <h3 class="post-card__title">[[ post.title ]]</h3>
+                                    <p class="post-card__meta">
+                                        <time datetime="[[ post.publishedAt.format('c') ]]">
+                                            [[ post.publishedAt.format('d/m/Y') ]]
+                                        </time>
+                                    </p>
+                                    [% if post.excerpt %]
+                                        <div class="post-card__excerpt">[[! post.excerpt !]]</div>
+                                    [% endif %]
+                                </span>
+                            </a>
                         </article>
                     </li>
                 [% endfor %]
