@@ -28,9 +28,23 @@ final class FrontPageControllerTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Stub `get_option` avec un mapping clé → valeur. Permet de cibler à la
+     * fois `show_on_front` ('page' ou 'posts') et `page_on_front` (id) sans
+     * que l'un ne remonte la valeur de l'autre.
+     *
+     * @param array<string, mixed> $map
+     */
+    private function stubOptions(array $map): void
+    {
+        Functions\when('get_option')->alias(static function (string $key, mixed $default = false) use ($map) {
+            return $map[$key] ?? $default;
+        });
+    }
+
     public function test_renders_archive_when_no_page_on_front(): void
     {
-        Functions\when('get_option')->justReturn(0);
+        $this->stubOptions(['show_on_front' => 'page', 'page_on_front' => 0]);
 
         $post = $this->createMock(ArchiveRendererInterface::class);
         $post->expects(self::once())->method('renderArchive')->willReturn('ARCHIVE_HTML');
@@ -45,9 +59,31 @@ final class FrontPageControllerTest extends TestCase
         self::assertSame('ARCHIVE_HTML', $controller->render());
     }
 
+    /**
+     * Régression historique : un site configuré `show_on_front=posts` peut
+     * garder un `page_on_front` non nul d'une ancienne config. Le controller
+     * doit alors rendre l'archive (sémantique WP), pas la page vide.
+     */
+    public function test_renders_archive_when_show_on_front_is_posts_even_if_page_on_front_set(): void
+    {
+        $this->stubOptions(['show_on_front' => 'posts', 'page_on_front' => 76]);
+
+        $post = $this->createMock(ArchiveRendererInterface::class);
+        $post->expects(self::once())->method('renderArchive')->willReturn('ARCHIVE_HTML');
+
+        $page = $this->createMock(PageRendererInterface::class);
+        $page->expects(self::never())->method('renderById');
+
+        $translations = $this->createMock(TranslationModelInterface::class);
+        $resolver     = $this->createMock(LanguageResolverInterface::class);
+
+        $controller = new FrontPageController($page, $post, $translations, $resolver, 'fr');
+        self::assertSame('ARCHIVE_HTML', $controller->render());
+    }
+
     public function test_renders_default_front_page_when_current_lang_is_default(): void
     {
-        Functions\when('get_option')->justReturn(56);
+        $this->stubOptions(['show_on_front' => 'page', 'page_on_front' => 56]);
 
         $page = $this->createMock(PageRendererInterface::class);
         $page->expects(self::once())->method('renderById')->with(56)->willReturn('FR_HOME_HTML');
@@ -65,7 +101,7 @@ final class FrontPageControllerTest extends TestCase
 
     public function test_renders_translated_front_page_for_non_default_language(): void
     {
-        Functions\when('get_option')->justReturn(56);
+        $this->stubOptions(['show_on_front' => 'page', 'page_on_front' => 56]);
 
         $page = $this->createMock(PageRendererInterface::class);
         // Doit rendre la traduction EN (57) et NON la page FR (56).
@@ -85,7 +121,7 @@ final class FrontPageControllerTest extends TestCase
 
     public function test_falls_back_to_default_front_page_when_translation_missing(): void
     {
-        Functions\when('get_option')->justReturn(56);
+        $this->stubOptions(['show_on_front' => 'page', 'page_on_front' => 56]);
 
         $page = $this->createMock(PageRendererInterface::class);
         // Pas de traduction EN → on rend la page par défaut (56).
