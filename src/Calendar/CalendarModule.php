@@ -12,6 +12,7 @@ use OliTheme\Calendar\Admin\ServicesAdminPage;
 use OliTheme\Calendar\Cpt\AvailabilityCpt;
 use OliTheme\Calendar\Cpt\BookingCpt;
 use OliTheme\Calendar\Frontend\BookingBlock;
+use OliTheme\Calendar\Notifications\BookingNotifier;
 use OliTheme\Calendar\Rest\CalendarRestController;
 use OliTheme\Container;
 use OliTheme\Core\ModuleInterface;
@@ -142,6 +143,25 @@ final class CalendarModule implements ModuleInterface
                 static fn (Container $cc): BookingBlock => new BookingBlock($cc->get(ServiceRepository::class)),
             );
         }
+        if (!$c->has(BookingNotifier::class)) {
+            $c->factory(
+                BookingNotifier::class,
+                static fn (Container $cc): BookingNotifier => new BookingNotifier(
+                    $cc->get(CalendarSettings::class),
+                    $cc->get(ServiceRepository::class),
+                ),
+            );
+        }
+
+        // Hook : envoie les notifications après création d'une réservation.
+        add_action('oli_booking_created', static function ($booking) use ($c): void {
+            if (!$booking instanceof Booking) {
+                return;
+            }
+            $notifier = $c->get(BookingNotifier::class);
+            \assert($notifier instanceof BookingNotifier);
+            $notifier->notify($booking);
+        });
 
         // REST routes + bloc Gutenberg + shortcode.
         add_action('rest_api_init', static function () use ($c): void {

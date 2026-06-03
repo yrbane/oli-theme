@@ -157,6 +157,17 @@ final class CalendarRestController
             ], $result['errorCode'] === 'rate_limit' ? 429 : 400);
         }
 
+        // Notification via action WP (BookingNotifier branché à `oli_booking_created`).
+        $bookingId = (int) ($result['bookingId'] ?? 0);
+        if ($bookingId > 0) {
+            $persisted = $this->bookings instanceof \OliTheme\Calendar\BookingRepository
+                ? $this->bookings->find($bookingId)
+                : null;
+            if ($persisted !== null && \function_exists('do_action')) {
+                do_action('oli_booking_created', $persisted);
+            }
+        }
+
         return new WP_REST_Response([
             'success'   => true,
             'bookingId' => $result['bookingId'] ?? null,
