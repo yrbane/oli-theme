@@ -12,8 +12,10 @@ use OliTheme\MetaSync\Auth\MetaOAuthController;
 use OliTheme\MetaSync\Auth\MetaOAuthExchange;
 use OliTheme\MetaSync\Auth\TokenRefresher;
 use OliTheme\MetaSync\Http\GraphApiClient;
+use OliTheme\MetaSync\Admin\MetaSyncMetabox;
 use OliTheme\MetaSync\Lifecycle\MetaPostState;
 use OliTheme\MetaSync\Lifecycle\MetaSyncDispatcher;
+use OliTheme\MetaSync\Lifecycle\MetaSyncReconciler;
 use OliTheme\MetaSync\Lifecycle\PayloadExtractor;
 use OliTheme\MetaSync\Publisher\FacebookPublisher;
 use OliTheme\MetaSync\Publisher\InstagramEditStrategy;
@@ -169,6 +171,42 @@ final class MetaSyncModule implements ModuleInterface
         });
         add_action('wp_trash_post', static function (int $id) use ($c): void {
             $c->get(MetaSyncDispatcher::class)->onDelete($id);
+        });
+
+        // P5 — Metabox sur l'éditeur (post/page/event).
+        if (!$c->has(MetaSyncMetabox::class)) {
+            $c->factory(
+                MetaSyncMetabox::class,
+                static fn (Container $cc): MetaSyncMetabox => new MetaSyncMetabox(
+                    $cc->get(MetaPostState::class),
+                    $cc->get(TokenStore::class),
+                ),
+            );
+        }
+        add_action('init', static function () use ($c): void {
+            $c->get(MetaSyncMetabox::class)->register();
+        });
+
+        // P5 — Reconciler cron quotidien.
+        if (!$c->has(MetaSyncReconciler::class)) {
+            $c->factory(
+                MetaSyncReconciler::class,
+                static fn (Container $cc): MetaSyncReconciler => new MetaSyncReconciler(
+                    $cc->get(GraphApiClient::class),
+                    $cc->get(TokenStore::class),
+                    $cc->get(MetaPostState::class),
+                ),
+            );
+        }
+        add_action(MetaSyncReconciler::CRON_HOOK, static function () use ($c): void {
+            $c->get(MetaSyncReconciler::class)->run();
+        });
+        add_action('init', static function (): void {
+            if (\function_exists('wp_next_scheduled') && \function_exists('wp_schedule_event')) {
+                if (!wp_next_scheduled(MetaSyncReconciler::CRON_HOOK)) {
+                    wp_schedule_event(time() + 300, 'daily', MetaSyncReconciler::CRON_HOOK);
+                }
+            }
         });
 
         // Cron quotidien de refresh du token.
