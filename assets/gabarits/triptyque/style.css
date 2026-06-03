@@ -1,0 +1,9 @@
+.gabarit-triptyque .triptyque { max-width: 800px; margin: 0 auto; }
+.gabarit-triptyque .triptyque__intro { font-size: 1.2rem; line-height: 1.7; font-style: italic; color: #4a5568; max-width: 60ch; margin: 2rem auto 3rem; padding: 0 1rem; }
+.gabarit-triptyque .triptyque__hero { margin: 3rem 0; }
+.gabarit-triptyque .triptyque__hero img { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 12px 32px -12px rgba(0,0,0,0.2); }
+.gabarit-triptyque .triptyque__development { font-size: 1.05rem; line-height: 1.8; color: #2d3748; max-width: 65ch; margin: 0 auto; padding: 0 1rem 3rem; }
+.gabarit-triptyque .triptyque__development p { margin-bottom: 1.25rem; }
+@media (max-width: 640px) {
+  .gabarit-triptyque .triptyque__intro { font-size: 1.05rem; }
+}

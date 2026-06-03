@@ -38,6 +38,9 @@ final class PageController implements PageRendererInterface
         private readonly CoverExtractor $coverExtractor = new CoverExtractor(),
         private readonly ?GalleryRepository $gallery = null,
         private readonly ?TranslationModelInterface $translations = null,
+        private readonly ?\OliTheme\Gabarits\GabaritResolver $gabarits = null,
+        private readonly ?\OliTheme\Gabarits\ZoneContentRepository $gabaritZones = null,
+        private readonly ?\OliTheme\Gabarits\GabaritRenderer $gabaritRenderer = null,
     ) {
     }
 
@@ -86,6 +89,12 @@ final class PageController implements PageRendererInterface
         $vm['coverHtml'] = $split['cover'];
         $vm['bodyHtml']  = $split['body'];
 
+        // Si un gabarit zonal s'applique à ce post, son rendu remplace bodyHtml.
+        $gabaritHtml = $this->renderGabaritIfZonal($entity->id);
+        if ($gabaritHtml !== '') {
+            $vm['bodyHtml'] = $gabaritHtml;
+        }
+
         // Routing spécial pour les pages galerie : on rend un template dédié
         // avec la liste de photos ou vidéos passée en plus du contenu normal.
         if ($this->gallery !== null) {
@@ -103,6 +112,24 @@ final class PageController implements PageRendererInterface
         }
 
         return $this->renderer->render('pages/page.html', $vm);
+    }
+
+    /**
+     * Si le post a un gabarit zonal avec un template custom, rend le HTML
+     * du gabarit (à utiliser à la place du body extrait du content WP).
+     */
+    private function renderGabaritIfZonal(int $postId): string
+    {
+        if ($this->gabarits === null || $this->gabaritZones === null || $this->gabaritRenderer === null) {
+            return '';
+        }
+        $gabarit = $this->gabarits->forPost($postId);
+        if ($gabarit === null || !$gabarit->isZonal() || !$gabarit->hasCustomTemplate()) {
+            return '';
+        }
+        $contents = $this->gabaritZones->load($postId);
+        $post     = \function_exists('get_post') ? get_post($postId) : null;
+        return $this->gabaritRenderer->render($gabarit, $contents, $post instanceof \WP_Post ? $post : null);
     }
 
     /**

@@ -1,0 +1,11 @@
+.gabarit-story .story { max-width: 880px; margin: 0 auto; padding: 0 1rem; }
+.gabarit-story .story__intro { font-size: 1.1rem; line-height: 1.7; color: #4c1d95; max-width: 62ch; margin: 2rem auto 3rem; }
+.gabarit-story .story__gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 3rem 0; }
+.gabarit-story .story__gallery .oli-zone-gallery { display: contents; }
+.gabarit-story .story__gallery img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 3; display: block; border-radius: 4px; transition: transform 0.4s ease, box-shadow 0.4s ease; }
+.gabarit-story .story__gallery img:hover { transform: scale(1.02); box-shadow: 0 12px 24px -8px rgba(139, 92, 246, 0.3); }
+.gabarit-story .story__quote { font-family: Georgia, serif; font-size: 1.8rem; font-style: italic; color: #8b5cf6; text-align: center; max-width: 50ch; margin: 4rem auto; padding: 0 2rem; position: relative; line-height: 1.4; }
+.gabarit-story .story__quote::before, .gabarit-story .story__quote::after { font-size: 3rem; color: rgba(139, 92, 246, 0.3); line-height: 0.5; }
+.gabarit-story .story__quote::before { content: '“'; vertical-align: -0.4em; margin-right: 0.2rem; }
+.gabarit-story .story__quote::after { content: '”'; vertical-align: -0.6em; margin-left: 0.2rem; }
+.gabarit-story .story__conclusion { font-size: 1.05rem; line-height: 1.75; color: #2d3748; max-width: 62ch; margin: 0 auto 3rem; }

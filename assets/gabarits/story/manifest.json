@@ -1,0 +1,13 @@
+{
+  "name": "Story photo",
+  "description": "Un reportage : intro texte, galerie photo défilante, citation marquante encadrée, conclusion. Optimisé pour raconter une histoire visuelle.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#8b5cf6",
+  "zones": [
+    {"id": "intro",      "type": "text",    "label": "Introduction",  "help": "Texte d'introduction (contexte, lieu, date)."},
+    {"id": "gallery",    "type": "gallery", "label": "Galerie photo", "help": "Sélection des images racontant l'histoire."},
+    {"id": "quote",      "type": "text",    "label": "Citation",      "help": "Phrase forte (sera affichée en grand entre les images et la conclusion)."},
+    {"id": "conclusion", "type": "text",    "label": "Conclusion",    "help": "Texte de clôture."}
+  ]
+}

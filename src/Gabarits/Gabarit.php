@@ -19,6 +19,8 @@ final readonly class Gabarit
 {
     /**
      * @param list<string> $supports types de contenu supportés ('post', 'page', 'oli_event')
+     * @param list<Zone>   $zones    architecture zonale du gabarit (vide = skin CSS pur)
+     * @param ?string      $templateFsPath Chemin filesystem absolu vers `template.html.tpl` si présent.
      */
     public function __construct(
         public string $id,
@@ -29,6 +31,8 @@ final readonly class Gabarit
         public ?string $jsPath = null,
         public bool $parallax = false,
         public string $previewColor = '#1a1a1a',
+        public array $zones = [],
+        public ?string $templateFsPath = null,
     ) {
     }
 
@@ -38,5 +42,31 @@ final readonly class Gabarit
     public function supportsType(string $postType): bool
     {
         return \in_array($postType, $this->supports, true);
+    }
+
+    /**
+     * Vrai si le gabarit a une architecture zonale (ne se contente pas de CSS).
+     */
+    public function isZonal(): bool
+    {
+        return !empty($this->zones);
+    }
+
+    /**
+     * Vrai si un template Lunar custom est associé (rendu serveur du gabarit).
+     */
+    public function hasCustomTemplate(): bool
+    {
+        return $this->templateFsPath !== null && is_file($this->templateFsPath);
+    }
+
+    public function zoneById(string $id): ?Zone
+    {
+        foreach ($this->zones as $z) {
+            if ($z->id === $id) {
+                return $z;
+            }
+        }
+        return null;
     }
 }

@@ -67,6 +67,15 @@ final class PostsModule implements ModuleInterface
                     $c->has(\OliTheme\I18n\TranslationModelInterface::class)
                         ? $c->get(\OliTheme\I18n\TranslationModelInterface::class)
                         : null,
+                    $c->has(\OliTheme\Gabarits\GabaritResolver::class)
+                        ? $c->get(\OliTheme\Gabarits\GabaritResolver::class)
+                        : null,
+                    $c->has(\OliTheme\Gabarits\ZoneContentRepository::class)
+                        ? $c->get(\OliTheme\Gabarits\ZoneContentRepository::class)
+                        : null,
+                    $c->has(\OliTheme\Gabarits\GabaritRenderer::class)
+                        ? $c->get(\OliTheme\Gabarits\GabaritRenderer::class)
+                        : null,
                 ),
             );
         }

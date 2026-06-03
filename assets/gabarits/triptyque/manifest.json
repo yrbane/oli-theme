@@ -1,0 +1,12 @@
+{
+  "name": "Triptyque",
+  "description": "Structure en trois temps : une introduction texte, une image héros pleine largeur, puis le développement texte. Idéal pour les billets long-form avec un visuel central fort.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#4a5568",
+  "zones": [
+    {"id": "intro",       "type": "text",  "label": "Introduction",        "help": "Texte d'ouverture (3-5 phrases) au-dessus de l'image."},
+    {"id": "hero",        "type": "image", "label": "Image héros",         "help": "Image plein large entre intro et développement."},
+    {"id": "development", "type": "text",  "label": "Développement",       "help": "Texte principal sous l'image."}
+  ]
+}

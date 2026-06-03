@@ -113,15 +113,35 @@ final class GabaritRegistry implements GabaritRegistryInterface
         $jsUri       = is_file($jsRelative) ? $this->rootUri . '/' . $slug . '/script.js' : null;
         $supportsRaw = $manifest['supports'] ?? ['post', 'page', 'oli_event'];
 
+        // Zones : tableau de définitions dans le manifest.
+        $zones = [];
+        if (\is_array($manifest['zones'] ?? null)) {
+            foreach ($manifest['zones'] as $rawZone) {
+                if (!\is_array($rawZone)) {
+                    continue;
+                }
+                $z = Zone::fromArray($rawZone);
+                if ($z !== null) {
+                    $zones[] = $z;
+                }
+            }
+        }
+
+        // Template custom optionnel — utilisé en rendu zonal.
+        $templatePath = $dir . '/template.html.tpl';
+        $template     = is_file($templatePath) ? $templatePath : null;
+
         return new Gabarit(
-            id:           $id,
-            name:         (string) ($manifest['name']        ?? ucfirst($slug)),
-            description:  (string) ($manifest['description'] ?? ''),
-            supports:     \is_array($supportsRaw) ? array_values(array_map('strval', $supportsRaw)) : ['post', 'page'],
-            cssPath:      $this->rootUri . '/' . $slug . '/style.css',
-            jsPath:       $jsUri,
-            parallax:     (bool) ($manifest['parallax']     ?? false),
-            previewColor: (string) ($manifest['previewColor'] ?? '#1a1a1a'),
+            id:             $id,
+            name:           (string) ($manifest['name']        ?? ucfirst($slug)),
+            description:    (string) ($manifest['description'] ?? ''),
+            supports:       \is_array($supportsRaw) ? array_values(array_map('strval', $supportsRaw)) : ['post', 'page'],
+            cssPath:        $this->rootUri . '/' . $slug . '/style.css',
+            jsPath:         $jsUri,
+            parallax:       (bool) ($manifest['parallax']     ?? false),
+            previewColor:   (string) ($manifest['previewColor'] ?? '#1a1a1a'),
+            zones:          $zones,
+            templateFsPath: $template,
         );
     }
 }
