@@ -305,28 +305,22 @@ header.site-header {
   margin-left: 0.15em;
 }
 
-/* Menu étoffé : on autorise le passage à la ligne (2 lignes max en pratique)
-   plutôt que de comprimer/déborder. Lisibilité conservée. */
+/* Menu compact : single-line (pas de wrap), sublist peut sortir verticalement.
+   Override de la règle générique flex-wrap: wrap héritée de l'en-tête. */
 .site-header .nav__list {
-  gap: 0.1rem 0.25rem;
-  flex-wrap: wrap;
-  overflow: visible; /* le sublist peut sortir verticalement */
+  gap: clamp(0.1rem, 0vw + 0.15rem, 0.35rem);
+  flex-wrap: nowrap;
+  overflow: visible;
 }
 .site-header .nav--desktop .nav__list > .nav__item > .nav__link {
-  padding: 0.4rem 0.7rem;
-  font-size: 0.8rem;
+  padding: clamp(0.3rem, 0.2rem + 0.15vw, 0.45rem) clamp(0.35rem, 0.2rem + 0.4vw, 0.7rem);
+  font-size: clamp(0.72rem, 0.5rem + 0.4vw, 0.88rem);
   letter-spacing: -0.005em;
 }
 
-/* Sur viewport ≤ 1280px : légère réduction, le wrap fait le reste. */
-@media (max-width: 1280px) {
-  .site-header .nav--desktop .nav__list > .nav__item > .nav__link {
-    padding: 0.35rem 0.55rem;
-    font-size: 0.76rem;
-  }
-}
-
-/* Note : le menu bascule en burger à 992px (61.99rem) via menu.css. */
+/* Note : le menu bascule en burger à 1088px (67.99rem) via menu.css.
+   Au-dessus, font-size et padding scalent automatiquement via clamp() →
+   le menu ne passe jamais sur 2 lignes. */
 
 /* Switcher de langue */
 .language-switcher,

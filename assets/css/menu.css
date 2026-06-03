@@ -1,11 +1,14 @@
 /* Navigation BEM — desktop hover/focus + mobile drawer. */
 .nav { display: contents; }
-.nav__list { list-style: none; margin: 0; display: flex; gap: var(--space-4); flex-wrap: wrap; }
-.nav__item { position: relative; }
+/* Sur desktop : `flex-wrap: nowrap` pour garder le menu sur UNE seule ligne,
+   quitte à ce qu'il se compacte. Si vraiment trop d'items pour la largeur
+   disponible, c'est la bascule en burger (à 67.99rem ci-dessous) qui prend
+   le relais. Le sous-menu mobile force `wrap: wrap` via override plus bas. */
+.nav__list { list-style: none; margin: 0; display: flex; gap: 0.25rem; flex-wrap: nowrap; min-width: 0; }
+.nav__item { position: relative; min-width: 0; }
 /* `white-space: nowrap` empêche un item dont le libellé contient un espace
-   (ex. « À propos ») de casser sur 2 lignes ; le wrap reste possible entre
-   items, mais ne coupe plus un item en deux. */
-.nav__link { display: inline-block; padding: var(--space-2) var(--space-3); text-decoration: none; color: var(--color-text); white-space: nowrap; }
+   (ex. « À propos ») de casser sur 2 lignes — il restera entier. */
+.nav__link { display: inline-block; padding: 0.35rem 0.6rem; text-decoration: none; color: var(--color-text); white-space: nowrap; }
 .nav__link:hover, .nav__link:focus-visible { color: var(--color-link-hover); text-decoration: underline; }
 .nav__item--current > .nav__link { font-weight: 700; }
 
@@ -33,11 +36,10 @@
 .nav-toggle { display: none; }
 .nav--mobile { display: none; }
 
-/* Bascule en menu burger à 61.99rem (~992 px) plutôt qu'à 47.99rem (~768 px).
-   Sur les tablettes paysage et petits laptops, le nombre d'items et la
-   longueur des libellés provoquaient des retours à la ligne disgracieux ;
-   passer en burger plus tôt évite cette zone intermédiaire. */
-@media (max-width: 61.99rem) {
+/* Bascule en menu burger à 67.99rem (~1088 px) — sous cette taille, même
+   avec des libellés courts, on n'arrive pas à tenir 6-10 items sur une
+   seule ligne sans rendu écrasé. Le burger reprend le relais. */
+@media (max-width: 67.99rem) {
     .nav--desktop { display: none; }
     .nav-toggle {
         display: inline-flex; align-items: center; gap: var(--space-2);
@@ -55,7 +57,9 @@
         z-index: 100;
     }
     .nav--mobile[hidden] { display: none; }
-    .nav--mobile .nav__list { flex-direction: column; gap: 0; }
+    /* Override : dans le drawer mobile, on revient à une pile verticale qui
+       peut wrap si besoin (impossible en pratique avec column). */
+    .nav--mobile .nav__list { flex-direction: column; gap: 0; flex-wrap: wrap; }
     .nav--mobile .nav__sublist { list-style: none; margin: 0; padding-left: var(--space-5); }
 }
 
@@ -65,12 +69,18 @@
     .site-footer__list { flex-direction: column; gap: var(--space-2); }
 }
 
-/* Taille de la typo du menu desktop : clamp fluide entre 992 px et 1440 px+
-   pour absorber les libellés moyens (« À propos », « Disciplines », etc.)
-   sans casser la ligne. */
-@media (min-width: 62rem) {
+/* Taille de la typo du menu desktop : clamp fluide entre 1088 px et 1440 px+.
+   Plus petite que la version précédente (0.72-0.92 rem au lieu de 0.78-1 rem)
+   pour faire tenir plus d'items sur une ligne et ne jamais déborder. */
+@media (min-width: 68rem) {
     .nav--desktop .nav__link {
-        font-size: clamp(0.78rem, 0.55rem + 0.45vw, 1rem);
-        padding-inline: clamp(0.35rem, 0.2rem + 0.45vw, 0.85rem);
+        font-size: clamp(0.72rem, 0.45rem + 0.42vw, 0.92rem);
+        padding-inline: clamp(0.3rem, 0.15rem + 0.4vw, 0.7rem);
+        padding-block: clamp(0.25rem, 0.15rem + 0.15vw, 0.45rem);
+        letter-spacing: -0.005em;
+    }
+    /* Compacte le gap aux viewports étroits desktop. */
+    .nav--desktop .nav__list {
+        gap: clamp(0.1rem, 0vw + 0.15rem, 0.4rem);
     }
 }
