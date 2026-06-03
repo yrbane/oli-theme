@@ -887,23 +887,28 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
 }
 
 /* ==========================================================================
-   Galeries Photos & Vidéos : layout vignettes-gauche / grande-droite.
+   Galeries Photos : image principale large + bande de miniatures sous l'image
+   (présentation smartphone portée sur desktop, demande Olivier #12).
+   Vidéos : conservent leur layout 2 colonnes (player + liste de titres).
    ========================================================================== */
 .gallery {
   display: grid;
-  grid-template-columns: minmax(180px, 320px) 1fr;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
-  max-width: 1200px;
+  max-width: 960px;
   margin: 1rem auto 4rem;
   padding: 0 1.5rem;
+}
+
+/* Override : la galerie vidéos garde son layout 2 colonnes. */
+.gallery--videos {
+  grid-template-columns: 1fr minmax(220px, 300px);
+  max-width: 1200px;
 }
 
 /* Page Vidéos : layout inversé — player large à gauche, listes des titres
    à droite. Vignettes des vidéos masquées (l'iframe YouTube affiche déjà
    la vidéo en cours), seuls le picto ▶ et la légende restent visibles. */
-.gallery--videos {
-  grid-template-columns: 1fr minmax(220px, 300px);
-}
 .gallery--videos .gallery__main { grid-column: 1; grid-row: 1; }
 .gallery--videos .gallery__thumbs {
   grid-column: 2;
@@ -967,10 +972,13 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   -webkit-box-orient: vertical;
 }
 .gallery__main {
-  position: sticky;
-  top: calc(var(--header-h, 75px) + var(--oli-admin-bar-offset, 0px) + 1rem);
   align-self: start;
   background: #ffffff;
+}
+/* Sticky uniquement sur la galerie vidéos (layout 2 colonnes). */
+.gallery--videos .gallery__main {
+  position: sticky;
+  top: calc(var(--header-h, 75px) + var(--oli-admin-bar-offset, 0px) + 1rem);
 }
 .gallery__main-figure { margin: 0; }
 .gallery__main-image,
@@ -1005,19 +1013,23 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   font-style: italic;
 }
 
-/* Liste de vignettes : grille 2-3 colonnes selon largeur. */
+/* Bande horizontale de miniatures sous l'image principale (galerie photos).
+   La galerie vidéos surcharge ces règles (liste verticale de titres). */
 .gallery__thumbs {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 0.4rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding-right: 0.25rem;
+  grid-auto-flow: column;
+  grid-auto-columns: 100px;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
   scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
+.gallery__thumb-item { scroll-snap-align: start; }
 .gallery__thumb-item { margin: 0; }
 .gallery__thumb-button {
   display: block;

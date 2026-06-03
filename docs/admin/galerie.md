@@ -10,6 +10,16 @@
 
 Les images bénéficient d'un `srcset` responsive (taille adaptée à l'écran) et d'une **lightbox** (clic = vue plein écran avec navigation ←/→).
 
+## Présentation côté front (page Photos)
+
+Layout vertical type smartphone :
+
+1. **Image principale** en grand au centre (max-width 960 px, ratio préservé).
+2. **Légende** sous l'image.
+3. **Bande horizontale de miniatures** scrollable (`scroll-snap`) sous l'image.
+
+Cliquer sur une miniature swappe l'image principale et sa légende (sans rechargement). La miniature active porte un cadre noir.
+
 ## Vidéos YouTube
 
 1. Renseigner l'**URL de la chaîne YouTube** : les vidéos publiques sont récupérées automatiquement.
@@ -19,6 +29,3 @@ Les images bénéficient d'un `srcset` responsive (taille adaptée à l'écran) 
 
 Les galeries s'affichent sur les pages WordPress nommées `photos`, `videos` (FR) et `photos-en`, `videos-en` (EN). Le bouton **« Créer les pages manquantes »** dans l'onglet Galerie les génère automatiquement si elles n'existent pas.
 
-## Évolution visuelle prévue
-
-Image principale au centre + bande de miniatures dessous — voir [#12](https://github.com/yrbane/oli-theme/issues/12).
