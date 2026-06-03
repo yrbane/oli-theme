@@ -66,6 +66,10 @@ final class AssetManager
         // Police personnalisée pour les titres (Google Fonts) si configurée.
         $this->injectTitlesFontOverride('oli-theme-admin-bar');
 
+        // Variables de typographie (tailles base, h1-h6, menu, footer) issues
+        // de l'admin → injectées en dernier pour gagner la cascade.
+        $this->injectTypographyOverride('oli-theme-admin-bar');
+
         wp_enqueue_script_module(
             'oli-theme',
             $this->themeUri . '/assets/js/main.js',
@@ -218,6 +222,27 @@ final class AssetManager
             }
             return $hints;
         }, 10, 2);
+    }
+
+    /**
+     * Injecte les custom-properties de typographie générées à partir des
+     * réglages admin (`oli_theme_settings[typography]`). Si l'option est
+     * absente, on retombe sur les valeurs par défaut de TypographySettings.
+     */
+    private function injectTypographyOverride(string $handle): void
+    {
+        if (!\function_exists('get_option') || !\function_exists('wp_add_inline_style')) {
+            return;
+        }
+        $settings = get_option('oli_theme_settings', []);
+        if (!\is_array($settings)) {
+            return;
+        }
+        $typoRaw = isset($settings['typography']) && \is_array($settings['typography'])
+            ? $settings['typography']
+            : [];
+        $typo = \OliTheme\Settings\TypographySettings::fromInput($typoRaw);
+        wp_add_inline_style($handle, $typo->toCss());
     }
 
     /**

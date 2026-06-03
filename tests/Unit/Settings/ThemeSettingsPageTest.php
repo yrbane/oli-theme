@@ -68,7 +68,7 @@ final class ThemeSettingsPageTest extends TestCase
 
         self::assertSame('oli_theme_settings_group', $capturedGroup);
         self::assertSame('oli_theme_settings', $capturedOptionKey);
-        self::assertSame(5, $addSectionCount);
+        self::assertSame(6, $addSectionCount);
     }
 
     /**

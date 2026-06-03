@@ -59,12 +59,13 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
             return SettingsBag::default();
         }
 
-        $banner    = $raw['banner'] ?? [];
-        $footer    = $raw['footer'] ?? [];
-        $social    = $raw['social'] ?? [];
-        $languages = $raw['languages'] ?? [];
-        $contact   = $raw['contact'] ?? [];
-        $seo       = $raw['seo'] ?? [];
+        $banner     = $raw['banner'] ?? [];
+        $footer     = $raw['footer'] ?? [];
+        $social     = $raw['social'] ?? [];
+        $languages  = $raw['languages'] ?? [];
+        $contact    = $raw['contact'] ?? [];
+        $seo        = $raw['seo'] ?? [];
+        $typography = $raw['typography'] ?? [];
 
         $defaults = SettingsBag::default();
 
@@ -108,6 +109,7 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
                 sitemapEnabled: (bool) ($seo['sitemapEnabled'] ?? true),
                 robotsTxtCustom: $this->stringOrNull($seo, 'robotsTxtCustom'),
             ),
+            typography: \is_array($typography) ? TypographySettings::fromInput($typography) : TypographySettings::default(),
         );
     }
 

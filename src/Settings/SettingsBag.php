@@ -23,6 +23,7 @@ final readonly class SettingsBag
      * @param LanguagesSettings $languages Paramètres multilingues.
      * @param ContactSettings $contact Paramètres du formulaire de contact.
      * @param SeoSettings $seo Paramètres SEO globaux.
+     * @param TypographySettings $typography Paramètres typographiques globaux.
      */
     public function __construct(
         public BannerSettings $banner,
@@ -31,6 +32,7 @@ final readonly class SettingsBag
         public LanguagesSettings $languages,
         public ContactSettings $contact,
         public SeoSettings $seo,
+        public TypographySettings $typography = new TypographySettings(),
     ) {
     }
 
@@ -47,6 +49,7 @@ final readonly class SettingsBag
             languages: new LanguagesSettings(['fr'], 'fr', LanguagesSettings::FALLBACK_HOME),
             contact: new ContactSettings(null, null, false, false),
             seo: new SeoSettings(null, null, null, null, true, null),
+            typography: TypographySettings::default(),
         );
     }
 }

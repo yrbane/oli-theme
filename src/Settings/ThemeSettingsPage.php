@@ -129,6 +129,9 @@ final class ThemeSettingsPage
         if (isset($input['seo']) && \is_array($input['seo'])) {
             $clean['seo'] = $this->sanitizeSeo($input['seo']);
         }
+        if (isset($input['typography']) && \is_array($input['typography'])) {
+            $clean['typography'] = $this->sanitizeTypography($input['typography']);
+        }
 
         return array_replace($existing, $clean);
     }
@@ -877,11 +880,12 @@ final class ThemeSettingsPage
     private function tabDefinitions(): array
     {
         return [
-            ['id' => 'banner',    'title' => __('Identité visuelle', 'oli-theme')],
-            ['id' => 'languages', 'title' => __('Langues', 'oli-theme')],
-            ['id' => 'footer',    'title' => __('Pied de page', 'oli-theme')],
-            ['id' => 'contact',   'title' => __('Contact', 'oli-theme')],
-            ['id' => 'seo',       'title' => __('SEO global', 'oli-theme')],
+            ['id' => 'banner',     'title' => __('Identité visuelle', 'oli-theme')],
+            ['id' => 'languages',  'title' => __('Langues', 'oli-theme')],
+            ['id' => 'footer',     'title' => __('Pied de page', 'oli-theme')],
+            ['id' => 'contact',    'title' => __('Contact', 'oli-theme')],
+            ['id' => 'seo',        'title' => __('SEO global', 'oli-theme')],
+            ['id' => 'typography', 'title' => __('Typographie', 'oli-theme')],
         ];
     }
 
@@ -890,6 +894,76 @@ final class ThemeSettingsPage
      */
     private function tabIds(): array
     {
-        return ['banner', 'languages', 'footer', 'contact', 'seo'];
+        return ['banner', 'languages', 'footer', 'contact', 'seo', 'typography'];
+    }
+
+    private function registerTypographyFields(string $page, string $section, SettingsBag $current): void
+    {
+        $helpTypo = self::helpBubble('typo');
+        $t        = $current->typography;
+
+        add_settings_field(
+            'oli_typography_base',
+            __('Taille de base (rem)', 'oli-theme') . $helpTypo,
+            fn () => $this->renderNumberField('typography', 'baseSize', $t->baseSize, TypographySettings::BASE_MIN, TypographySettings::BASE_MAX, 0.05, __('1 rem = 16 px par défaut. Entre 0.75 et 1.5.', 'oli-theme')),
+            $page,
+            $section,
+        );
+        add_settings_field(
+            'oli_typography_scale',
+            __('Ratio d\'échelle des titres', 'oli-theme') . $helpTypo,
+            fn () => $this->renderNumberField('typography', 'scaleRatio', $t->scaleRatio, TypographySettings::RATIO_MIN, TypographySettings::RATIO_MAX, 0.01, __('Suite géométrique entre h6 et h1. Entre 1.05 (subtil) et 1.6 (contrasté).', 'oli-theme')),
+            $page,
+            $section,
+        );
+        add_settings_field(
+            'oli_typography_menu',
+            __('Taille du menu (rem)', 'oli-theme') . $helpTypo,
+            fn () => $this->renderNumberField('typography', 'menuSize', $t->menuSize, TypographySettings::AUX_MIN, TypographySettings::AUX_MAX, 0.025, __('Entre 0.6 et 1.4.', 'oli-theme')),
+            $page,
+            $section,
+        );
+        add_settings_field(
+            'oli_typography_footer',
+            __('Taille du pied de page (rem)', 'oli-theme') . $helpTypo,
+            fn () => $this->renderNumberField('typography', 'footerSize', $t->footerSize, TypographySettings::AUX_MIN, TypographySettings::AUX_MAX, 0.025, __('Entre 0.6 et 1.4.', 'oli-theme')),
+            $page,
+            $section,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     *
+     * @return array<string, mixed>
+     */
+    private function sanitizeTypography(array $input): array
+    {
+        $t = TypographySettings::fromInput($input);
+
+        return [
+            'baseSize'   => $t->baseSize,
+            'scaleRatio' => $t->scaleRatio,
+            'menuSize'   => $t->menuSize,
+            'footerSize' => $t->footerSize,
+        ];
+    }
+
+    private function renderNumberField(string $section, string $key, float $value, float $min, float $max, float $step, string $description): void
+    {
+        $name = self::OPTION . '[' . $section . '][' . $key . ']';
+        $id   = 'oli-' . $section . '-' . $key;
+        printf(
+            '<input type="number" id="%1$s" name="%2$s" value="%3$s" min="%4$s" max="%5$s" step="%6$s" class="small-text" />',
+            esc_attr($id),
+            esc_attr($name),
+            esc_attr((string) $value),
+            esc_attr((string) $min),
+            esc_attr((string) $max),
+            esc_attr((string) $step),
+        );
+        if ($description !== '') {
+            echo '<p class="description">' . esc_html($description) . '</p>';
+        }
     }
 }
