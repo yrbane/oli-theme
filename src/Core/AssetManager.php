@@ -137,6 +137,23 @@ final class AssetManager
     }
 
     /**
+     * Active les supports thématiques globaux : image mise en avant, titre dynamique.
+     * À brancher sur `after_setup_theme`.
+     *
+     * Sans `post-thumbnails`, WordPress n'affiche pas la metabox « Image mise en
+     * avant » même si un CPT déclare `'thumbnail'` dans `supports` — c'est ce qui
+     * a empêché Olivier de pouvoir choisir l'image d'une slide.
+     */
+    public function registerThemeSupports(): void
+    {
+        if (!\function_exists('add_theme_support')) {
+            return;
+        }
+        add_theme_support('post-thumbnails');
+        add_theme_support('title-tag');
+    }
+
+    /**
      * Enqueue la variation CSS sélectionnée (après main.css pour l'overrider).
      * Retourne true si une variation a été enqueuée, false sinon — utilisé
      * par {@see self::enqueueFront()} pour calculer les bonnes dépendances.

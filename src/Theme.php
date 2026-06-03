@@ -292,6 +292,7 @@ final class Theme
         add_action('after_setup_theme', static function () use ($container): void {
             $assets = $container->get(AssetManager::class);
             \assert($assets instanceof AssetManager);
+            $assets->registerThemeSupports();
             $assets->registerEditorStyles();
         });
 
