@@ -139,30 +139,32 @@ final class ThemeSettingsPage
 
     private function registerBannerFields(string $page, string $section, SettingsBag $current): void
     {
+        $helpBanner = self::helpBubble('banniere');
+        $helpIdent  = self::helpBubble('identite');
         add_settings_field(
             'oli_banner_logo_id',
-            __('ID du média logo', 'oli-theme'),
+            __('ID du média logo', 'oli-theme') . $helpIdent,
             fn () => $this->renderMediaIdField('banner', 'logoId', $current->banner->logoId),
             $page,
             $section,
         );
         add_settings_field(
             'oli_banner_desktop_id',
-            __('ID du média bannière desktop', 'oli-theme'),
+            __('ID du média bannière desktop', 'oli-theme') . $helpBanner,
             fn () => $this->renderMediaIdField('banner', 'bannerDesktopId', $current->banner->bannerDesktopId),
             $page,
             $section,
         );
         add_settings_field(
             'oli_banner_mobile_id',
-            __('ID du média bannière mobile', 'oli-theme'),
+            __('ID du média bannière mobile', 'oli-theme') . $helpBanner,
             fn () => $this->renderMediaIdField('banner', 'bannerMobileId', $current->banner->bannerMobileId),
             $page,
             $section,
         );
         add_settings_field(
             'oli_banner_alt_fr',
-            __('Texte alternatif (FR)', 'oli-theme'),
+            __('Texte alternatif (FR)', 'oli-theme') . $helpBanner,
             fn () => $this->renderTextField(
                 'banner',
                 'altByLanguage[fr]',
@@ -174,7 +176,7 @@ final class ThemeSettingsPage
         );
         add_settings_field(
             'oli_banner_alt_en',
-            __('Texte alternatif (EN)', 'oli-theme'),
+            __('Texte alternatif (EN)', 'oli-theme') . $helpBanner,
             fn () => $this->renderTextField(
                 'banner',
                 'altByLanguage[en]',
@@ -184,6 +186,32 @@ final class ThemeSettingsPage
             $page,
             $section,
         );
+    }
+
+    /**
+     * Génère le HTML d'une bulle d'aide « ? » liant vers un guide de l'onglet Aide.
+     *
+     * Utilise les helpers WP s'ils sont chargés, sinon construit une URL relative
+     * (utile pour les tests unitaires hors WordPress).
+     */
+    private static function helpBubble(string $guideId): string
+    {
+        $guideId = preg_replace('/[^a-z0-9_\-]/', '', strtolower($guideId)) ?? '';
+        if (\function_exists('admin_url') && \function_exists('add_query_arg')) {
+            $url = add_query_arg(
+                ['page' => 'oli-theme-settings', 'tab' => 'aide', 'guide' => $guideId],
+                admin_url('themes.php'),
+            );
+        } else {
+            $url = '/wp-admin/themes.php?page=oli-theme-settings&tab=aide&guide=' . $guideId;
+        }
+        $urlAttr = \function_exists('esc_url') ? esc_url($url) : htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $label   = \function_exists('esc_attr__')
+            ? esc_attr__('Voir le guide d\'aide', 'oli-theme')
+            : 'Voir le guide d\'aide';
+
+        return ' <a class="oli-help-bubble" href="' . $urlAttr
+            . '" title="' . $label . '" aria-label="' . $label . '">?</a>';
     }
 
     /**
@@ -218,9 +246,10 @@ final class ThemeSettingsPage
         // l'option `oli_languages`, qui est la source de vérité (cf. sanitize
         // qui la synchronise). La lecture est paresseuse (dans les callbacks de
         // rendu) pour ne pas toucher get_option hors contexte d'affichage.
+        $helpLang = self::helpBubble('traductions');
         add_settings_field(
             'oli_languages_enabled',
-            __('Langues activées', 'oli-theme'),
+            __('Langues activées', 'oli-theme') . $helpLang,
             function () use ($current): void {
                 [$enabled] = $this->liveLanguages($current);
                 $this->renderLanguagesCheckboxes($enabled);
@@ -230,7 +259,7 @@ final class ThemeSettingsPage
         );
         add_settings_field(
             'oli_languages_default',
-            __('Langue par défaut', 'oli-theme'),
+            __('Langue par défaut', 'oli-theme') . $helpLang,
             function () use ($current): void {
                 [$enabled, $default] = $this->liveLanguages($current);
                 $this->renderLanguagesDefault($default, $enabled);
@@ -331,9 +360,10 @@ final class ThemeSettingsPage
 
     private function registerFooterFields(string $page, string $section, SettingsBag $current): void
     {
+        $helpFooter = self::helpBubble('footer');
         add_settings_field(
             'oli_footer_legal_fr',
-            __('Mentions légales (FR)', 'oli-theme'),
+            __('Mentions légales (FR)', 'oli-theme') . $helpFooter,
             fn () => $this->renderTextarea(
                 'footer',
                 'legalByLanguage[fr]',
@@ -345,7 +375,7 @@ final class ThemeSettingsPage
         );
         add_settings_field(
             'oli_footer_legal_en',
-            __('Mentions légales (EN)', 'oli-theme'),
+            __('Mentions légales (EN)', 'oli-theme') . $helpFooter,
             fn () => $this->renderTextarea(
                 'footer',
                 'legalByLanguage[en]',

@@ -91,6 +91,17 @@ final class AssetManager
             $this->version('assets/css/admin.css'),
         );
 
+        // Charge la feuille de style des bulles d'aide et de l'onglet Aide
+        // sur toutes les pages de réglages du thème.
+        if ($hookSuffix === 'appearance_page_oli-theme-settings') {
+            wp_enqueue_style(
+                'oli-theme-admin-help',
+                $this->themeUri . '/assets/css/admin-help.css',
+                ['oli-theme-admin'],
+                $this->version('assets/css/admin-help.css'),
+            );
+        }
+
         // Charge les assets SEO admin uniquement sur les écrans d'édition de contenu et les pages SEO.
         $isEditScreen = \in_array($hookSuffix, ['post.php', 'post-new.php'], true);
         $isSeoPage = str_starts_with($hookSuffix, 'tools_page_oli-seo-');

@@ -24,6 +24,13 @@ final class ThemeSettingsPageTest extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
+        // Stubs WP requis par la bulle d'aide contextuelle injectée dans les titres de champs.
+        Functions\when('admin_url')->alias(static fn (string $p = ''): string => '/wp-admin/' . $p);
+        Functions\when('add_query_arg')->alias(static function (array $a, string $url = ''): string {
+            return $url . '?' . http_build_query($a);
+        });
+        Functions\when('esc_url')->returnArg(1);
+        Functions\when('esc_attr__')->returnArg(1);
     }
 
     protected function tearDown(): void

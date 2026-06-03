@@ -1,0 +1,158 @@
+/* Bulle d'aide contextuelle sur les champs de réglages du thème. */
+.oli-help-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: #ef7c33;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.oli-help-bubble:hover,
+.oli-help-bubble:focus {
+    background: #b85d1f;
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(239, 124, 51, 0.25);
+}
+
+/* Index des guides : grille de cartes cliquables. */
+.oli-help-wrap {
+    max-width: 960px;
+    margin: 0;
+    padding: 0 0 2rem;
+}
+
+.oli-help-intro {
+    font-size: 1.05rem;
+    color: #1d2327;
+    margin: 0 0 1.5rem;
+}
+
+.oli-help-index {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+}
+
+.oli-help-index li {
+    margin: 0;
+}
+
+.oli-help-card {
+    display: block;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #1d2327;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.oli-help-card:hover,
+.oli-help-card:focus {
+    border-color: #ef7c33;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.oli-help-card strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: #2271b1;
+}
+
+.oli-help-card span {
+    font-size: 0.875rem;
+    color: #50575e;
+    line-height: 1.45;
+}
+
+/* Page d'un guide : contenu Markdown rendu. */
+.oli-help-guide .oli-help-back {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+}
+
+.oli-help-content {
+    max-width: 760px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    padding: 1.25rem 1.75rem;
+    line-height: 1.65;
+}
+
+.oli-help-content h1 {
+    margin-top: 0;
+    font-size: 1.75rem;
+    color: #1d2327;
+    border-bottom: 1px solid #dcdcde;
+    padding-bottom: 0.5rem;
+}
+
+.oli-help-content h2 {
+    margin-top: 1.75rem;
+    font-size: 1.3rem;
+    color: #2271b1;
+}
+
+.oli-help-content h3 {
+    margin-top: 1.25rem;
+    font-size: 1.1rem;
+}
+
+.oli-help-content p {
+    margin: 0.75rem 0;
+}
+
+.oli-help-content ul,
+.oli-help-content ol {
+    margin: 0.75rem 0 0.75rem 1.5rem;
+}
+
+.oli-help-content li {
+    margin: 0.25rem 0;
+}
+
+.oli-help-content code {
+    background: #f0f0f1;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.oli-help-content pre {
+    background: #1d2327;
+    color: #f0f0f1;
+    padding: 0.85rem 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.oli-help-content pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+.oli-help-content a {
+    color: #2271b1;
+}
+
+.oli-help-content a:hover {
+    color: #ef7c33;
+}
