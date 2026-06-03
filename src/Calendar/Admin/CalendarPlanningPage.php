@@ -103,38 +103,115 @@ final class CalendarPlanningPage implements AdminTabInterface
         <?php if (empty($slots)): ?>
             <div class="notice notice-warning inline"><p><?php esc_html_e('Aucun créneau généré pour cette semaine. Vérifiez les jours ouvrés et la plage horaire dans Réglages.', 'oli-theme'); ?></p></div>
         <?php else: ?>
-            <table class="widefat oli-planning-grid">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e('Date', 'oli-theme'); ?></th>
-                        <th><?php esc_html_e('Heure', 'oli-theme'); ?></th>
-                        <th><?php esc_html_e('État', 'oli-theme'); ?></th>
-                        <th><?php esc_html_e('Détail', 'oli-theme'); ?></th>
-                        <th><?php esc_html_e('Action', 'oli-theme'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($slots as $slot):
-                    $state  = $this->resolveState($slot, $availabilities, $bookings);
-                    $detail = $this->slotDetail($state, $slot, $availabilities, $bookings, $servicesById);
-                ?>
-                    <tr class="oli-planning-row oli-planning-row--<?php echo esc_attr($state['type']); ?>">
-                        <td><?php echo esc_html($slot['start']->format('D d/m')); ?></td>
-                        <td><?php echo esc_html($slot['start']->format('H:i') . ' → ' . $slot['end']->format('H:i')); ?></td>
-                        <td><?php echo esc_html($state['label']); ?></td>
-                        <td><?php echo $detail; // déjà escapé ?></td>
-                        <td><?php echo $this->renderActions($state, $slot); // déjà escapé ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
+            <?php
+            // Regroupe les créneaux en grille jours × heures.
+            $byKey = [];     // 'YYYY-MM-DD|HH:MM' → slot
+            $daysIndex = []; // 'YYYY-MM-DD' → ['label' => 'lun. 02/06', 'iso' => '...']
+            $hoursIndex = []; // 'HH:MM' → 'HH:MM → HH:MM'
+            foreach ($slots as $slot) {
+                $dayKey  = $slot['start']->format('Y-m-d');
+                $hourKey = $slot['start']->format('H:i');
+                $byKey[$dayKey . '|' . $hourKey] = $slot;
+                if (!isset($daysIndex[$dayKey])) {
+                    $daysIndex[$dayKey] = [
+                        'label' => $this->localizedDayHeader($slot['start']),
+                        'iso'   => $dayKey,
+                    ];
+                }
+                if (!isset($hoursIndex[$hourKey])) {
+                    $hoursIndex[$hourKey] = $slot['start']->format('H:i') . ' – ' . $slot['end']->format('H:i');
+                }
+            }
+            ksort($daysIndex);
+            ksort($hoursIndex);
+            $today = (new DateTimeImmutable('now'))->format('Y-m-d');
+            ?>
+            <div class="oli-planning-legend">
+                <span class="oli-planning-pill oli-planning-pill--available"><?php esc_html_e('Libre', 'oli-theme'); ?></span>
+                <span class="oli-planning-pill oli-planning-pill--blocked"><?php esc_html_e('Bloqué', 'oli-theme'); ?></span>
+                <span class="oli-planning-pill oli-planning-pill--pending"><?php esc_html_e('En attente', 'oli-theme'); ?></span>
+                <span class="oli-planning-pill oli-planning-pill--confirmed"><?php esc_html_e('Confirmée', 'oli-theme'); ?></span>
+            </div>
+            <div class="oli-planning-scroll">
+                <table class="oli-planning-week">
+                    <thead>
+                        <tr>
+                            <th class="oli-planning-week__corner" scope="col"><?php esc_html_e('Heure', 'oli-theme'); ?></th>
+                            <?php foreach ($daysIndex as $day): ?>
+                                <th scope="col" class="oli-planning-week__day-header<?php echo $day['iso'] === $today ? ' is-today' : ''; ?>">
+                                    <?php echo esc_html($day['label']); ?>
+                                </th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($hoursIndex as $hourKey => $hourLabel): ?>
+                        <tr>
+                            <th scope="row" class="oli-planning-week__hour"><?php echo esc_html($hourLabel); ?></th>
+                            <?php foreach ($daysIndex as $day):
+                                $slot = $byKey[$day['iso'] . '|' . $hourKey] ?? null;
+                                if ($slot === null) {
+                                    echo '<td class="oli-planning-week__cell oli-planning-week__cell--empty" aria-hidden="true"></td>';
+                                    continue;
+                                }
+                                $state = $this->resolveState($slot, $availabilities, $bookings);
+                                $detail = $this->slotDetail($state, $slot, $availabilities, $bookings, $servicesById);
+                                $actions = $this->renderActions($state, $slot);
+                            ?>
+                                <td class="oli-planning-week__cell oli-planning-week__cell--<?php echo esc_attr($state['type']); ?>">
+                                    <div class="oli-planning-week__cell-label"><?php echo esc_html($state['label']); ?></div>
+                                    <div class="oli-planning-week__cell-detail"><?php echo $detail; // déjà escapé ?></div>
+                                    <div class="oli-planning-week__cell-actions"><?php echo $actions; // déjà escapé ?></div>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
 
         <style>
-            .oli-planning-grid tr.oli-planning-row--available { background: rgba(46, 204, 113, 0.08); }
-            .oli-planning-grid tr.oli-planning-row--blocked   { background: rgba(0, 0, 0, 0.05); color: #777; }
-            .oli-planning-grid tr.oli-planning-row--pending   { background: rgba(243, 156, 18, 0.12); }
-            .oli-planning-grid tr.oli-planning-row--confirmed { background: rgba(52, 152, 219, 0.12); }
+            .oli-planning-legend { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0 0 0.75rem; }
+            .oli-planning-pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.55rem; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+            .oli-planning-pill::before { content: ''; width: 0.6rem; height: 0.6rem; border-radius: 50%; }
+            .oli-planning-pill--available { background: #e6f7ed; color: #1e7a3f; }
+            .oli-planning-pill--available::before { background: #2ecc71; }
+            .oli-planning-pill--blocked   { background: #ececec; color: #555; }
+            .oli-planning-pill--blocked::before   { background: #888; }
+            .oli-planning-pill--pending   { background: #fdf2dd; color: #8a5b00; }
+            .oli-planning-pill--pending::before   { background: #f39c12; }
+            .oli-planning-pill--confirmed { background: #e0effd; color: #1e5b8d; }
+            .oli-planning-pill--confirmed::before { background: #3498db; }
+
+            .oli-planning-scroll { overflow-x: auto; border: 1px solid #dcdcde; border-radius: 6px; background: #fff; }
+            .oli-planning-week { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+            .oli-planning-week th, .oli-planning-week td { border-bottom: 1px solid #ececec; border-right: 1px solid #ececec; vertical-align: top; }
+            .oli-planning-week th:last-child, .oli-planning-week td:last-child { border-right: 0; }
+            .oli-planning-week tbody tr:last-child th, .oli-planning-week tbody tr:last-child td { border-bottom: 0; }
+
+            .oli-planning-week__corner { width: 92px; min-width: 92px; background: #f6f7f7; text-align: left; padding: 0.5rem 0.6rem; font-size: 0.78rem; color: #50575e; position: sticky; left: 0; top: 0; z-index: 3; }
+            .oli-planning-week__day-header { background: #f6f7f7; padding: 0.5rem 0.6rem; font-size: 0.85rem; color: #1d2327; text-align: center; position: sticky; top: 0; z-index: 2; }
+            .oli-planning-week__day-header.is-today { background: #fef9f1; color: #b85d1f; box-shadow: inset 0 -2px 0 #ef7c33; }
+            .oli-planning-week__hour { width: 92px; min-width: 92px; background: #fafafa; padding: 0.4rem 0.6rem; font-size: 0.78rem; color: #50575e; text-align: left; font-weight: 600; position: sticky; left: 0; z-index: 1; }
+
+            .oli-planning-week__cell { padding: 0.45rem 0.5rem; font-size: 0.82rem; min-height: 70px; transition: background-color 120ms ease, box-shadow 120ms ease; }
+            .oli-planning-week__cell--empty { background: repeating-linear-gradient(45deg, #fff 0 6px, #f8f8f8 6px 12px); }
+            .oli-planning-week__cell--available { background: #ecfaf1; }
+            .oli-planning-week__cell--blocked   { background: #efefef; color: #777; }
+            .oli-planning-week__cell--pending   { background: #fef4e0; }
+            .oli-planning-week__cell--confirmed { background: #e6f0fa; }
+            .oli-planning-week__cell--available:hover,
+            .oli-planning-week__cell--pending:hover,
+            .oli-planning-week__cell--confirmed:hover { box-shadow: inset 0 0 0 2px rgba(0,0,0,0.08); }
+
+            .oli-planning-week__cell-label { font-weight: 600; font-size: 0.78rem; margin-bottom: 0.2rem; }
+            .oli-planning-week__cell-detail { font-size: 0.78rem; line-height: 1.35; color: #50575e; margin-bottom: 0.35rem; word-wrap: break-word; }
+            .oli-planning-week__cell-actions { display: flex; flex-direction: column; gap: 0.2rem; }
+            .oli-planning-week__cell-actions .button,
+            .oli-planning-week__cell-actions form { width: 100%; }
+            .oli-planning-week__cell-actions .button { font-size: 0.72rem; padding: 0.15rem 0.45rem; min-height: 0; line-height: 1.4; }
+            .oli-planning-week__cell-actions form { display: block; margin: 0; }
         </style>
         <?php
     }
@@ -273,6 +350,20 @@ final class CalendarPlanningPage implements AdminTabInterface
         $day = $reference->setTime(0, 0, 0);
         $dow = (int) $day->format('N');
         return $dow > 1 ? $day->modify('-' . ($dow - 1) . ' day') : $day;
+    }
+
+    /**
+     * Libellé de jour de semaine en français (et anglais en repli) sans
+     * dépendre de l'extension intl. Format : « lun. 02/06 ».
+     */
+    private function localizedDayHeader(DateTimeImmutable $day): string
+    {
+        static $labels = [
+            1 => 'lun.', 2 => 'mar.', 3 => 'mer.', 4 => 'jeu.',
+            5 => 'ven.', 6 => 'sam.', 7 => 'dim.',
+        ];
+        $dow = (int) $day->format('N');
+        return ($labels[$dow] ?? $day->format('D')) . ' ' . $day->format('d/m');
     }
 
     // ------------------------------------------------------------------

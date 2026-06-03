@@ -23,17 +23,17 @@ final class SocialAdminPage implements AdminTabInterface
 
     public function id(): string
     {
-        return 'social';
+        return 'comptes';
     }
 
     public function group(): string
     {
-        return 'identite';
+        return 'reseaux';
     }
 
     public function label(): string
     {
-        return __('Réseaux sociaux', 'oli-theme');
+        return __('Comptes', 'oli-theme');
     }
 
     public function capability(): string

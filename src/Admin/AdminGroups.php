@@ -27,8 +27,9 @@ final class AdminGroups
             'apparence'  => __('Apparence', 'oli-theme'),
             'contenu'    => __('Contenu', 'oli-theme'),
             'contact'    => __('Contact', 'oli-theme'),
-            'seo'        => __('SEO', 'oli-theme'),
+            'reseaux'    => __('Réseaux sociaux', 'oli-theme'),
             'calendrier' => __('Calendrier & réservations', 'oli-theme'),
+            'seo'        => __('SEO', 'oli-theme'),
             'aide'       => __('Aide & documentation', 'oli-theme'),
         ];
     }

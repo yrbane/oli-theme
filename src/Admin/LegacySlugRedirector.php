@@ -16,7 +16,7 @@ final class LegacySlugRedirector
 {
     /** @var array<string, array{tab: string, sub: string}> */
     private const MAP = [
-        'oli-social-links'     => ['tab' => 'identite',  'sub' => 'social'],
+        'oli-social-links'     => ['tab' => 'reseaux',   'sub' => 'comptes'],
         'oli-gallery'          => ['tab' => 'contenu',   'sub' => 'galerie'],
         'oli-theme-variations' => ['tab' => 'apparence', 'sub' => 'variations'],
         'oli-seo-dashboard'    => ['tab' => 'seo',       'sub' => 'dashboard'],

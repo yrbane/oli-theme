@@ -31,8 +31,8 @@ final class AdminCompatRedirectTest extends TestCase
         $target = (new LegacySlugRedirector())->targetFor('oli-social-links', []);
         self::assertNotNull($target);
         self::assertStringContainsString('page=oli-theme-settings', $target);
-        self::assertStringContainsString('tab=identite', $target);
-        self::assertStringContainsString('sub=social', $target);
+        self::assertStringContainsString('tab=reseaux', $target);
+        self::assertStringContainsString('sub=comptes', $target);
     }
 
     public function testMapsRedirectsSlugAndKeepsExtraParams(): void
