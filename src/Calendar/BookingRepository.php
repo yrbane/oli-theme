@@ -15,7 +15,7 @@ use OliTheme\Calendar\Cpt\BookingCpt;
  *
  * @since 1.3.0
  */
-final class BookingRepository
+final class BookingRepository implements BookingRepositoryInterface
 {
     private const META_START   = '_oli_book_start';
     private const META_END     = '_oli_book_end';

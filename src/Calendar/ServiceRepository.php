@@ -11,7 +11,7 @@ namespace OliTheme\Calendar;
  *
  * @since 1.3.0
  */
-final class ServiceRepository
+final class ServiceRepository implements ServiceRepositoryInterface
 {
     public const OPTION_KEY = 'oli_services';
 

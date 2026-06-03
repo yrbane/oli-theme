@@ -11,6 +11,8 @@ use OliTheme\Calendar\Admin\CalendarSettingsAdminPage;
 use OliTheme\Calendar\Admin\ServicesAdminPage;
 use OliTheme\Calendar\Cpt\AvailabilityCpt;
 use OliTheme\Calendar\Cpt\BookingCpt;
+use OliTheme\Calendar\Frontend\BookingBlock;
+use OliTheme\Calendar\Rest\CalendarRestController;
 use OliTheme\Container;
 use OliTheme\Core\ModuleInterface;
 
@@ -100,5 +102,68 @@ final class CalendarModule implements ModuleInterface
         add_action('admin_post_' . CalendarPlanningPage::ACTION_UNBLOCK,  [CalendarPlanningPage::class, 'handleUnblock']);
         add_action('admin_post_' . CalendarPlanningPage::ACTION_CONFIRM,  [CalendarPlanningPage::class, 'handleConfirm']);
         add_action('admin_post_' . CalendarPlanningPage::ACTION_CANCEL,   [CalendarPlanningPage::class, 'handleCancel']);
+
+        // Services dérivés (P3 : front + REST).
+        if (!$c->has(SlotAvailabilityResolver::class)) {
+            $c->factory(SlotAvailabilityResolver::class, static fn (): SlotAvailabilityResolver => new SlotAvailabilityResolver());
+        }
+        if (!$c->has(RateLimiter::class)) {
+            $c->factory(RateLimiter::class, static fn (): RateLimiter => new RateLimiter());
+        }
+        if (!$c->has(BookingFormHandler::class)) {
+            $c->factory(
+                BookingFormHandler::class,
+                static fn (Container $cc): BookingFormHandler => new BookingFormHandler(
+                    $cc->get(CalendarSettings::class),
+                    $cc->get(ServiceRepository::class),
+                    $cc->get(AvailabilityRepository::class),
+                    $cc->get(BookingRepository::class),
+                    $cc->get(RateLimiter::class),
+                ),
+            );
+        }
+        if (!$c->has(CalendarRestController::class)) {
+            $c->factory(
+                CalendarRestController::class,
+                static fn (Container $cc): CalendarRestController => new CalendarRestController(
+                    $cc->get(CalendarSettings::class),
+                    $cc->get(SlotGenerator::class),
+                    $cc->get(SlotAvailabilityResolver::class),
+                    $cc->get(ServiceRepository::class),
+                    $cc->get(AvailabilityRepository::class),
+                    $cc->get(BookingRepository::class),
+                    $cc->get(BookingFormHandler::class),
+                ),
+            );
+        }
+        if (!$c->has(BookingBlock::class)) {
+            $c->factory(
+                BookingBlock::class,
+                static fn (Container $cc): BookingBlock => new BookingBlock($cc->get(ServiceRepository::class)),
+            );
+        }
+
+        // REST routes + bloc Gutenberg + shortcode.
+        add_action('rest_api_init', static function () use ($c): void {
+            $rest = $c->get(CalendarRestController::class);
+            \assert($rest instanceof CalendarRestController);
+            $rest->register();
+        });
+        add_action('init', static function () use ($c): void {
+            $block = $c->get(BookingBlock::class);
+            \assert($block instanceof BookingBlock);
+            $block->register();
+        });
+
+        // Enqueue front pour le widget (CSS + JS module).
+        add_action('wp_enqueue_scripts', static function (): void {
+            if (!has_block(BookingBlock::BLOCK_NAME) && !is_admin()) {
+                // On enqueue partout (le widget peut aussi être inséré via shortcode
+                // dans des contenus servis hors page_on_front).
+            }
+            $themeUri = get_template_directory_uri();
+            wp_enqueue_style('oli-booking', $themeUri . '/assets/css/booking.css', [], '1.3.0');
+            wp_enqueue_script_module('oli-booking', $themeUri . '/assets/js/booking-calendar.js', [], '1.3.0');
+        });
     }
 }

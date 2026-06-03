@@ -1,0 +1,114 @@
+/* Widget de réservation Olikalari. */
+.oli-booking {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+.oli-booking__title { margin-top: 0; }
+.oli-booking__service-picker { margin: 1rem 0; }
+.oli-booking__service-select {
+    padding: 0.4rem 0.7rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+}
+.oli-booking__week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+.oli-booking__nav-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.oli-booking__nav-btn:hover { background: var(--color-border); }
+.oli-booking__nav-label { font-weight: 600; }
+
+.oli-booking__slot-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+}
+.oli-booking__slot-btn {
+    width: 100%;
+    padding: 0.6rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.oli-booking__slot-btn:hover,
+.oli-booking__slot-btn:focus-visible {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    outline: none;
+}
+.oli-booking__empty {
+    text-align: center;
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+/* Modale (élément <dialog>). */
+.oli-booking__modal {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 480px;
+    width: 90vw;
+}
+.oli-booking__modal::backdrop { background: rgba(0, 0, 0, 0.4); }
+.oli-booking__modal-title { margin: 0 0 1rem; font-size: 1.2rem; }
+.oli-booking__form label {
+    display: block;
+    margin-bottom: 0.75rem;
+}
+.oli-booking__form label > span {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+}
+.oli-booking__form input,
+.oli-booking__form textarea {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font: inherit;
+}
+.oli-booking__form-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+.oli-booking__form-actions button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    background: #fff;
+}
+.oli-booking__form-actions button[type="submit"] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent);
+}
+.oli-booking__form-error  { color: #c0392b; margin-top: 0.75rem; }
+.oli-booking__form-success { color: #27ae60; margin-top: 0.75rem; }

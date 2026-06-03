@@ -15,7 +15,7 @@ use OliTheme\Calendar\Cpt\AvailabilityCpt;
  *
  * @since 1.3.0
  */
-final class AvailabilityRepository
+final class AvailabilityRepository implements AvailabilityRepositoryInterface
 {
     private const META_START  = '_oli_avail_start';
     private const META_END    = '_oli_avail_end';
