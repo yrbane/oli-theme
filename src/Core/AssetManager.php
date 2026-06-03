@@ -221,35 +221,95 @@ final class AssetManager
     }
 
     /**
-     * Injecte une CSS custom-property `--oli-internal-banner-url` quand
-     * l'admin a choisi une image personnalisée pour le bandeau des pages
-     * internes (option `oli_internal_banner_image`). Les variations qui
-     * supportent cette property l'utilisent à la place de l'image par défaut.
+     * Injecte une CSS custom-property `--oli-internal-banner-url` qui pilote
+     * l'image du bandeau des pages internes.
+     *
+     * Trois sources de priorité décroissante :
+     *  1. `oli_theme_settings[banner][bannerDesktopId]` / `bannerMobileId` :
+     *     médiathèque, deux fichiers (desktop & mobile). Si les deux sont
+     *     renseignés, on émet la version mobile par défaut + un media query
+     *     `(min-width: 768px)` qui bascule sur la version desktop. Si un seul
+     *     est renseigné, il s'applique partout.
+     *  2. `oli_internal_banner_image` (legacy : URL unique, sélecteur
+     *     historique sur l'écran Apparence > Variations CSS).
+     *  3. Image par défaut du thème (codée dans la variation CSS active).
      */
     private function injectInternalBannerOverride(string $handle): void
     {
-        if (!\function_exists('get_option')) {
+        if (!\function_exists('get_option') || !\function_exists('wp_add_inline_style')) {
             return;
         }
 
-        $url = (string) get_option('oli_internal_banner_image', '');
-        if ($url === '') {
-            return;
+        [$desktopUrl, $mobileUrl] = $this->resolveResponsiveBannerUrls();
+
+        $css = $this->buildBannerCss($desktopUrl, $mobileUrl);
+        if ($css === '') {
+            // Fallback legacy : URL unique côté Apparence.
+            $legacy = (string) get_option('oli_internal_banner_image', '');
+            if ($legacy === '') {
+                return;
+            }
+            $legacy = \function_exists('esc_url') ? (string) esc_url($legacy) : $legacy;
+            if ($legacy === '') {
+                return;
+            }
+            $css = \sprintf("html{--oli-internal-banner-url:url('%s');}", $legacy);
         }
 
-        if (\function_exists('esc_url')) {
-            $url = esc_url($url);
-        }
-        if ($url === '') {
-            return;
-        }
-
-        if (!\function_exists('wp_add_inline_style')) {
-            return;
-        }
-
-        $css = \sprintf("html{--oli-internal-banner-url:url('%s');}", $url);
         wp_add_inline_style($handle, $css);
+    }
+
+    /**
+     * Lit les IDs de bannière responsive depuis les Settings et résout les URLs.
+     *
+     * @return array{0:string,1:string} desktopUrl, mobileUrl (vide si absent)
+     */
+    private function resolveResponsiveBannerUrls(): array
+    {
+        $settings = get_option('oli_theme_settings', []);
+        if (!\is_array($settings)) {
+            return ['', ''];
+        }
+        $banner = isset($settings['banner']) && \is_array($settings['banner']) ? $settings['banner'] : [];
+
+        $desktopId = isset($banner['bannerDesktopId']) ? (int) $banner['bannerDesktopId'] : 0;
+        $mobileId  = isset($banner['bannerMobileId']) ? (int) $banner['bannerMobileId'] : 0;
+
+        $resolve = static function (int $id): string {
+            if ($id <= 0 || !\function_exists('wp_get_attachment_image_url')) {
+                return '';
+            }
+            $url = wp_get_attachment_image_url($id, 'full');
+            if (!\is_string($url) || $url === '') {
+                return '';
+            }
+
+            return \function_exists('esc_url') ? (string) esc_url($url) : $url;
+        };
+
+        return [$resolve($desktopId), $resolve($mobileId)];
+    }
+
+    /**
+     * Construit la déclaration CSS de la custom-property selon les URLs disponibles.
+     */
+    private function buildBannerCss(string $desktopUrl, string $mobileUrl): string
+    {
+        if ($desktopUrl === '' && $mobileUrl === '') {
+            return '';
+        }
+
+        $base = $mobileUrl !== '' ? $mobileUrl : $desktopUrl;
+        $css  = \sprintf("html{--oli-internal-banner-url:url('%s');}", $base);
+
+        if ($desktopUrl !== '' && $mobileUrl !== '' && $desktopUrl !== $mobileUrl) {
+            $css .= \sprintf(
+                "@media(min-width:768px){html{--oli-internal-banner-url:url('%s');}}",
+                $desktopUrl,
+            );
+        }
+
+        return $css;
     }
 
     /**
