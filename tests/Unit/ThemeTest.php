@@ -19,6 +19,9 @@ use PHPUnit\Framework\TestCase;
  */
 final class ThemeTest extends TestCase
 {
+    /** Répertoire temporaire utilisé comme racine du thème pendant le test. */
+    private string $themeRoot = '';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,12 +39,20 @@ final class ThemeTest extends TestCase
                 default   => '',
             };
         });
+        // Crée un faux thème avec son dossier `templates/` pour que la validation
+        // de chemin de Lunar (PathValidator) ne lève pas TemplateException.
+        $this->themeRoot = sys_get_temp_dir() . '/oli-theme-test-' . uniqid('', true);
+        @mkdir($this->themeRoot . '/templates', 0o777, true);
     }
 
     protected function tearDown(): void
     {
         Monkey\tearDown();
         Theme::reset();
+        if ($this->themeRoot !== '' && is_dir($this->themeRoot)) {
+            @rmdir($this->themeRoot . '/templates');
+            @rmdir($this->themeRoot);
+        }
         parent::tearDown();
     }
 
@@ -50,7 +61,7 @@ final class ThemeTest extends TestCase
         Functions\when('add_action')->justReturn(true);
         Functions\when('get_option')->justReturn(false);
 
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
         $container = Theme::container();
 
         self::assertInstanceOf(Container::class, $container);
@@ -67,7 +78,7 @@ final class ThemeTest extends TestCase
             ->with('wp_enqueue_scripts', \Mockery::any());
         Functions\when('get_option')->justReturn(false);
 
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
 
         $this->addToAssertionCount(1);
     }
@@ -77,10 +88,10 @@ final class ThemeTest extends TestCase
         Functions\when('add_action')->justReturn(true);
         Functions\when('get_option')->justReturn(false);
 
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
         $first = Theme::container();
 
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
         $second = Theme::container();
 
         self::assertSame($first, $second);
@@ -92,7 +103,7 @@ final class ThemeTest extends TestCase
         Functions\when('add_filter')->justReturn(true);
         Functions\when('get_option')->justReturn(false);
 
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
         $container = Theme::container();
 
         self::assertInstanceOf(\OliTheme\I18n\LanguageRegistry::class, $container->get(\OliTheme\I18n\LanguageRegistry::class));
@@ -113,7 +124,7 @@ final class ThemeTest extends TestCase
         Functions\when('get_option')->justReturn(false);
 
         Theme::reset();
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
         self::assertInstanceOf(Container::class, Theme::container());
     }
 
@@ -267,7 +278,7 @@ final class ThemeTest extends TestCase
         Functions\when('get_option')->justReturn(false);
 
         Theme::reset();
-        Theme::boot(sys_get_temp_dir());
+        Theme::boot($this->themeRoot);
 
         $renderer = Theme::container()->get(ViewRenderer::class);
         self::assertInstanceOf(ViewRenderer::class, $renderer);
