@@ -329,6 +329,10 @@ final class Theme
         (new \OliTheme\MetaSync\MetaSyncModule($container))->register();
         (new \OliTheme\Gabarits\GabaritModule($container))->register();
         (new \OliTheme\MediaFolders\MediaFoldersModule($container))->register();
+
+        // Petites surcharges Gutenberg : alignement « Justifié » ajouté
+        // aux blocs paragraph/heading/list/etc.
+        (new \OliTheme\Editor\JustifyAlignment())->register();
     }
 
     /**

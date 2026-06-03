@@ -142,6 +142,12 @@ h6 { font-size: var(--font-size-h6, 1rem); }
 .site-footer__text { max-width: 60ch; margin: var(--space-3) auto; font-size: var(--font-size-footer, 0.875rem); line-height: 1.5; color: var(--color-muted); }
 .site-footer__text a { color: inherit; text-decoration: underline; }
 
+/* Alignement Justifié pour les blocs Gutenberg (paragraph, heading, list, etc.).
+   La classe `.has-text-align-justify` est générée par WP quand on choisit
+   « Justifié » dans le sélecteur d'alignement de la toolbar (activé par
+   OliTheme\Editor\JustifyAlignment via block_type_metadata). */
+.has-text-align-justify { text-align: justify; hyphens: auto; }
+
 /* Cartes d'article (archive home, archives blog). Vignette à gauche + titre
    moyen + excerpt, cliquable dans son ensemble. */
 .archive__list--cards { display: grid; gap: var(--space-4); list-style: none; padding: 0; margin: 0; }

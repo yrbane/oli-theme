@@ -32,6 +32,9 @@
 
 .editor-styles-wrapper p { color: #111111; }
 
+/* Aperçu de l'alignement Justifié dans l'éditeur (toolbar Gutenberg). */
+.editor-styles-wrapper .has-text-align-justify { text-align: justify; hyphens: auto; }
+
 .editor-styles-wrapper a {
   color: #111111;
   text-decoration: underline;
