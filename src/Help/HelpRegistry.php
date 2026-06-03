@@ -41,7 +41,8 @@ final class HelpRegistry
             new HelpGuide('social', __('Réseaux sociaux', 'oli-theme'), __('Connecter les comptes sociaux affichés en footer.', 'oli-theme'), 'social.md'),
             new HelpGuide('calendrier', __('Calendrier (P1)', 'oli-theme'), __('Réservations cours et massages — fondations livrées, admin à venir.', 'oli-theme'), 'calendrier.md'),
             new HelpGuide('meta-sync', __('Synchro Facebook + Instagram (P1)', 'oli-theme'), __('Publication & propagation des modifications/suppressions — stockage chiffré livré.', 'oli-theme'), 'meta-sync.md'),
-            new HelpGuide('gabarits', __('Gabarits — styles de présentation', 'oli-theme'), __('10 styles interchangeables (parallaxe, brutalist, cinéma, magazine, etc.).', 'oli-theme'), 'gabarits.md'),
+            new HelpGuide('gabarits', __('Gabarits — styles de présentation', 'oli-theme'), __('12 styles interchangeables (parallaxe, brutalist, cinéma, magazine, triptyque, story, etc.) + zones de contenu.', 'oli-theme'), 'gabarits.md'),
+            new HelpGuide('dossiers-media', __('Dossiers médiathèque', 'oli-theme'), __('Organiser les médias en dossiers et sous-dossiers hiérarchiques.', 'oli-theme'), 'dossiers-media.md'),
         ];
     }
 

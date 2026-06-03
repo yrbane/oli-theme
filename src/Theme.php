@@ -328,6 +328,7 @@ final class Theme
         (new \OliTheme\Calendar\CalendarModule($container))->register();
         (new \OliTheme\MetaSync\MetaSyncModule($container))->register();
         (new \OliTheme\Gabarits\GabaritModule($container))->register();
+        (new \OliTheme\MediaFolders\MediaFoldersModule($container))->register();
     }
 
     /**
