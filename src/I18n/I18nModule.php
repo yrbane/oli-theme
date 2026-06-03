@@ -32,6 +32,27 @@ final class I18nModule implements ModuleInterface
             $rules->register();
         });
 
+        // Sur `/<lang>/` sans page cible explicite, injecte le page_id de la
+        // traduction de page_on_front pour que WP route vers `front-page.php`.
+        add_action('parse_request', function ($wp): void {
+            if (!\is_object($wp)) {
+                return;
+            }
+            $c = $this->container;
+            if (!$c->has(LanguageHomeRouter::class)) {
+                $c->factory(
+                    LanguageHomeRouter::class,
+                    static fn (Container $cc): LanguageHomeRouter => new LanguageHomeRouter(
+                        $cc->get(LanguageRegistry::class),
+                        $cc->get(TranslationModelInterface::class),
+                    ),
+                );
+            }
+            $router = $c->get(LanguageHomeRouter::class);
+            \assert($router instanceof LanguageHomeRouter);
+            $router->route($wp);
+        });
+
         add_filter('query_vars', function (array $vars): array {
             $rules = $this->container->get(RewriteRules::class);
             \assert($rules instanceof RewriteRules);
