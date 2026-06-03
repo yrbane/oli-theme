@@ -323,6 +323,7 @@ final class Theme
         (new \OliTheme\Appearance\AppearanceModule($container))->register();
         (new \OliTheme\Gallery\GalleryModule($container))->register();
         (new \OliTheme\Social\SocialModule($container))->register();
+        (new \OliTheme\Help\HelpModule($container))->register();
     }
 
     /**
