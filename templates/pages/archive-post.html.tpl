@@ -6,11 +6,11 @@
 [% block main %]
     [% include 'partials/breadcrumbs.html.tpl' %]
     <section class="archive archive-post">
+        [% if archiveTitle %]
         <header class="archive__header">
-            <h1 class="archive__title">
-                [% if archiveTitle %][[ archiveTitle ]][% else %]Actualités[% endif %]
-            </h1>
+            <h1 class="archive__title">[[ archiveTitle ]]</h1>
         </header>
+        [% endif %]
         [% if posts %]
             <ul class="archive__list archive__list--cards">
                 [% for post in posts %]
