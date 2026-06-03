@@ -12,6 +12,12 @@ use OliTheme\MetaSync\Auth\MetaOAuthController;
 use OliTheme\MetaSync\Auth\MetaOAuthExchange;
 use OliTheme\MetaSync\Auth\TokenRefresher;
 use OliTheme\MetaSync\Http\GraphApiClient;
+use OliTheme\MetaSync\Lifecycle\MetaPostState;
+use OliTheme\MetaSync\Lifecycle\MetaSyncDispatcher;
+use OliTheme\MetaSync\Lifecycle\PayloadExtractor;
+use OliTheme\MetaSync\Publisher\FacebookPublisher;
+use OliTheme\MetaSync\Publisher\InstagramEditStrategy;
+use OliTheme\MetaSync\Publisher\InstagramPublisher;
 
 /**
  * Module Meta Sync — Phase 1 (P1) : fondations DI uniquement.
@@ -103,6 +109,66 @@ final class MetaSyncModule implements ModuleInterface
             $registry = $c->get(AdminTabRegistry::class);
             \assert($registry instanceof AdminTabRegistry);
             $registry->add($c->get(MetaSyncAdminPage::class));
+        });
+
+        // Publishers + dispatcher (P2-P4).
+        if (!$c->has(FacebookPublisher::class)) {
+            $c->factory(
+                FacebookPublisher::class,
+                static fn (Container $cc): FacebookPublisher => new FacebookPublisher(
+                    $cc->get(GraphApiClient::class),
+                    $cc->get(TokenStore::class),
+                ),
+            );
+        }
+        if (!$c->has(InstagramPublisher::class)) {
+            $c->factory(
+                InstagramPublisher::class,
+                static fn (Container $cc): InstagramPublisher => new InstagramPublisher(
+                    $cc->get(GraphApiClient::class),
+                    $cc->get(TokenStore::class),
+                    InstagramEditStrategy::Skip,
+                ),
+            );
+        }
+        if (!$c->has(PayloadExtractor::class)) {
+            $c->factory(PayloadExtractor::class, static fn (): PayloadExtractor => new PayloadExtractor());
+        }
+        if (!$c->has(MetaPostState::class)) {
+            $c->factory(MetaPostState::class, static fn (): MetaPostState => new MetaPostState());
+        }
+        if (!$c->has(MetaSyncDispatcher::class)) {
+            $c->factory(
+                MetaSyncDispatcher::class,
+                static fn (Container $cc): MetaSyncDispatcher => new MetaSyncDispatcher(
+                    $cc->get(PayloadExtractor::class),
+                    $cc->get(MetaPostState::class),
+                    $cc->get(FacebookPublisher::class),
+                    $cc->get(InstagramPublisher::class),
+                ),
+            );
+        }
+
+        // Hooks WP de cycle de vie.
+        add_action('publish_post',  static function (int $id) use ($c): void {
+            $c->get(MetaSyncDispatcher::class)->onPublish($id);
+        });
+        add_action('publish_page',  static function (int $id) use ($c): void {
+            $c->get(MetaSyncDispatcher::class)->onPublish($id);
+        });
+        add_action('publish_oli_event', static function (int $id) use ($c): void {
+            $c->get(MetaSyncDispatcher::class)->onPublish($id);
+        });
+        add_action('post_updated',  static function (int $id, $after = null) use ($c): void {
+            if (\is_object($after) && ($after->post_status ?? '') === 'publish') {
+                $c->get(MetaSyncDispatcher::class)->onUpdate($id);
+            }
+        }, 10, 3);
+        add_action('before_delete_post', static function (int $id) use ($c): void {
+            $c->get(MetaSyncDispatcher::class)->onDelete($id);
+        });
+        add_action('wp_trash_post', static function (int $id) use ($c): void {
+            $c->get(MetaSyncDispatcher::class)->onDelete($id);
         });
 
         // Cron quotidien de refresh du token.
