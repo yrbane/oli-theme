@@ -325,6 +325,7 @@ final class Theme
         (new \OliTheme\Gallery\GalleryModule($container))->register();
         (new \OliTheme\Social\SocialModule($container))->register();
         (new \OliTheme\Help\HelpModule($container))->register();
+        (new \OliTheme\Calendar\CalendarModule($container))->register();
     }
 
     /**

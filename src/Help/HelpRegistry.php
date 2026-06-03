@@ -39,6 +39,7 @@ final class HelpRegistry
             new HelpGuide('seo', __('SEO', 'oli-theme'), __('Tableau de bord SEO, métadonnées, scores.', 'oli-theme'), 'seo.md'),
             new HelpGuide('redirections', __('Redirections', 'oli-theme'), __('Gérer les redirections 301 personnalisées.', 'oli-theme'), 'redirections.md'),
             new HelpGuide('social', __('Réseaux sociaux', 'oli-theme'), __('Connecter les comptes sociaux affichés en footer.', 'oli-theme'), 'social.md'),
+            new HelpGuide('calendrier', __('Calendrier (P1)', 'oli-theme'), __('Réservations cours et massages — fondations livrées, admin à venir.', 'oli-theme'), 'calendrier.md'),
         ];
     }
 
