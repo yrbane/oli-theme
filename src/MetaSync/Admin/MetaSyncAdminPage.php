@@ -32,12 +32,12 @@ final class MetaSyncAdminPage implements AdminTabInterface
 
     public function group(): string
     {
-        return 'contact';
+        return 'reseaux';
     }
 
     public function label(): string
     {
-        return __('Synchro Meta', 'oli-theme');
+        return __('Synchro Facebook / Instagram', 'oli-theme');
     }
 
     public function capability(): string
@@ -50,7 +50,7 @@ final class MetaSyncAdminPage implements AdminTabInterface
         $creds = $this->tokens->load();
         $now   = time();
         $admin = admin_url('admin-post.php');
-        $back  = add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'contact', 'sub' => 'meta-sync'], admin_url('themes.php'));
+        $back  = add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'reseaux', 'sub' => 'meta-sync'], admin_url('themes.php'));
 
         $this->renderHelpBanner();
         $this->renderStatusFlash();

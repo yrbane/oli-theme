@@ -148,7 +148,7 @@ final class MetaOAuthController
     {
         $back = add_query_arg([
             'page' => 'oli-theme-settings',
-            'tab'  => 'contact',
+            'tab'  => 'reseaux',
             'sub'  => 'meta-sync',
             'oli_meta_status' => $status,
             'oli_meta_extra'  => $extra,
