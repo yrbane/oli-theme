@@ -1,0 +1,14 @@
+.gabarit-cinema { background: #0a0a0a; color: #e8e8e8; }
+.gabarit-cinema .site-header, .gabarit-cinema .site-footer { background: #0a0a0a; color: #888; }
+.gabarit-cinema .site-main { max-width: 62ch; padding: 6rem 2rem; }
+.gabarit-cinema h1 { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 3rem; color: #fff; }
+.gabarit-cinema h2 { font-size: 2rem; color: #fff; margin-top: 3rem; }
+.gabarit-cinema p { font-size: 1.05rem; line-height: 1.75; color: #c8c8c8; }
+.gabarit-cinema a { color: #ffb300; }
+.gabarit-cinema .post__content > * { opacity: 0; transform: translateY(20px); animation: gabarit-cinema-fadein 0.8s forwards; }
+.gabarit-cinema .post__content > *:nth-child(1) { animation-delay: 0.1s; }
+.gabarit-cinema .post__content > *:nth-child(2) { animation-delay: 0.2s; }
+.gabarit-cinema .post__content > *:nth-child(3) { animation-delay: 0.3s; }
+.gabarit-cinema .post__content > *:nth-child(n+4) { animation-delay: 0.4s; }
+@keyframes gabarit-cinema-fadein { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gabarit-cinema .post__content > * { animation: none; opacity: 1; transform: none; } }

@@ -1,0 +1,7 @@
+{
+  "name": "Magazine",
+  "description": "Texte en deux colonnes (desktop), lettrine décorative en début d'article, séparateurs élégants.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#1e3a8a"
+}

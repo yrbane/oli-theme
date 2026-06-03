@@ -1,0 +1,7 @@
+{
+  "name": "Newsletter",
+  "description": "Colonne étroite serif centrée, lettrine, signatures décoratives en fin de section. Pensé comme une lettre.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#5d4037"
+}

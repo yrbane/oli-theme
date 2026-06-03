@@ -1,0 +1,26 @@
+.gabarit-editorial .site-main { max-width: 60ch; }
+.gabarit-editorial h1 { font-style: italic; font-weight: 400; }
+.gabarit-editorial blockquote {
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: #7c2d12;
+  border-left: 4px solid #7c2d12;
+  padding-left: 1.25rem;
+  margin: 2.5rem -1.5rem 2.5rem -2rem;
+  position: relative;
+}
+.gabarit-editorial blockquote::before {
+  content: '“';
+  position: absolute;
+  top: -1.2rem; left: -1rem;
+  font-size: 4rem;
+  color: rgba(124, 45, 18, 0.2);
+  font-family: Georgia, serif;
+}
+.gabarit-editorial figure {
+  margin: 2.5rem -3rem;
+  max-width: calc(100% + 6rem);
+}
+@media (max-width: 900px) { .gabarit-editorial figure { margin: 2rem 0; max-width: 100%; } }

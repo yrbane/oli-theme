@@ -1,0 +1,7 @@
+{
+  "name": "Classique",
+  "description": "Mise en page sobre, optimisée pour la lecture longue. Largeur ~65 caractères, titres réguliers, pas d'effets.",
+  "supports": ["post", "page", "oli_event"],
+  "parallax": false,
+  "previewColor": "#1d2327"
+}

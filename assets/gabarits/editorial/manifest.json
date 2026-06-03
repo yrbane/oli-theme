@@ -1,0 +1,7 @@
+{
+  "name": "Éditorial",
+  "description": "Mise en page asymétrique, pull-quotes prononcées via <blockquote>, marges hors-gabarit pour les images.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#7c2d12"
+}

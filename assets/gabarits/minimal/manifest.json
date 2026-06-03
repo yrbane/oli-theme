@@ -1,0 +1,7 @@
+{
+  "name": "Minimal",
+  "description": "Maximum d'espace blanc, typographie fine, contraste réduit. Idéal pour des contenus très épurés.",
+  "supports": ["post", "page", "oli_event"],
+  "parallax": false,
+  "previewColor": "#f5f5f5"
+}

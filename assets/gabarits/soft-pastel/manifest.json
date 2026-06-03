@@ -1,0 +1,7 @@
+{
+  "name": "Soft Pastel",
+  "description": "Coins arrondis, dégradés doux, ombres légères, palette pastel. Atmosphère bienveillante et accueillante.",
+  "supports": ["post", "page", "oli_event"],
+  "parallax": false,
+  "previewColor": "#fde2e4"
+}

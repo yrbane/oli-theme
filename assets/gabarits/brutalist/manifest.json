@@ -1,0 +1,7 @@
+{
+  "name": "Brutalist",
+  "description": "Typographie brute en monospace, bordures noires épaisses, fond crème, angles vifs. Esthétique radicale.",
+  "supports": ["post", "page", "oli_event"],
+  "parallax": false,
+  "previewColor": "#000000"
+}

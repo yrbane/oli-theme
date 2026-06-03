@@ -1,0 +1,7 @@
+{
+  "name": "Zen",
+  "description": "Maximum d'espace, hauteur de ligne généreuse, justification, fond ivoire, transitions lentes.",
+  "supports": ["post", "page", "oli_event"],
+  "parallax": false,
+  "previewColor": "#d4c5a9"
+}

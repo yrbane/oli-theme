@@ -1,0 +1,10 @@
+.gabarit-newsletter { background: #faf6f0; }
+.gabarit-newsletter .site-main { max-width: 56ch; font-family: Georgia, serif; padding: 4rem 2rem; }
+.gabarit-newsletter h1 { font-style: italic; font-weight: 400; color: #5d4037; text-align: center; }
+.gabarit-newsletter h1::after { content: '〜'; display: block; font-size: 1.5rem; color: #a1887f; margin-top: 0.5rem; }
+.gabarit-newsletter .post__content > p:first-of-type::first-letter,
+.gabarit-newsletter .page__content > p:first-of-type::first-letter {
+  font-size: 3.5em; float: left; line-height: 0.85; padding: 0.05em 0.15em 0 0; color: #8d6e63; font-family: Georgia, serif;
+}
+.gabarit-newsletter p { line-height: 1.8; color: #3e2723; }
+.gabarit-newsletter h2::before { content: '— '; color: #a1887f; }

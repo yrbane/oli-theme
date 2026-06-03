@@ -1,0 +1,7 @@
+{
+  "name": "Cinéma",
+  "description": "Mode sombre permanent, blanc sur noir, titres très grands, fade-in au scroll, ambiance cinématographique.",
+  "supports": ["post", "page"],
+  "parallax": false,
+  "previewColor": "#0a0a0a"
+}

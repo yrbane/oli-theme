@@ -1,0 +1,20 @@
+.gabarit-magazine .post__content, .gabarit-magazine .page__content {
+  column-count: 2;
+  column-gap: 2.5rem;
+  column-rule: 1px solid rgba(0,0,0,0.08);
+  text-align: justify;
+  hyphens: auto;
+}
+@media (max-width: 768px) {
+  .gabarit-magazine .post__content, .gabarit-magazine .page__content { column-count: 1; }
+}
+.gabarit-magazine .post__content > p:first-of-type::first-letter,
+.gabarit-magazine .page__content > p:first-of-type::first-letter {
+  font-family: Georgia, serif;
+  font-size: 4.5em;
+  float: left;
+  line-height: 0.85;
+  padding: 0.05em 0.1em 0 0;
+  color: #1e3a8a;
+}
+.gabarit-magazine h2 { border-bottom: 1px solid rgba(30, 58, 138, 0.2); padding-bottom: 0.3rem; }

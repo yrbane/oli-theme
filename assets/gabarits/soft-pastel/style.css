@@ -1,0 +1,6 @@
+.gabarit-soft-pastel { background: linear-gradient(180deg, #fde2e4 0%, #fff5e1 50%, #e2f0cb 100%); background-attachment: fixed; }
+.gabarit-soft-pastel .site-main { max-width: 64ch; background: rgba(255,255,255,0.85); border-radius: 24px; padding: 3rem; backdrop-filter: blur(8px); box-shadow: 0 12px 32px -8px rgba(150, 100, 100, 0.15); margin-top: 2rem; margin-bottom: 2rem; }
+.gabarit-soft-pastel h1 { color: #5b3a4d; font-weight: 700; }
+.gabarit-soft-pastel h2 { color: #8a4e6a; }
+.gabarit-soft-pastel a { color: #c2185b; }
+.gabarit-soft-pastel blockquote { background: rgba(253, 226, 228, 0.5); border-left: 4px solid #f48fb1; border-radius: 0 12px 12px 0; padding: 1rem 1.5rem; }

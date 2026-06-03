@@ -1,0 +1,27 @@
+.gabarit-photo-story .post__hero, .gabarit-photo-story .page__hero, .gabarit-photo-story .page__cover, .gabarit-photo-story .post__featured {
+  position: relative;
+  min-height: 70vh;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0;
+}
+.gabarit-photo-story .post__title, .gabarit-photo-story .page__title {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  margin-top: -10vh;
+  padding: 0 var(--space-4);
+}
+.gabarit-photo-story .post__content, .gabarit-photo-story .page__content {
+  background: #fff;
+  padding: 4rem 2rem;
+  max-width: 68ch;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -20px 40px -10px rgba(0,0,0,0.1);
+}

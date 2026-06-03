@@ -1,0 +1,7 @@
+{
+  "name": "Photo Story",
+  "description": "Image mise en avant en hero plein écran avec effet parallaxe, contenu sur fond clair en dessous. Idéal pour les reportages photo.",
+  "supports": ["post", "page"],
+  "parallax": true,
+  "previewColor": "#0f172a"
+}

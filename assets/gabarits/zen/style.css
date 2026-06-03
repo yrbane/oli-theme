@@ -1,0 +1,9 @@
+.gabarit-zen { background: #faf6ee; }
+.gabarit-zen .site-main { max-width: 60ch; padding: 6rem 3rem; }
+.gabarit-zen h1, .gabarit-zen h2 { font-weight: 300; color: #4a3f33; letter-spacing: 0.01em; }
+.gabarit-zen h1 { font-size: 2.5rem; margin-bottom: 3rem; text-align: center; }
+.gabarit-zen p { line-height: 2; color: #5a4a3a; margin-bottom: 1.75rem; text-align: justify; hyphens: auto; }
+.gabarit-zen a { color: #8a6f47; text-decoration: none; border-bottom: 1px dotted currentColor; transition: color 1.2s ease, border-color 1.2s ease; }
+.gabarit-zen a:hover { color: #4a3f33; border-color: #4a3f33; }
+.gabarit-zen hr { border: 0; text-align: center; margin: 4rem 0; }
+.gabarit-zen hr::after { content: '✺'; color: #8a6f47; font-size: 1.5rem; }
