@@ -10,10 +10,13 @@
 
 ## Si le menu déborde sur deux lignes
 
-Cela arrive quand la **somme des largeurs** des items dépasse la largeur du conteneur :
+Le thème applique trois leviers pour éviter le retour à la ligne :
 
-- **Solution rapide** : raccourcir les titres des items (ex. « À propos » plutôt que « En savoir plus sur l'auteur »).
-- **Solution prévue** : ajustement automatique de la taille de typo + bascule menu burger plus précoce — voir [#10](https://github.com/yrbane/oli-theme/issues/10).
+1. **`white-space: nowrap`** sur chaque item : un libellé multi-mots (ex. « À propos », « Cours particulier ») ne se coupe jamais en plein milieu.
+2. **`clamp()` sur la taille de typo desktop** : entre 992 px et 1440 px+, la police s'adapte fluidement (de 0.78rem à 1rem) pour absorber des libellés un peu plus longs sans casser la ligne.
+3. **Bascule en menu burger à 992 px** (au lieu de 768 px précédemment) : sur tablette paysage et petit laptop, le burger remplace le menu horizontal — finie la zone intermédiaire où des items rentrent péniblement sur 2 lignes.
+
+Si malgré tout 2 lignes apparaissent au-delà de 992 px, c'est que la somme des libellés est vraiment trop longue. Raccourcir un ou deux items (ex. « À propos » plutôt que « En savoir plus sur l'auteur ») règle le problème.
 
 ## Menus par langue
 

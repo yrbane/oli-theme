@@ -326,14 +326,7 @@ header.site-header {
   }
 }
 
-/* En-dessous de 1024px on est de toute façon basculé en menu mobile par
-   la base CSS, mais filet de sécurité pour les variations qui ne le font pas. */
-@media (max-width: 1100px) and (min-width: 768px) {
-  .site-header .nav--desktop .nav__list > .nav__item > .nav__link {
-    padding: 0.3rem 0.25rem;
-    font-size: 0.65rem;
-  }
-}
+/* Note : le menu bascule en burger à 992px (61.99rem) via menu.css. */
 
 /* Switcher de langue */
 .language-switcher,

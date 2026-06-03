@@ -2,7 +2,10 @@
 .nav { display: contents; }
 .nav__list { list-style: none; margin: 0; display: flex; gap: var(--space-4); flex-wrap: wrap; }
 .nav__item { position: relative; }
-.nav__link { display: inline-block; padding: var(--space-2) var(--space-3); text-decoration: none; color: var(--color-text); }
+/* `white-space: nowrap` empêche un item dont le libellé contient un espace
+   (ex. « À propos ») de casser sur 2 lignes ; le wrap reste possible entre
+   items, mais ne coupe plus un item en deux. */
+.nav__link { display: inline-block; padding: var(--space-2) var(--space-3); text-decoration: none; color: var(--color-text); white-space: nowrap; }
 .nav__link:hover, .nav__link:focus-visible { color: var(--color-link-hover); text-decoration: underline; }
 .nav__item--current > .nav__link { font-weight: 700; }
 
@@ -30,7 +33,11 @@
 .nav-toggle { display: none; }
 .nav--mobile { display: none; }
 
-@media (max-width: 47.99rem) {
+/* Bascule en menu burger à 61.99rem (~992 px) plutôt qu'à 47.99rem (~768 px).
+   Sur les tablettes paysage et petits laptops, le nombre d'items et la
+   longueur des libellés provoquaient des retours à la ligne disgracieux ;
+   passer en burger plus tôt évite cette zone intermédiaire. */
+@media (max-width: 61.99rem) {
     .nav--desktop { display: none; }
     .nav-toggle {
         display: inline-flex; align-items: center; gap: var(--space-2);
@@ -56,4 +63,14 @@
 .site-footer__list { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-4); justify-content: center; margin: 0 0 var(--space-3); padding: 0; }
 @media (max-width: 47.99rem) {
     .site-footer__list { flex-direction: column; gap: var(--space-2); }
+}
+
+/* Taille de la typo du menu desktop : clamp fluide entre 992 px et 1440 px+
+   pour absorber les libellés moyens (« À propos », « Disciplines », etc.)
+   sans casser la ligne. */
+@media (min-width: 62rem) {
+    .nav--desktop .nav__link {
+        font-size: clamp(0.78rem, 0.55rem + 0.45vw, 1rem);
+        padding-inline: clamp(0.35rem, 0.2rem + 0.45vw, 0.85rem);
+    }
 }
