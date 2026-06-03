@@ -67,7 +67,7 @@
             </section>
         [% endif %]
 
-        [% if not hasPhotos and not hasFolderGalleries %]
+        [% if hasAnyGallery == false %]
             <p class="gallery__empty">Aucune photo n'a encore été ajoutée. Configurez la galerie depuis Apparence &gt; Galerie ou via Médias &gt; Dossiers.</p>
         [% endif %]
 

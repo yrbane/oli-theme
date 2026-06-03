@@ -104,8 +104,9 @@ final class PageController implements PageRendererInterface
                 $vm['hasPhotos'] = $vm['photos'] !== [];
                 // Galeries par dossier (aggregation de toutes les folders) :
                 // chaque dossier devient une section avec ses photos.
-                $vm['folderGalleries'] = $this->buildFolderGalleries();
+                $vm['folderGalleries']    = $this->buildFolderGalleries();
                 $vm['hasFolderGalleries'] = $vm['folderGalleries'] !== [];
+                $vm['hasAnyGallery']      = $vm['hasPhotos'] || $vm['hasFolderGalleries'];
                 return $this->renderer->render('pages/gallery-photos.html', $vm);
             }
             if (\in_array($entity->slug, self::VIDEO_SLUGS, true)) {
