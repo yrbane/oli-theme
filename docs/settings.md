@@ -1,9 +1,15 @@
 # Settings (Identité du site)
 
+> **Documentation client** : pour la documentation utilisateur (Olivier), voir
+> directement l'onglet **« Aide & documentation »** dans l'admin du thème
+> (`/wp-admin/themes.php?page=oli-theme-settings&tab=aide`). Les 14 guides
+> Markdown sont versionnés Git sous `docs/admin/*.md`. Chaque champ de réglages
+> porte une bulle « ? » qui ouvre directement le guide correspondant.
+
 > **Depuis le Cycle 2 (ADR 0014)**, toute la configuration du thème est rassemblée
 > sur une **page unique à onglets** : **Apparence > Réglages du thème**
 > (`themes.php?page=oli-theme-settings`), groupée par thème (Identité & Marque,
-> Apparence, Contenu, Contact, SEO). Les réglages décrits ici correspondent aux
+> Apparence, Contenu, Contact, SEO, **Aide & documentation**). Les réglages décrits ici correspondent aux
 > sous-onglets des groupes **Identité & Marque**, **Contact** et **SEO**. Les
 > anciennes URLs sont redirigées en 301 vers le bon onglet.
 
