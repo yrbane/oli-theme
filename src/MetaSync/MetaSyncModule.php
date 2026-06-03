@@ -17,6 +17,7 @@ use OliTheme\MetaSync\Lifecycle\MetaPostState;
 use OliTheme\MetaSync\Lifecycle\MetaSyncDispatcher;
 use OliTheme\MetaSync\Lifecycle\MetaSyncReconciler;
 use OliTheme\MetaSync\Lifecycle\PayloadExtractor;
+use OliTheme\MetaSync\Publisher\FacebookEventPublisher;
 use OliTheme\MetaSync\Publisher\FacebookPublisher;
 use OliTheme\MetaSync\Publisher\InstagramEditStrategy;
 use OliTheme\MetaSync\Publisher\InstagramPublisher;
@@ -139,6 +140,15 @@ final class MetaSyncModule implements ModuleInterface
         if (!$c->has(MetaPostState::class)) {
             $c->factory(MetaPostState::class, static fn (): MetaPostState => new MetaPostState());
         }
+        if (!$c->has(FacebookEventPublisher::class)) {
+            $c->factory(
+                FacebookEventPublisher::class,
+                static fn (Container $cc): FacebookEventPublisher => new FacebookEventPublisher(
+                    $cc->get(GraphApiClient::class),
+                    $cc->get(TokenStore::class),
+                ),
+            );
+        }
         if (!$c->has(MetaSyncDispatcher::class)) {
             $c->factory(
                 MetaSyncDispatcher::class,
@@ -147,6 +157,7 @@ final class MetaSyncModule implements ModuleInterface
                     $cc->get(MetaPostState::class),
                     $cc->get(FacebookPublisher::class),
                     $cc->get(InstagramPublisher::class),
+                    $cc->get(FacebookEventPublisher::class),
                 ),
             );
         }
