@@ -26,7 +26,17 @@ final class MetaSyncDispatcher
         private readonly MetaPostState $state,
         private readonly PublisherInterface $facebook,
         private readonly PublisherInterface $instagram,
+        private readonly ?PublisherInterface $facebookEvent = null,
     ) {
+    }
+
+    private function fbPublisher(int $postId): PublisherInterface
+    {
+        if ($this->facebookEvent === null) {
+            return $this->facebook;
+        }
+        $postType = \function_exists('get_post_type') ? (string) get_post_type($postId) : '';
+        return $postType === 'oli_event' ? $this->facebookEvent : $this->facebook;
     }
 
     public function onPublish(int $postId): void
@@ -86,7 +96,8 @@ final class MetaSyncDispatcher
         $fbId = $this->state->fbPostId($postId);
         $igId = $this->state->igMediaId($postId);
         if ($fbId !== '') {
-            $result = $this->facebook->delete($fbId);
+            $publisher = $this->fbPublisher($postId);
+            $result = $publisher->delete($fbId);
             if ($result instanceof GraphApiError) {
                 $this->state->recordError($postId, '[FB delete] ' . $result->message);
             } else {
@@ -105,7 +116,7 @@ final class MetaSyncDispatcher
 
     private function doCreate(PublishPayload $payload, string $platform): void
     {
-        $publisher = $platform === 'facebook' ? $this->facebook : $this->instagram;
+        $publisher = $platform === 'facebook' ? $this->fbPublisher($payload->postId) : $this->instagram;
         $result    = $publisher->create($payload);
         if ($result instanceof GraphApiError) {
             $this->state->recordError($payload->postId, sprintf('[%s create] %s', strtoupper($platform), $result->message));
@@ -116,7 +127,7 @@ final class MetaSyncDispatcher
 
     private function doEdit(PublishPayload $payload, string $platform, string $externalId): void
     {
-        $publisher = $platform === 'facebook' ? $this->facebook : $this->instagram;
+        $publisher = $platform === 'facebook' ? $this->fbPublisher($payload->postId) : $this->instagram;
         $result    = $publisher->edit($externalId, $payload);
         if ($result instanceof GraphApiError) {
             $this->state->recordError($payload->postId, sprintf('[%s edit] %s', strtoupper($platform), $result->message));
