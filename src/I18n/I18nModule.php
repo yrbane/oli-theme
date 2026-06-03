@@ -60,6 +60,41 @@ final class I18nModule implements ModuleInterface
             return $rules->addQueryVar($vars);
         });
 
+        // LanguagePathRouter : strip /<lang>/ de REQUEST_URI avant que WP ne
+        // résolve, puis réinjecte oli_lang dans les query_vars résolus. Sans
+        // ça, /en/2026/06/03/slug/ tomberait sur l'ancienne capture aveugle
+        // `^en/(.+)/?$ → pagename=…` et 404ait.
+        if (!$this->container->has(LanguagePathRouter::class)) {
+            $this->container->factory(
+                LanguagePathRouter::class,
+                static fn (\OliTheme\Container $cc): LanguagePathRouter => new LanguagePathRouter(
+                    $cc->get(LanguageRegistry::class),
+                ),
+            );
+        }
+        add_filter('do_parse_request', function ($continue) {
+            $router = $this->container->get(LanguagePathRouter::class);
+            \assert($router instanceof LanguagePathRouter);
+
+            return $router->interceptParseRequest((bool) $continue);
+        }, 0);
+        add_filter('request', function ($vars) {
+            if (!\is_array($vars)) {
+                return $vars;
+            }
+            $router = $this->container->get(LanguagePathRouter::class);
+            \assert($router instanceof LanguagePathRouter);
+
+            return $router->injectLanguageQueryVar($vars);
+        }, 1);
+        // Restaure REQUEST_URI une fois la résolution WP terminée, pour que
+        // LanguageResolver (qui lit l'URI brute) voie encore le préfixe /<lang>/.
+        add_action('parse_request', function () {
+            $router = $this->container->get(LanguagePathRouter::class);
+            \assert($router instanceof LanguagePathRouter);
+            $router->restoreRequestUri();
+        }, 999);
+
         // Filtre rewrite_rules_array : empêche les « verbose page rules » que
         // WordPress génère automatiquement à partir des slugs de pages (ex.
         // page slugée « en » → `^en/?$ → pagename=en`) d'écraser nos rules de

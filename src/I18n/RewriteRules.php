@@ -7,12 +7,19 @@ namespace OliTheme\I18n;
 /**
  * Rewrite rules custom pour préfixer les URLs par la langue.
  *
- * Ajoute une règle "top" par langue activée :
- *   ^fr/?$         -> index.php?oli_lang=fr
- *   ^fr/(.+)/?$    -> index.php?oli_lang=fr&pagename=$matches[1]
+ * Ajoute une règle "top" par langue NON-défaut activée :
+ *   ^en/?$         -> index.php?oli_lang=en   (racine de la langue)
  *
- * Et déclare la query var 'oli_lang' afin que WordPress la conserve à travers
- * la résolution de la requête.
+ * La résolution des sous-paths `/en/<rest>` (permalinks date, taxonomies,
+ * pages, etc.) est faite par {@see LanguagePathRouter} qui retire le
+ * préfixe `/en/` de REQUEST_URI avant que WP_Rewrite ne matche, puis
+ * réinjecte `oli_lang=en` dans les query_vars. Cela évite de devoir
+ * dupliquer chaque rule WP standard (post-date, archives, etc.) par
+ * langue et empêche la capture aveugle `^en/(.+)/?$ → pagename=$1` qui
+ * 404ait sur tout permalink ≠ page.
+ *
+ * Déclare aussi la query var 'oli_lang' afin que WordPress la conserve à
+ * travers la résolution de la requête.
  *
  * @package OliTheme\I18n
  *
@@ -30,18 +37,19 @@ final class RewriteRules
      */
     public function register(): void
     {
+        $default = $this->registry->default();
         foreach ($this->registry->all() as $language) {
+            if ($language->equals($default)) {
+                continue;
+            }
             $code = preg_quote($language->code, '~');
 
+            // Seule la racine de langue est explicitement gérée. Les sous-paths
+            // sont strippés en amont par LanguagePathRouter, puis WP_Rewrite
+            // applique ses rules standard sur le path résultant.
             add_rewrite_rule(
                 '^' . $code . '/?$',
                 'index.php?oli_lang=' . $language->code,
-                'top',
-            );
-
-            add_rewrite_rule(
-                '^' . $code . '/(.+)/?$',
-                'index.php?oli_lang=' . $language->code . '&pagename=$matches[1]',
                 'top',
             );
         }
@@ -85,8 +93,7 @@ final class RewriteRules
             }
 
             $code = $language->code;
-            $ours['^' . $code . '/?$']       = 'index.php?oli_lang=' . $code;
-            $ours['^' . $code . '/(.+)/?$']  = 'index.php?oli_lang=' . $code . '&pagename=$matches[1]';
+            $ours['^' . $code . '/?$'] = 'index.php?oli_lang=' . $code;
         }
 
         // Supprime les rules existantes ayant les MÊMES patterns que les nôtres
@@ -95,6 +102,16 @@ final class RewriteRules
         // l'emporte.
         foreach (array_keys($ours) as $pattern) {
             unset($rules[$pattern]);
+        }
+
+        // Purge aussi toute rule héritée `^<code>/(.+)/?$ → pagename=…` (ancienne
+        // capture aveugle qui 404ait sur les permalinks date). C'est désormais
+        // {@see LanguagePathRouter} qui gère ces sous-paths.
+        foreach ($this->registry->all() as $language) {
+            if ($language->equals($default)) {
+                continue;
+            }
+            unset($rules['^' . $language->code . '/(.+)/?$']);
         }
 
         return $ours + $rules;

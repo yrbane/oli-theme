@@ -39,10 +39,11 @@ final class RewriteRulesTest extends TestCase
         self::assertContains('existing', $rules->addQueryVar(['existing']));
     }
 
-    public function test_it_should_add_top_rewrite_rule_for_each_language(): void
+    public function test_it_should_add_one_top_rule_per_non_default_language(): void
     {
-        Functions\expect('add_rewrite_rule')
-            ->atLeast()->times(4);
+        // 4 langues activées : 3 non-défaut (en/it/es) → 3 rules ^<code>/?$.
+        // Plus de rule ^<code>/(.+)/?$ : remplacée par LanguagePathRouter.
+        Functions\expect('add_rewrite_rule')->times(3);
 
         (new RewriteRules(new LanguageRegistry()))->register();
 
@@ -62,15 +63,16 @@ final class RewriteRulesTest extends TestCase
 
         $wpRules = [
             '^en/?$'             => 'index.php?pagename=en',          // verbose page rule conflictuelle
-            '^en/(.+)/?$'        => 'index.php?pagename=en/$matches[1]', // idem (descendants)
+            '^en/(.+)/?$'        => 'index.php?pagename=en/$matches[1]', // ancienne capture aveugle (purgée)
             '^some-other/?$'     => 'index.php?pagename=some-other',  // doit être préservée
         ];
 
         $filtered = $rules->filter($wpRules);
 
-        // Nos rules ont remplacé les verbose-page-rules pour ^en/?$ et ^en/(.+)/?$.
+        // Notre rule racine remplace la verbose-page-rule.
         self::assertSame('index.php?oli_lang=en', $filtered['^en/?$']);
-        self::assertSame('index.php?oli_lang=en&pagename=$matches[1]', $filtered['^en/(.+)/?$']);
+        // L'ancienne rule de capture est purgée : LanguagePathRouter prend le relais.
+        self::assertArrayNotHasKey('^en/(.+)/?$', $filtered);
         // Les rules non-langue sont préservées.
         self::assertSame('index.php?pagename=some-other', $filtered['^some-other/?$']);
     }
