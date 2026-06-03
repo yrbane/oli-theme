@@ -19,7 +19,7 @@ use OliTheme\Seo\SeoControllerInterface;
  *
  * @since 1.0.0
  */
-final class PageController
+final class PageController implements PageRendererInterface
 {
     /** Slugs des pages traitées comme galerie photos. */
     private const PHOTO_SLUGS = ['photos', 'photos-en'];
@@ -46,7 +46,15 @@ final class PageController
      */
     public function renderSingular(): string
     {
-        $id = (int) get_queried_object_id();
+        return $this->renderById((int) get_queried_object_id());
+    }
+
+    /**
+     * Rend une page par son id WP. Utilisé notamment par le front-page
+     * controller pour rendre la traduction de `page_on_front`.
+     */
+    public function renderById(int $id): string
+    {
         $entity = $id > 0 ? $this->posts->find($id) : null;
 
         if (! $entity instanceof PostEntity) {

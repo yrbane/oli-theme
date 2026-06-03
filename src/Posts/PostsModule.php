@@ -86,6 +86,19 @@ final class PostsModule implements ModuleInterface
             );
         }
 
+        if (! $container->has(FrontPageController::class)) {
+            $container->factory(
+                FrontPageController::class,
+                static fn (Container $c): FrontPageController => new FrontPageController(
+                    $c->get(PageController::class),
+                    $c->get(PostController::class),
+                    $c->get(\OliTheme\I18n\TranslationModelInterface::class),
+                    $c->get(LanguageResolverInterface::class),
+                    $c->get(LanguageRegistryInterface::class)->default()->code,
+                ),
+            );
+        }
+
         if (! $container->has(NotFoundController::class)) {
             $container->factory(
                 NotFoundController::class,

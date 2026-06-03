@@ -3,20 +3,20 @@
 /**
  * Pontage WordPress → page d'accueil.
  *
- * Si un article static est défini comme page d'accueil, on rend la page
- * comme une page WP standard. Sinon, on affiche l'archive des actualités.
+ * Délègue à {@see FrontPageController} qui sait choisir la bonne page selon
+ * la langue courante : si `page_on_front` a une traduction pour la langue
+ * active, c'est elle qui est rendue (corrige le bug où /en/ rendait toujours
+ * la page d'accueil FR).
+ *
+ * Si `page_on_front` n'est pas défini, l'archive des articles filtrée par
+ * langue est rendue à la place.
  *
  * @package OliTheme
  */
 
 declare(strict_types=1);
 
-use OliTheme\Posts\PageController;
-use OliTheme\Posts\PostController;
+use OliTheme\Posts\FrontPageController;
 use OliTheme\Theme;
 
-if (\get_queried_object_id() > 0) {
-    echo Theme::container()->get(PageController::class)->renderSingular();
-} else {
-    echo Theme::container()->get(PostController::class)->renderArchive();
-}
+echo Theme::container()->get(FrontPageController::class)->render();
