@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OliTheme\Admin;
 
 /**
- * Définition figée des 5 groupes principaux (onglets de premier niveau).
+ * Définition figée des 6 groupes principaux (onglets de premier niveau).
  *
  * @package OliTheme\Admin
  *
@@ -28,6 +28,7 @@ final class AdminGroups
             'contenu'   => __('Contenu', 'oli-theme'),
             'contact'   => __('Contact', 'oli-theme'),
             'seo'       => __('SEO', 'oli-theme'),
+            'aide'      => __('Aide & documentation', 'oli-theme'),
         ];
     }
 
