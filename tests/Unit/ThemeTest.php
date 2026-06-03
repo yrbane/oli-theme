@@ -48,6 +48,7 @@ final class ThemeTest extends TestCase
     public function test_it_should_register_core_services_in_container(): void
     {
         Functions\when('add_action')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
 
         Theme::boot(sys_get_temp_dir());
         $container = Theme::container();
@@ -64,6 +65,7 @@ final class ThemeTest extends TestCase
         Functions\expect('add_action')
             ->atLeast()->once()
             ->with('wp_enqueue_scripts', \Mockery::any());
+        Functions\when('get_option')->justReturn(false);
 
         Theme::boot(sys_get_temp_dir());
 
@@ -73,6 +75,7 @@ final class ThemeTest extends TestCase
     public function test_it_should_be_idempotent_on_boot(): void
     {
         Functions\when('add_action')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
 
         Theme::boot(sys_get_temp_dir());
         $first = Theme::container();
@@ -107,6 +110,7 @@ final class ThemeTest extends TestCase
     public function testContainerReturnsBootedContainer(): void
     {
         Functions\when('add_action')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
 
         Theme::reset();
         Theme::boot(sys_get_temp_dir());

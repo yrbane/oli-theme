@@ -23,6 +23,12 @@ final class LanguageSwitcherControllerTest extends TestCase
         Monkey\setUp();
         Functions\when('get_option')->justReturn(false);
         Functions\when('home_url')->alias(static fn (string $path = '') => 'https://example.test' . $path);
+        // Brain Monkey + Patchwork laissent `function_exists` à true entre tests :
+        // si une suite précédente a stubé get_template_directory, function_exists
+        // renvoie true ici et flagUrlFor() tente l'appel sans stub actif.
+        // On stub avec une chaîne vide → is_file('') renvoie false → null retourné.
+        Functions\when('get_template_directory')->justReturn('');
+        Functions\when('get_template_directory_uri')->justReturn('');
     }
 
     protected function tearDown(): void

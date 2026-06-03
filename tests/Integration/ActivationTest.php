@@ -34,6 +34,7 @@ final class ActivationTest extends TestCase
             };
         });
         Functions\when('add_action')->justReturn(true);
+        Functions\when('get_option')->justReturn(false);
     }
 
     protected function tearDown(): void
