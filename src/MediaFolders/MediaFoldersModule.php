@@ -31,15 +31,23 @@ final class MediaFoldersModule implements ModuleInterface
         if (!$c->has(MediaFoldersAdmin::class)) {
             $c->factory(MediaFoldersAdmin::class, static fn (): MediaFoldersAdmin => new MediaFoldersAdmin());
         }
+        if (!$c->has(MediaFoldersBulkActions::class)) {
+            $c->factory(MediaFoldersBulkActions::class, static fn (): MediaFoldersBulkActions => new MediaFoldersBulkActions());
+        }
+        if (!$c->has(DefaultUploadFolder::class)) {
+            $c->factory(DefaultUploadFolder::class, static fn (): DefaultUploadFolder => new DefaultUploadFolder());
+        }
 
         // Enregistrement de la taxonomie sur init (avant le rendu admin).
         add_action('init', static function () use ($c): void {
             $c->get(MediaFoldersTaxonomy::class)->register();
         }, 0);
 
-        // UI admin (filtre dropdown + query) — uniquement côté admin.
+        // UI admin (filtre + bulk actions + dossier d'upload par défaut).
         if (\function_exists('is_admin') && is_admin()) {
             $c->get(MediaFoldersAdmin::class)->register();
+            $c->get(MediaFoldersBulkActions::class)->register();
+            $c->get(DefaultUploadFolder::class)->register();
         }
 
         // Services frontend (shortcode + bloc Gutenberg).

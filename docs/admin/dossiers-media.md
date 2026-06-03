@@ -13,19 +13,36 @@ Les dossiers sont éditables / supprimables comme n'importe quelle catégorie Wo
 
 ## Ranger un média dans un dossier
 
-### Une à la fois
+### Une seule image (et multi-dossiers)
 
 1. Ouvrir un média (`Admin → Médias → Bibliothèque → cliquer sur une image`).
-2. Dans la colonne de droite, encadré **Dossiers** : cocher les dossiers.
+2. Dans la colonne de droite, encadré **Dossiers** : **cocher un OU plusieurs dossiers** (un même média peut appartenir à plusieurs dossiers en même temps).
 3. Sauvegarder.
 
-### En masse
+### Bouger d'un dossier à un autre
 
-`Admin → Médias → Bibliothèque` (vue **Liste**, pas Mosaïque) :
-1. Cocher plusieurs médias.
-2. En haut, sélecteur **Actions groupées → Modifier** → cliquer **Appliquer**.
-3. Dans le bloc qui apparaît, choisir les dossiers à appliquer.
-4. **Mettre à jour**.
+Même endroit qu'au-dessus : décocher l'ancien dossier, cocher le nouveau, sauvegarder. (Ou utiliser **« Déplacer vers le dossier… »** en bulk pour les actions de masse — voir ci-dessous.)
+
+### Plusieurs images en une fois (bulk actions)
+
+`Admin → Médias → Bibliothèque` (vue **Liste** — bascule en haut à gauche) :
+
+1. **Cocher** les médias à traiter (case à gauche de chaque ligne, ou « Tout sélectionner »).
+2. Choisir l'action dans le sélecteur **Actions groupées** :
+   - **Déplacer vers le dossier…** — *remplace* les dossiers actuels par celui choisi.
+   - **Ajouter au dossier…** — *ajoute* le dossier choisi sans toucher aux dossiers existants (parfait pour mettre une image dans plusieurs dossiers).
+   - **Retirer du dossier…** — enlève le dossier choisi de chaque média sélectionné, sans toucher aux autres.
+3. **Appliquer** → page de confirmation avec dropdown du dossier cible.
+4. **Appliquer** → notice verte confirme combien de médias ont été traités.
+
+### Upload : assigner automatiquement les nouveaux fichiers
+
+Au-dessus de la médiathèque, une notice bleue **« Dossier par défaut pour mes uploads »** propose un sélecteur. Une fois un dossier choisi :
+- **Tous tes uploads à partir de maintenant** (drag & drop, bouton Ajouter, depuis l'éditeur, depuis la modale wp.media…) sont **automatiquement** rangés dans ce dossier.
+- C'est par utilisateur (chaque admin a son propre défaut).
+- Pour désactiver : choisir **« — Aucun (pas d'assignation auto) — »** et cliquer **Définir**.
+
+→ Pratique pour un import en masse : crée le dossier, définis-le par défaut, glisse tes 200 photos dans la médiathèque, tout est rangé automatiquement.
 
 ## Filtrer la médiathèque par dossier
 
