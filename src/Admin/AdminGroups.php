@@ -23,12 +23,13 @@ final class AdminGroups
     public static function all(): array
     {
         return [
-            'identite'  => __('Identité & Marque', 'oli-theme'),
-            'apparence' => __('Apparence', 'oli-theme'),
-            'contenu'   => __('Contenu', 'oli-theme'),
-            'contact'   => __('Contact', 'oli-theme'),
-            'seo'       => __('SEO', 'oli-theme'),
-            'aide'      => __('Aide & documentation', 'oli-theme'),
+            'identite'   => __('Identité & Marque', 'oli-theme'),
+            'apparence'  => __('Apparence', 'oli-theme'),
+            'contenu'    => __('Contenu', 'oli-theme'),
+            'contact'    => __('Contact', 'oli-theme'),
+            'seo'        => __('SEO', 'oli-theme'),
+            'calendrier' => __('Calendrier & réservations', 'oli-theme'),
+            'aide'       => __('Aide & documentation', 'oli-theme'),
         ];
     }
 

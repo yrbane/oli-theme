@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace OliTheme\Calendar;
 
+use OliTheme\Admin\AdminTabRegistry;
+use OliTheme\Calendar\Admin\BookingsListAdminPage;
+use OliTheme\Calendar\Admin\CalendarPlanningPage;
+use OliTheme\Calendar\Admin\CalendarSettingsAdminPage;
+use OliTheme\Calendar\Admin\ServicesAdminPage;
 use OliTheme\Calendar\Cpt\AvailabilityCpt;
 use OliTheme\Calendar\Cpt\BookingCpt;
 use OliTheme\Container;
@@ -66,5 +71,34 @@ final class CalendarModule implements ModuleInterface
             (new AvailabilityCpt())->register();
             (new BookingCpt())->register();
         }, 0);
+
+        // Sous-onglets admin : Réglages, Services, Planning, Réservations.
+        add_action('admin_menu', static function () use ($c): void {
+            $registry = $c->get(AdminTabRegistry::class);
+            \assert($registry instanceof AdminTabRegistry);
+
+            $registry->add(new CalendarPlanningPage(
+                $c->get(CalendarSettings::class),
+                $c->get(SlotGenerator::class),
+                $c->get(AvailabilityRepository::class),
+                $c->get(BookingRepository::class),
+                $c->get(ServiceRepository::class),
+            ));
+            $registry->add(new ServicesAdminPage($c->get(ServiceRepository::class)));
+            $registry->add(new BookingsListAdminPage(
+                $c->get(BookingRepository::class),
+                $c->get(ServiceRepository::class),
+            ));
+            $registry->add(new CalendarSettingsAdminPage());
+        }, 10);
+
+        // Handlers admin-post pour les actions des formulaires.
+        add_action('admin_post_' . CalendarSettingsAdminPage::ACTION,     [CalendarSettingsAdminPage::class, 'handleSave']);
+        add_action('admin_post_' . ServicesAdminPage::ACTION_SAVE,        [ServicesAdminPage::class, 'handleSave']);
+        add_action('admin_post_' . ServicesAdminPage::ACTION_DELETE,      [ServicesAdminPage::class, 'handleDelete']);
+        add_action('admin_post_' . CalendarPlanningPage::ACTION_BLOCK,    [CalendarPlanningPage::class, 'handleBlock']);
+        add_action('admin_post_' . CalendarPlanningPage::ACTION_UNBLOCK,  [CalendarPlanningPage::class, 'handleUnblock']);
+        add_action('admin_post_' . CalendarPlanningPage::ACTION_CONFIRM,  [CalendarPlanningPage::class, 'handleConfirm']);
+        add_action('admin_post_' . CalendarPlanningPage::ACTION_CANCEL,   [CalendarPlanningPage::class, 'handleCancel']);
     }
 }
