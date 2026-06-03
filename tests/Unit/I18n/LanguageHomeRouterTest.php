@@ -17,7 +17,7 @@ final class LanguageHomeRouterTest extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
         Functions\when('__')->returnArg(1);
     }
 

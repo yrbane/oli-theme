@@ -55,7 +55,7 @@ final class SettingsResolutionTest extends TestCase
         Functions\when('get_bloginfo')->justReturn('Oli');
         Functions\when('get_template_directory_uri')->justReturn('https://example.com/theme');
         Functions\when('get_template_directory')->justReturn($themePath);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
 

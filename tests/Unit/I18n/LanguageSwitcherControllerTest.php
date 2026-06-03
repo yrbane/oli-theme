@@ -21,7 +21,7 @@ final class LanguageSwitcherControllerTest extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
         Functions\when('home_url')->alias(static fn (string $path = '') => 'https://example.test' . $path);
         // Brain Monkey + Patchwork laissent `function_exists` à true entre tests :
         // si une suite précédente a stubé get_template_directory, function_exists
@@ -44,6 +44,41 @@ final class LanguageSwitcherControllerTest extends TestCase
 
         self::assertCount(4, $vm->items);
         self::assertSame('fr', $vm->current->code);
+    }
+
+    /**
+     * Invariant : le switcher ne doit afficher QUE les langues cochées dans
+     * Réglages → Identité → Langues (option `oli_languages.enabled`).
+     */
+    public function test_view_model_only_shows_enabled_languages(): void
+    {
+        // Seules FR et EN cochées : IT et ES (du catalogue) ne doivent PAS apparaître.
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages'
+            ? ['enabled' => ['fr', 'en'], 'default' => 'fr']
+            : $d);
+
+        $controller = $this->buildController('fr');
+        $vm = $controller->build(0);
+
+        self::assertCount(2, $vm->items);
+        $codes = array_map(static fn ($i) => $i->code, $vm->items);
+        self::assertSame(['fr', 'en'], $codes);
+    }
+
+    /**
+     * Fallback : si l'option `oli_languages` n'a jamais été enregistrée
+     * (premier déploiement), le site est monolingue FR — un seul item, donc
+     * le sélecteur est masqué côté template.
+     */
+    public function test_view_model_is_empty_when_option_absent_falls_back_to_french_only(): void
+    {
+        Functions\when('get_option')->justReturn(false);
+
+        $controller = $this->buildController('fr');
+        $vm = $controller->build(0);
+
+        // Une seule langue effective → switcher vide (template masque).
+        self::assertSame([], $vm->items);
     }
 
     public function test_view_model_is_empty_when_single_language_enabled(): void
@@ -219,6 +254,7 @@ final class LanguageSwitcherControllerTest extends TestCase
             return match ($key) {
                 'show_on_front' => 'page',
                 'page_on_front' => 76,
+                'oli_languages' => ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'],
                 default => $default,
             };
         });

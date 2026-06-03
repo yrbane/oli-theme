@@ -93,7 +93,11 @@ final class LanguageRegistry implements LanguageRegistryInterface
         $stored = get_option(self::OPTION_KEY, false);
 
         if (!\is_array($stored)) {
-            return [$this->catalogue, $this->catalogue['fr']];
+            // Option absente (premier déploiement ou reset) : site monolingue
+            // FR par défaut. On ne renvoie PAS tout le catalogue, sinon le
+            // switcher afficherait 4 drapeaux avant qu'aucune langue n'ait
+            // été cochée dans Réglages → Identité → Langues.
+            return [['fr' => $this->catalogue['fr']], $this->catalogue['fr']];
         }
 
         $enabledCodes = \is_array($stored['enabled'] ?? null) ? $stored['enabled'] : [];

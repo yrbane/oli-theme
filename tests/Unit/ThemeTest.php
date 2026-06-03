@@ -59,7 +59,7 @@ final class ThemeTest extends TestCase
     public function test_it_should_register_core_services_in_container(): void
     {
         Functions\when('add_action')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::boot($this->themeRoot);
         $container = Theme::container();
@@ -76,7 +76,7 @@ final class ThemeTest extends TestCase
         Functions\expect('add_action')
             ->atLeast()->once()
             ->with('wp_enqueue_scripts', \Mockery::any());
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::boot($this->themeRoot);
 
@@ -86,7 +86,7 @@ final class ThemeTest extends TestCase
     public function test_it_should_be_idempotent_on_boot(): void
     {
         Functions\when('add_action')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::boot($this->themeRoot);
         $first = Theme::container();
@@ -101,7 +101,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::boot($this->themeRoot);
         $container = Theme::container();
@@ -121,7 +121,7 @@ final class ThemeTest extends TestCase
     public function testContainerReturnsBootedContainer(): void
     {
         Functions\when('add_action')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::reset();
         Theme::boot($this->themeRoot);
@@ -132,7 +132,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -149,7 +149,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -164,7 +164,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -177,7 +177,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -192,7 +192,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -205,7 +205,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         \OliTheme\Theme::reset();
         \OliTheme\Theme::boot(__DIR__);
@@ -257,7 +257,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         $GLOBALS['wpdb'] = new \stdClass();
 
@@ -275,7 +275,7 @@ final class ThemeTest extends TestCase
     {
         Functions\when('add_action')->justReturn(true);
         Functions\when('add_filter')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
 
         Theme::reset();
         Theme::boot($this->themeRoot);

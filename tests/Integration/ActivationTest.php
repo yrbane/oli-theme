@@ -34,7 +34,7 @@ final class ActivationTest extends TestCase
             };
         });
         Functions\when('add_action')->justReturn(true);
-        Functions\when('get_option')->justReturn(false);
+        Functions\when('get_option')->alias(static fn (string $k, $d = false) => $k === 'oli_languages' ? ['enabled' => ['fr', 'en', 'it', 'es'], 'default' => 'fr'] : $d);
     }
 
     protected function tearDown(): void
