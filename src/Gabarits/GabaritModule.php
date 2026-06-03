@@ -54,10 +54,19 @@ final class GabaritModule implements ModuleInterface
                 static fn (Container $cc): GabaritResolver => new GabaritResolver($cc->get(GabaritRegistryInterface::class)),
             );
         }
+        if (!$c->has(ZoneContentRepository::class)) {
+            $c->factory(ZoneContentRepository::class, static fn (): ZoneContentRepository => new ZoneContentRepository());
+        }
+        if (!$c->has(GabaritRenderer::class)) {
+            $c->factory(GabaritRenderer::class, static fn (): GabaritRenderer => new GabaritRenderer());
+        }
         if (!$c->has(GabaritMetabox::class)) {
             $c->factory(
                 GabaritMetabox::class,
-                static fn (Container $cc): GabaritMetabox => new GabaritMetabox($cc->get(GabaritRegistryInterface::class)),
+                static fn (Container $cc): GabaritMetabox => new GabaritMetabox(
+                    $cc->get(GabaritRegistryInterface::class),
+                    $cc->get(ZoneContentRepository::class),
+                ),
             );
         }
         if (!$c->has(GabaritAdminPage::class)) {
