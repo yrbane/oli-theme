@@ -21,6 +21,6 @@ Cocher les langues à activer. La langue **par défaut** est sélectionnée via 
 
 Sur le même onglet, un **panneau d'audit** liste tous les contenus traduisibles et signale les versions manquantes. Le bouton **« Créer les brouillons manquants »** génère automatiquement les contreparties.
 
-## Bug connu
+## Comportement sur la home par langue
 
-Lien vers l'article traduit absent sur la home anglaise — voir [#8](https://github.com/yrbane/oli-theme/issues/8).
+Quand `page_on_front` est défini (option WordPress « Une page statique »), visiter `/<langue>/` rend automatiquement la **traduction** de la page d'accueil si elle existe (groupe `_oli_translation_group`). Sans traduction, la page d'accueil par défaut est servie en repli.
