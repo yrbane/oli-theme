@@ -8,8 +8,10 @@
 
 .editor-styles-wrapper {
   font-family: 'Manrope', system-ui, sans-serif;
-  font-size: 20px;
-  line-height: 1.55;
+  /* Aligné sur le front (18 px) pour que le preview Gutenberg ait
+     les mêmes proportions visuelles que le rendu publié. */
+  font-size: 18px;
+  line-height: 1.6;
   color: #111111;
   --wp--style--global--content-size: 60ch;
   --wp--style--global--wide-size: 1100px;

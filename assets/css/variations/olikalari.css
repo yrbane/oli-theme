@@ -35,8 +35,10 @@ html, body {
   color: #111111;
   font-family: 'Manrope', system-ui, sans-serif;
   font-weight: 400;
-  font-size: 22px;
-  line-height: 1.55;
+  /* Body en 18px : lisible, plus modeste que 22px (l'ancien rendait
+     l'ensemble massif, surtout les h1 hero qui se basaient sur rem). */
+  font-size: 18px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   color-scheme: only light;
   forced-color-adjust: none;
@@ -416,9 +418,11 @@ article, .post, .page {
   padding: 0 2rem 2rem;
 }
 .page__title, .entry-title, .post__title {
-  font-size: 4rem;
+  /* Hero éditorial fluide : ~36 px en mobile, ~48 px en desktop large.
+     Le 4rem précédent (88 px à root 22 px) écrasait toute la page. */
+  font-size: clamp(2rem, 1.4rem + 1.8vw, 2.8rem);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: #111111;
   text-align: center;
