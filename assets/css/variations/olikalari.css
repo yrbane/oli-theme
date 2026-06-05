@@ -1803,6 +1803,52 @@ li { margin-bottom: 0.25rem; }
 ul li::marker { color: #ef7c33; }
 ol li::marker { color: #6b6b6b; font-weight: 600; }
 
+/* --- Listes hiérarchiques (style « Hiérarchique » sur core/list) -------
+   Numérotation à la Word : 1, 1.1, 1.1.1 sur trois niveaux d'imbrication.
+   Activée via le sélecteur de Style côté éditeur Gutenberg ; rendu CSS
+   uniquement (front), aucun JS. Issue #22. */
+.wp-block-list.is-style-hierarchical,
+.wp-block-list.is-style-hierarchical ol {
+  list-style: none;
+  padding-left: 1.75em;
+}
+.wp-block-list.is-style-hierarchical {
+  counter-reset: oli-lvl1;
+}
+.wp-block-list.is-style-hierarchical > li {
+  counter-increment: oli-lvl1;
+  counter-reset: oli-lvl2;
+  position: relative;
+}
+.wp-block-list.is-style-hierarchical > li::before {
+  content: counter(oli-lvl1) ". ";
+  position: absolute;
+  left: -1.75em;
+  font-weight: 600;
+  color: #333333;
+}
+.wp-block-list.is-style-hierarchical ol > li {
+  counter-increment: oli-lvl2;
+  counter-reset: oli-lvl3;
+}
+.wp-block-list.is-style-hierarchical ol > li::before {
+  content: counter(oli-lvl1) "." counter(oli-lvl2) " ";
+  position: absolute;
+  left: -1.75em;
+  font-weight: 600;
+  color: #555555;
+}
+.wp-block-list.is-style-hierarchical ol ol > li {
+  counter-increment: oli-lvl3;
+}
+.wp-block-list.is-style-hierarchical ol ol > li::before {
+  content: counter(oli-lvl1) "." counter(oli-lvl2) "." counter(oli-lvl3) " ";
+  position: absolute;
+  left: -2em;
+  font-weight: 600;
+  color: #777777;
+}
+
 /* --- Marquage et exposants -------------------------------------------- */
 mark {
   background: #fef4e0;

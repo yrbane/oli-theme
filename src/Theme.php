@@ -340,6 +340,10 @@ final class Theme
             \get_template_directory_uri(),
             '1.7.0',
         ))->register();
+
+        // Style de bloc « Hiérarchique » sur core/list pour numérotation
+        // 1, 1.1, 1.1.1 (rendu CSS uniquement, voir olikalari.css).
+        (new \OliTheme\Editor\HierarchicalListStyle())->register();
     }
 
     /**
