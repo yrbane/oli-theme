@@ -333,6 +333,13 @@ final class Theme
         // Petites surcharges Gutenberg : alignement « Justifié » ajouté
         // aux blocs paragraph/heading/list/etc.
         (new \OliTheme\Editor\JustifyAlignment())->register();
+
+        // Formats inline custom : souligné (retiré du toolbar Gutenberg core)
+        // et couleur appliquée à la sélection (au lieu du paragraphe entier).
+        (new \OliTheme\Editor\InlineFormats(
+            \get_template_directory_uri(),
+            '1.7.0',
+        ))->register();
     }
 
     /**
