@@ -67,20 +67,34 @@ h5 { font-size: 0.92rem; line-height: 1.4;  margin: 1.5rem 0 0.5rem;  font-weigh
 h6 { font-size: 0.82rem; line-height: 1.45; margin: 1.25rem 0 0.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #666666; }
 p { margin: 0 0 1.25em; color: #111111; }
 
+/* Hyperliens dans le contenu : bleu lisible (WCAG AA sur fond clair),
+   conservé souligné pour l'accessibilité. Les contextes spécifiques
+   (header, footer, breadcrumbs, cards) ré-overrident plus bas. */
 a {
-  color: #111111;
+  color: #1e6fb8;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
-  transition: opacity 150ms ease;
+  transition: color 120ms ease, opacity 150ms ease;
 }
-a:hover { opacity: 0.55; }
+a:hover { color: #14507f; opacity: 1; }
+a:focus-visible { outline: 2px solid #1e6fb8; outline-offset: 2px; border-radius: 2px; }
 
 em, i {
   font-style: italic;
   background: none;
   -webkit-text-fill-color: currentColor;
   color: #111111;
+}
+
+/* Alignement « Justifié » (Gutenberg : option ajoutée par JustifyAlignment.php).
+   Activation de la césure douce pour éviter les rivières blanches en typo web. */
+.has-text-align-justify {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
 }
 
 /* ==========================================================================
@@ -568,8 +582,9 @@ article, .post, .page {
   padding: 0;
 }
 .feature-card__link::after { content: ' →'; text-decoration: none; }
+/* Micro-marge latérale sur les vignettes home (~4px) pour aérer la grille. */
 .feature-card__media {
-  margin: 0 0 0.75rem;
+  margin: 0 0.25rem 0.75rem;
   aspect-ratio: 16 / 10;
   border-radius: 0;
   overflow: hidden;
@@ -1455,7 +1470,10 @@ a.btn:focus-visible,
   }
   h1, h2, h3, h4, h5, h6,
   p, em, i { color: #f1f1ef; }
-  a { color: #f1f1ef; }
+  /* Liens en bleu clair sur fond sombre (contraste AA conservé). */
+  a { color: #7fb6e6; }
+  a:hover { color: #b8d4ef; }
+  a:focus-visible { outline-color: #7fb6e6; }
 
   /* Header / bandeau */
   .site-header,
