@@ -1,0 +1,100 @@
+/**
+ * Médias → Ordonner les galeries.
+ * Grille de vignettes draggable, styles minimaux dans le ton de WP admin.
+ */
+
+.oli-reorder__picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.oli-reorder__picker label {
+    margin-right: 0.25rem;
+}
+
+.oli-reorder__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    position: sticky;
+    top: 32px; /* admin bar */
+    z-index: 10;
+}
+
+.oli-reorder__status {
+    font-size: 0.95em;
+    color: #50575e;
+}
+
+.oli-reorder__status.is-success {
+    color: #008a20;
+    font-weight: 600;
+}
+
+.oli-reorder__status.is-error {
+    color: #d63638;
+    font-weight: 600;
+}
+
+.oli-reorder__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+}
+
+.oli-reorder__item {
+    position: relative;
+    background: #fff;
+    border: 2px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: grab;
+    user-select: none;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    text-align: center;
+}
+
+.oli-reorder__item:hover {
+    border-color: #2271b1;
+}
+
+.oli-reorder__item.is-dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.oli-reorder__item.is-drop-target {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.25);
+}
+
+.oli-reorder__item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 2px;
+    pointer-events: none; /* sinon Firefox capture le drag sur l'image */
+}
+
+.oli-reorder__caption {
+    display: block;
+    font-size: 0.85em;
+    color: #50575e;
+    margin-top: 0.4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
