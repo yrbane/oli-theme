@@ -1,6 +1,8 @@
 /**
  * Galerie photos/vidéos : switch de l'élément principal au clic sur une vignette.
  * Sur la galerie photos : un clic sur l'image principale ouvre une lightbox.
+ * Filtres dossier (photos uniquement) : rangée de boutons « Tous | <dossier> »
+ * qui rechargent les vignettes depuis un JSON inline (`#oli-gallery-data`).
  * Détecte le type via data-gallery-photos ou data-gallery-videos.
  */
 export function initGallery() {
@@ -11,61 +13,140 @@ export function initGallery() {
     const mainImg     = root.querySelector('[data-gallery-main-image]');
     const mainIframe  = root.querySelector('[data-gallery-main-iframe]');
     const mainCaption = root.querySelector('[data-gallery-main-caption]');
-    const thumbs      = root.querySelectorAll('[data-gallery-thumb]');
+    const thumbsList  = root.querySelector('[data-gallery-thumbs-list]') || root.querySelector('.gallery__thumbs');
 
-    if (!thumbs.length) return;
-    thumbs[0].classList.add('is-active');
-
-    thumbs.forEach((btn) => {
-        btn.addEventListener('click', (e) => {
+    // Event delegation sur la liste de vignettes pour survivre aux re-render.
+    if (thumbsList) {
+        thumbsList.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-gallery-thumb]');
+            if (!btn) return;
             e.preventDefault();
-            thumbs.forEach((b) => b.classList.remove('is-active'));
+            thumbsList.querySelectorAll('[data-gallery-thumb]').forEach((b) => b.classList.remove('is-active'));
             btn.classList.add('is-active');
-
-            if (isVideo && mainIframe) {
-                const embed = btn.getAttribute('data-embed') || '';
-                if (embed) {
-                    const url = new URL(embed, window.location.origin);
-                    url.searchParams.set('autoplay', '1');
-                    mainIframe.src = url.toString();
-                }
-                if (mainCaption) {
-                    mainCaption.textContent = btn.getAttribute('data-caption') || '';
-                }
-            } else if (mainImg) {
-                mainImg.src = btn.getAttribute('data-url') || '';
-                // Met à jour le srcset au swap, sinon l'ancien resterait
-                // prioritaire sur le nouveau src (le navigateur préfère srcset).
-                const srcset = btn.getAttribute('data-srcset') || '';
-                if (srcset) {
-                    mainImg.srcset = srcset;
-                    mainImg.sizes = '(max-width: 900px) 100vw, 720px';
-                } else {
-                    mainImg.removeAttribute('srcset');
-                }
-                mainImg.alt = btn.getAttribute('data-alt') || '';
-                if (mainCaption) {
-                    mainCaption.textContent = btn.getAttribute('data-caption') || '';
-                }
-            }
+            applyThumb(btn);
         });
-    });
+        const first = thumbsList.querySelector('[data-gallery-thumb]');
+        if (first) first.classList.add('is-active');
+    }
+
+    function applyThumb(btn) {
+        if (isVideo && mainIframe) {
+            const embed = btn.getAttribute('data-embed') || '';
+            if (embed) {
+                const url = new URL(embed, window.location.origin);
+                url.searchParams.set('autoplay', '1');
+                mainIframe.src = url.toString();
+            }
+            if (mainCaption) {
+                mainCaption.textContent = btn.getAttribute('data-caption') || '';
+            }
+        } else if (mainImg) {
+            mainImg.src = btn.getAttribute('data-url') || '';
+            // Met à jour le srcset au swap, sinon l'ancien resterait
+            // prioritaire sur le nouveau src (le navigateur préfère srcset).
+            const srcset = btn.getAttribute('data-srcset') || '';
+            if (srcset) {
+                mainImg.srcset = srcset;
+                mainImg.sizes = '(max-width: 900px) 100vw, 720px';
+            } else {
+                mainImg.removeAttribute('srcset');
+            }
+            mainImg.alt = btn.getAttribute('data-alt') || '';
+            if (mainCaption) {
+                mainCaption.textContent = btn.getAttribute('data-caption') || '';
+            }
+        }
+    }
+
+    // === Filtres par dossier (galerie photos uniquement) ===
+    const filtersNav = document.querySelector('[data-gallery-filters]');
+    const dataScript = document.getElementById('oli-gallery-data');
+    if (!isVideo && filtersNav && dataScript && thumbsList) {
+        let galleryData = {};
+        try {
+            galleryData = JSON.parse(dataScript.textContent || '{}');
+        } catch (_e) {
+            galleryData = {};
+        }
+
+        function renderThumbs(photos) {
+            thumbsList.innerHTML = photos.map((p) => {
+                const srcset = p.srcset
+                    ? ` srcset="${escapeAttr(p.srcset)}" sizes="160px"`
+                    : '';
+                return `
+                    <li class="gallery__thumb-item">
+                        <button type="button"
+                                class="gallery__thumb-button"
+                                data-gallery-thumb
+                                data-url="${escapeAttr(p.url)}"
+                                data-srcset="${escapeAttr(p.srcset || '')}"
+                                data-alt="${escapeAttr(p.alt || '')}"
+                                data-caption="${escapeAttr(p.caption || '')}">
+                            <img class="gallery__thumb-image" src="${escapeAttr(p.thumb || p.url)}"${srcset} alt="${escapeAttr(p.alt || '')}" loading="lazy">
+                        </button>
+                    </li>`;
+            }).join('');
+
+            const first = thumbsList.querySelector('[data-gallery-thumb]');
+            if (first) {
+                first.classList.add('is-active');
+                applyThumb(first);
+            } else if (mainImg) {
+                // Dossier vide → vide aussi la principale.
+                mainImg.removeAttribute('src');
+                mainImg.removeAttribute('srcset');
+                mainImg.alt = '';
+                if (mainCaption) mainCaption.textContent = '';
+            }
+        }
+
+        filtersNav.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-gallery-filter]');
+            if (!btn) return;
+            const key = btn.getAttribute('data-gallery-filter') || 'all';
+            filtersNav.querySelectorAll('[data-gallery-filter]').forEach((b) => {
+                b.classList.remove('is-active');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-pressed', 'true');
+            renderThumbs(Array.isArray(galleryData[key]) ? galleryData[key] : []);
+        });
+    }
 
     // Lightbox sur la photo principale (galerie photos uniquement).
     if (!isVideo && mainImg) {
         mainImg.style.cursor = 'zoom-in';
-        // Construit la liste complète des photos depuis les vignettes
-        // (pour la navigation prev/next dans la lightbox).
-        const photos = Array.from(thumbs).map((btn) => ({
-            url: btn.getAttribute('data-url') || '',
-            alt: btn.getAttribute('data-alt') || '',
-            caption: btn.getAttribute('data-caption') || '',
-        }));
         mainImg.addEventListener('click', () => {
+            // On reconstruit la liste à chaque ouverture pour refléter le
+            // filtre courant (les vignettes ont pu être rerendues).
+            const thumbs = thumbsList ? thumbsList.querySelectorAll('[data-gallery-thumb]') : [];
+            const photos = Array.from(thumbs).map((btn) => ({
+                url: btn.getAttribute('data-url') || '',
+                alt: btn.getAttribute('data-alt') || '',
+                caption: btn.getAttribute('data-caption') || '',
+            }));
             const activeIndex = Array.from(thumbs).findIndex((b) => b.classList.contains('is-active'));
             openLightbox(photos, Math.max(0, activeIndex));
         });
     }
+}
+
+/**
+ * Échappe une valeur pour usage dans un attribut HTML.
+ *
+ * @param {string} s
+ * @returns {string}
+ */
+function escapeAttr(s) {
+    return String(s).replace(/[&"'<>]/g, (c) => ({
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '<': '&lt;',
+        '>': '&gt;',
+    }[c]));
 }
 
 /**

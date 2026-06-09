@@ -107,6 +107,13 @@ final class PageController implements PageRendererInterface
                 $vm['folderGalleries']    = $this->buildFolderGalleries();
                 $vm['hasFolderGalleries'] = $vm['folderGalleries'] !== [];
                 $vm['hasAnyGallery']      = $vm['hasPhotos'] || $vm['hasFolderGalleries'];
+                // Données consommées par le JS de filtres dossiers : permet
+                // de basculer la galerie principale entre `all` et chaque
+                // dossier sans recharger la page.
+                $vm['galleryDataJson']    = $this->buildGalleryFiltersJson(
+                    $vm['photos'],
+                    $vm['folderGalleries'],
+                );
                 return $this->renderer->render('pages/gallery-photos.html', $vm);
             }
             if (\in_array($entity->slug, self::VIDEO_SLUGS, true)) {
@@ -149,6 +156,24 @@ final class PageController implements PageRendererInterface
             ];
         }
         return $out;
+    }
+
+    /**
+     * Sérialise la donnée des filtres galerie en JSON pour le client.
+     *
+     * Forme : `{"all": [...allPhotos], "folder-<slug>": [...photosDossier], ...}`.
+     *
+     * @param list<array<string, mixed>>                                              $allPhotos
+     * @param list<array{slug:string, name:string, photos:list<array<string, mixed>>}> $folderGalleries
+     */
+    private function buildGalleryFiltersJson(array $allPhotos, array $folderGalleries): string
+    {
+        $buckets = ['all' => $allPhotos];
+        foreach ($folderGalleries as $folder) {
+            $buckets['folder-' . $folder['slug']] = $folder['photos'];
+        }
+
+        return (string) json_encode($buckets, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**

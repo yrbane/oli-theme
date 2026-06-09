@@ -262,6 +262,104 @@ final class PageControllerTest extends TestCase
         self::assertSame('<html>en-home</html>', $controller->renderSingular());
     }
 
+    /**
+     * Sur la page galerie photos, le contrôleur doit exposer `galleryDataJson`
+     * — un JSON {"all": [...], "folder-<slug>": [...]} consommé par le JS de
+     * filtres pour permettre de basculer la galerie principale d'un dossier à
+     * un autre sans recharger la page.
+     */
+    public function testGalleryPhotosPageExposesGalleryDataJson(): void
+    {
+        $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
+        $entity = new PostEntity(
+            id: 42,
+            type: 'page',
+            title: 'Photos',
+            content: '',
+            excerpt: null,
+            slug: 'photos',
+            language: $french,
+            featuredImageUrl: null,
+            featuredImageAlt: null,
+            permalink: 'https://example.com/galerie/photos',
+            publishedAt: new DateTimeImmutable('2026-01-01', new DateTimeZone('UTC')),
+            updatedAt: null,
+            author: null,
+        );
+
+        $model = $this->createMock(PostModelInterface::class);
+        $model->method('find')->with(42)->willReturn($entity);
+
+        $resolver = $this->createMock(LanguageResolverInterface::class);
+        $resolver->method('current')->willReturn($french);
+
+        $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
+        $switcher->method('build')->willReturn(new LanguageSwitcherViewModel(current: $french, items: []));
+
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
+        // Les deux services finalisés (GalleryRepository, MediaFolderQuery)
+        // sont instanciés réellement ; on stubbe leurs fonctions WP en aval.
+        Functions\when('get_option')->alias(static fn (string $key, $default = null) => match ($key) {
+            \OliTheme\Gallery\GalleryRepository::OPTION_PHOTOS => '[]',
+            default => $default,
+        });
+        Functions\when('taxonomy_exists')->justReturn(true);
+        Functions\when('get_terms')->justReturn([
+            (object) ['slug' => 'test', 'name' => 'Test', 'parent' => 0, 'term_id' => 9, 'count' => 1],
+        ]);
+        Functions\when('get_posts')->justReturn([
+            (object) ['ID' => 2, 'post_excerpt' => '', 'post_title' => ''],
+        ]);
+        Functions\when('wp_get_attachment_image_url')->justReturn('u2');
+        Functions\when('wp_get_attachment_image_srcset')->justReturn('');
+        Functions\when('get_post_meta')->justReturn('b');
+
+        $gallery     = new \OliTheme\Gallery\GalleryRepository();
+        $folderQuery = new \OliTheme\MediaFolders\MediaFolderQuery();
+
+        $renderer = $this->createMock(RendererInterface::class);
+        $renderer->expects(self::once())
+            ->method('render')
+            ->with(
+                'pages/gallery-photos.html',
+                self::callback(function (array $vm): bool {
+                    if (!isset($vm['galleryDataJson']) || !\is_string($vm['galleryDataJson'])) {
+                        return false;
+                    }
+                    $decoded = json_decode($vm['galleryDataJson'], true);
+
+                    return \is_array($decoded)
+                        && \array_key_exists('all', $decoded)
+                        && ($decoded['folder-test'][0]['id'] ?? null) === 2;
+                }),
+            )
+            ->willReturn('<html>photos</html>');
+
+        Functions\when('get_queried_object_id')->justReturn(42);
+
+        $controller = new PageController(
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
+            new \OliTheme\Posts\CoverExtractor(),
+            $gallery,
+            null,
+            null,
+            null,
+            null,
+            $folderQuery,
+        );
+
+        self::assertSame('<html>photos</html>', $controller->renderSingular());
+    }
+
     private function buildSeoMock(): SeoControllerInterface
     {
         $seoVm = new SeoHeadViewModel('T', 'D', 'index', 'https://ex.com', [], [], [], '{}');

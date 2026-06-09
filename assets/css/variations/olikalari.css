@@ -1873,3 +1873,41 @@ sub, sup { font-size: 0.72em; }
   color: #ef7c33;
   text-decoration-thickness: 2px;
 }
+
+/* ==========================================================================
+   Filtres par dossier au-dessus de la galerie photos.
+   Une rangée de boutons « Tous | <dossier> | … ». Au clic, la galerie
+   principale (image + thumbs) bascule sur les photos du dossier (JS).
+   ========================================================================== */
+.gallery__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 960px;
+  margin: 1rem auto 0;
+  padding: 0 1.5rem;
+}
+.gallery__filter {
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.gallery__filter:hover {
+  border-color: #ef7c33;
+  color: #ef7c33;
+}
+.gallery__filter.is-active {
+  background: #ef7c33;
+  border-color: #ef7c33;
+  color: #ffffff;
+}
+.gallery__filter:focus-visible {
+  outline: 2px solid #ef7c33;
+  outline-offset: 2px;
+}
