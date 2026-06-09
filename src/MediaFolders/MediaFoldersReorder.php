@@ -107,7 +107,6 @@ final class MediaFoldersReorder
             </p>
 
             <form method="get" action="" class="oli-reorder__picker">
-                <input type="hidden" name="post_type" value="attachment">
                 <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
                 <label for="oli-reorder-folder"><strong><?php esc_html_e('Dossier :', 'oli-theme'); ?></strong></label>
                 <?php
