@@ -43,12 +43,15 @@ final class GabaritMetabox
     public function addMetabox(): void
     {
         foreach (['post', 'page', 'oli_event'] as $type) {
+            // `side` (sidebar de droite) plutôt que `normal` (bas du contenu)
+            // pour que la metabox soit immédiatement visible dans Gutenberg
+            // sans avoir à scroller en dessous de l'éditeur de blocs.
             add_meta_box(
                 'oli-gabarit',
                 __('Gabarit & zones', 'oli-theme'),
                 [$this, 'render'],
                 $type,
-                'normal',
+                'side',
                 'high',
             );
         }
