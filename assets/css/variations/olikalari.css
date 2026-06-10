@@ -702,8 +702,8 @@ body > footer a:hover, .site-footer a:hover { opacity: 0.55; }
   gap: 1rem;
 }
 .site-footer .social-links__link {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   color: #6b6b6b;
   background: transparent;
 }
@@ -716,8 +716,8 @@ body > footer a:hover, .site-footer a:hover { opacity: 0.55; }
   background: #f4f4f3;
 }
 .site-footer .social-links__link svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 /* Tableaux, code */
