@@ -300,10 +300,12 @@ final class PageControllerTest extends TestCase
         $menus->method('buildPrimary')->willReturn([]);
         $menus->method('buildFooter')->willReturn([]);
 
-        // Les deux services finalisés (GalleryRepository, MediaFolderQuery)
-        // sont instanciés réellement ; on stubbe leurs fonctions WP en aval.
+        // Les services finalisés (GalleryRepository, MediaFolderQuery,
+        // MediaFoldersGallerySettings) sont instanciés réellement ; on stubbe
+        // leurs fonctions WP en aval. Le dossier `test` est coché pour que la
+        // page galerie photos l'expose comme bucket `folder-test`.
         Functions\when('get_option')->alias(static fn (string $key, $default = null) => match ($key) {
-            \OliTheme\Gallery\GalleryRepository::OPTION_PHOTOS => '[]',
+            \OliTheme\MediaFolders\MediaFoldersGallerySettings::OPTION => ['test'],
             default => $default,
         });
         Functions\when('taxonomy_exists')->justReturn(true);
@@ -317,8 +319,9 @@ final class PageControllerTest extends TestCase
         Functions\when('wp_get_attachment_image_srcset')->justReturn('');
         Functions\when('get_post_meta')->justReturn('b');
 
-        $gallery     = new \OliTheme\Gallery\GalleryRepository();
-        $folderQuery = new \OliTheme\MediaFolders\MediaFolderQuery();
+        $gallery         = new \OliTheme\Gallery\GalleryRepository();
+        $folderQuery     = new \OliTheme\MediaFolders\MediaFolderQuery();
+        $gallerySettings = new \OliTheme\MediaFolders\MediaFoldersGallerySettings();
 
         $renderer = $this->createMock(RendererInterface::class);
         $renderer->expects(self::once())
@@ -355,6 +358,102 @@ final class PageControllerTest extends TestCase
             null,
             null,
             $folderQuery,
+            $gallerySettings,
+        );
+
+        self::assertSame('<html>photos</html>', $controller->renderSingular());
+    }
+
+    /**
+     * Quand `oli_gallery_folders` est configuré, seuls les dossiers présents
+     * dans la liste sont rendus comme buckets (les autres sont ignorés même
+     * s'ils contiennent des photos). Permet à l'éditeur de cocher quels
+     * dossiers exposer publiquement.
+     */
+    public function testGalleryPhotosPageFiltersBuildFolderGalleriesByConfig(): void
+    {
+        $french = new Language('fr', 'Français', 'Français', '🇫🇷', 'fr_FR', 'ltr');
+        $entity = new PostEntity(
+            id: 42,
+            type: 'page',
+            title: 'Photos',
+            content: '',
+            excerpt: null,
+            slug: 'photos',
+            language: $french,
+            featuredImageUrl: null,
+            featuredImageAlt: null,
+            permalink: 'https://example.com/galerie/photos',
+            publishedAt: new DateTimeImmutable('2026-01-01', new DateTimeZone('UTC')),
+            updatedAt: null,
+            author: null,
+        );
+
+        $model = $this->createMock(PostModelInterface::class);
+        $model->method('find')->with(42)->willReturn($entity);
+
+        $resolver = $this->createMock(LanguageResolverInterface::class);
+        $resolver->method('current')->willReturn($french);
+
+        $switcher = $this->createMock(LanguageSwitcherControllerInterface::class);
+        $switcher->method('build')->willReturn(new LanguageSwitcherViewModel(current: $french, items: []));
+
+        $menus = $this->createMock(MenuControllerInterface::class);
+        $menus->method('buildPrimary')->willReturn([]);
+        $menus->method('buildFooter')->willReturn([]);
+
+        // Deux dossiers existent ; seul `voyage` est coché.
+        Functions\when('get_option')->alias(static fn (string $key, $default = null) => match ($key) {
+            \OliTheme\MediaFolders\MediaFoldersGallerySettings::OPTION => ['voyage'],
+            default => $default,
+        });
+        Functions\when('taxonomy_exists')->justReturn(true);
+        Functions\when('get_terms')->justReturn([
+            (object) ['slug' => 'voyage', 'name' => 'Voyage', 'parent' => 0, 'term_id' => 1, 'count' => 1],
+            (object) ['slug' => 'archives', 'name' => 'Archives', 'parent' => 0, 'term_id' => 2, 'count' => 1],
+        ]);
+        Functions\when('get_posts')->justReturn([
+            (object) ['ID' => 10, 'post_excerpt' => '', 'post_title' => ''],
+        ]);
+        Functions\when('wp_get_attachment_image_url')->justReturn('u');
+        Functions\when('wp_get_attachment_image_srcset')->justReturn('');
+        Functions\when('get_post_meta')->justReturn('');
+
+        $gallery         = new \OliTheme\Gallery\GalleryRepository();
+        $folderQuery     = new \OliTheme\MediaFolders\MediaFolderQuery();
+        $gallerySettings = new \OliTheme\MediaFolders\MediaFoldersGallerySettings();
+
+        $renderer = $this->createMock(RendererInterface::class);
+        $renderer->expects(self::once())
+            ->method('render')
+            ->with(
+                'pages/gallery-photos.html',
+                self::callback(static function (array $vm): bool {
+                    $slugs = array_map(static fn (array $f): string => (string) $f['slug'], $vm['folderGalleries'] ?? []);
+
+                    return $slugs === ['voyage'];
+                }),
+            )
+            ->willReturn('<html>photos</html>');
+
+        Functions\when('get_queried_object_id')->justReturn(42);
+
+        $controller = new PageController(
+            $model,
+            $resolver,
+            $switcher,
+            $menus,
+            $this->buildSeoMock(),
+            $this->buildBreadcrumbsMock(),
+            $renderer,
+            new \OliTheme\Posts\CoverExtractor(),
+            $gallery,
+            null,
+            null,
+            null,
+            null,
+            $folderQuery,
+            $gallerySettings,
         );
 
         self::assertSame('<html>photos</html>', $controller->renderSingular());

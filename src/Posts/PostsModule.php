@@ -79,6 +79,9 @@ final class PostsModule implements ModuleInterface
                     $c->has(\OliTheme\MediaFolders\MediaFolderQuery::class)
                         ? $c->get(\OliTheme\MediaFolders\MediaFolderQuery::class)
                         : null,
+                    $c->has(\OliTheme\MediaFolders\MediaFoldersGallerySettings::class)
+                        ? $c->get(\OliTheme\MediaFolders\MediaFoldersGallerySettings::class)
+                        : null,
                 ),
             );
         }

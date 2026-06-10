@@ -48,18 +48,28 @@ final class MediaFoldersModule implements ModuleInterface
                 ),
             );
         }
+        if (!$c->has(MediaFoldersGallerySettings::class)) {
+            $c->factory(
+                MediaFoldersGallerySettings::class,
+                static fn (Container $cc): MediaFoldersGallerySettings => new MediaFoldersGallerySettings(
+                    $cc->get(MediaFolderQuery::class),
+                ),
+            );
+        }
 
         // Enregistrement de la taxonomie sur init (avant le rendu admin).
         add_action('init', static function () use ($c): void {
             $c->get(MediaFoldersTaxonomy::class)->register();
         }, 0);
 
-        // UI admin (filtre + bulk actions + dossier d'upload par défaut + réordonnancement).
+        // UI admin (filtre + bulk actions + dossier d'upload par défaut +
+        // réordonnancement + sélection des dossiers exposés en galerie).
         if (\function_exists('is_admin') && is_admin()) {
             $c->get(MediaFoldersAdmin::class)->register();
             $c->get(MediaFoldersBulkActions::class)->register();
             $c->get(DefaultUploadFolder::class)->register();
             $c->get(MediaFoldersReorder::class)->register();
+            $c->get(MediaFoldersGallerySettings::class)->register();
         }
 
         // Services frontend (shortcode + bloc Gutenberg).

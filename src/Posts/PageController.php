@@ -42,6 +42,7 @@ final class PageController implements PageRendererInterface
         private readonly ?\OliTheme\Gabarits\ZoneContentRepository $gabaritZones = null,
         private readonly ?\OliTheme\Gabarits\GabaritRenderer $gabaritRenderer = null,
         private readonly ?\OliTheme\MediaFolders\MediaFolderQuery $folderQuery = null,
+        private readonly ?\OliTheme\MediaFolders\MediaFoldersGallerySettings $gallerySettings = null,
     ) {
     }
 
@@ -100,12 +101,13 @@ final class PageController implements PageRendererInterface
         // avec la liste de photos ou vidéos passée en plus du contenu normal.
         if ($this->gallery !== null) {
             if (\in_array($entity->slug, self::PHOTO_SLUGS, true)) {
-                $vm['photos']    = $this->gallery->getPhotos();
-                $vm['hasPhotos'] = $vm['photos'] !== [];
-                // Galeries par dossier (aggregation de toutes les folders) :
-                // chaque dossier devient une section avec ses photos.
+                // Galeries par dossier (sélection éditoriale ou fallback) :
+                // chaque dossier devient un bucket pour les filtres front.
                 $vm['folderGalleries']    = $this->buildFolderGalleries();
                 $vm['hasFolderGalleries'] = $vm['folderGalleries'] !== [];
+                // « Tous » = union dédupliquée des photos des dossiers exposés.
+                $vm['photos']    = $this->aggregateAllPhotos($vm['folderGalleries']);
+                $vm['hasPhotos'] = $vm['photos'] !== [];
                 $vm['hasAnyGallery']      = $vm['hasPhotos'] || $vm['hasFolderGalleries'];
                 // Données consommées par le JS de filtres dossiers : permet
                 // de basculer la galerie principale entre `all` et chaque
@@ -138,13 +140,25 @@ final class PageController implements PageRendererInterface
         if ($this->folderQuery === null) {
             return [];
         }
-        $out = [];
+        // Sélection éditoriale (Médias → Galerie photos). Si l'éditeur a
+        // coché des dossiers, on respecte cet ordre exactement ; sinon on
+        // rend tous les dossiers racine non vides (fallback historique).
+        $configured = $this->gallerySettings?->getConfiguredFolders() ?? [];
+        $foldersBySlug = [];
         foreach ($this->folderQuery->allFolders() as $folder) {
-            // On rend uniquement les dossiers racine ; leurs sous-dossiers
-            // sont inclus par include_children dans photosInFolder().
-            if ($folder['parent'] !== 0) {
-                continue;
-            }
+            $foldersBySlug[$folder['slug']] = $folder;
+        }
+        $ordered = $configured !== []
+            ? array_values(array_filter(
+                array_map(static fn (string $slug) => $foldersBySlug[$slug] ?? null, $configured),
+            ))
+            : array_values(array_filter(
+                $foldersBySlug,
+                static fn (array $folder): bool => $folder['parent'] === 0,
+            ));
+
+        $out = [];
+        foreach ($ordered as $folder) {
             $photos = $this->folderQuery->photosInFolder($folder['slug'], includeChildren: true);
             if (empty($photos)) {
                 continue;
@@ -155,6 +169,34 @@ final class PageController implements PageRendererInterface
                 'photos' => $photos,
             ];
         }
+        return $out;
+    }
+
+    /**
+     * Agrège les photos de tous les dossiers exposés en une liste unique
+     * pour le filtre « Tous », en dédupliquant par identifiant attachment.
+     * Si la même photo est rangée dans plusieurs dossiers, elle n'apparaît
+     * qu'une seule fois.
+     *
+     * @param list<array{slug:string, name:string, photos:list<array<string, mixed>>}> $folderGalleries
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function aggregateAllPhotos(array $folderGalleries): array
+    {
+        $seen = [];
+        $out  = [];
+        foreach ($folderGalleries as $folder) {
+            foreach ($folder['photos'] as $photo) {
+                $id = (int) ($photo['id'] ?? 0);
+                if ($id <= 0 || isset($seen[$id])) {
+                    continue;
+                }
+                $seen[$id] = true;
+                $out[]     = $photo;
+            }
+        }
+
         return $out;
     }
 
