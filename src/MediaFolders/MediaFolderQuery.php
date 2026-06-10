@@ -34,18 +34,49 @@ final class MediaFolderQuery
         }
         $out = [];
         foreach ($terms as $t) {
-            if (!\is_object($t) || !isset($t->slug)) {
+            if (!$t instanceof \WP_Term) {
                 continue;
             }
+            $slug = (string) $t->slug;
             $out[] = [
-                'slug'    => (string) $t->slug,
-                'name'    => (string) ($t->name ?? $t->slug),
-                'parent'  => (int) ($t->parent ?? 0),
-                'term_id' => (int) ($t->term_id ?? 0),
-                'count'   => (int) ($t->count ?? 0),
+                'slug'    => $slug,
+                'name'    => (string) $t->name,
+                'parent'  => (int) $t->parent,
+                'term_id' => (int) $t->term_id,
+                // Le `count` natif n'est pas fiable pour les attachments
+                // (`_update_post_term_count` ne compte que les posts publish,
+                // or les attachments sont en `inherit`). On recompte.
+                'count'   => $this->countAttachmentsInFolder($slug),
             ];
         }
         return $out;
+    }
+
+    /**
+     * Recompte dynamiquement le nombre de photos rangées dans un dossier
+     * (et ses sous-dossiers). Utilisé en remplacement du `count` natif des
+     * terms WP, faussé sur la taxonomie attachment.
+     */
+    private function countAttachmentsInFolder(string $slug): int
+    {
+        if ($slug === '' || !\function_exists('get_posts')) {
+            return 0;
+        }
+        $ids = get_posts([
+            'post_type'      => 'attachment',
+            'post_status'    => 'inherit',
+            'post_mime_type' => 'image',
+            'numberposts'    => -1,
+            'fields'         => 'ids',
+            'tax_query'      => [[
+                'taxonomy'         => MediaFoldersTaxonomy::TAXONOMY,
+                'field'            => 'slug',
+                'terms'            => $slug,
+                'include_children' => true,
+            ]],
+        ]);
+
+        return \count($ids);
     }
 
     /**
@@ -94,7 +125,7 @@ final class MediaFolderQuery
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array{id:int, url:string, srcset:string, thumb:string, alt:string, caption:string, title:string}|null
      */
     private function hydrate(object $post): ?array
     {

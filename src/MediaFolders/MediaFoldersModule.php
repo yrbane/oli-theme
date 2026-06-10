@@ -53,6 +53,7 @@ final class MediaFoldersModule implements ModuleInterface
                 MediaFoldersGallerySettings::class,
                 static fn (Container $cc): MediaFoldersGallerySettings => new MediaFoldersGallerySettings(
                     $cc->get(MediaFolderQuery::class),
+                    $cc->get(MediaFoldersReorder::class),
                 ),
             );
         }

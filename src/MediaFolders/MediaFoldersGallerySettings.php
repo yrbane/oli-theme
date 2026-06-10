@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace OliTheme\MediaFolders;
 
 /**
- * Page d'administration sous Médias permettant à l'éditeur de cocher les
- * dossiers de la médiathèque à exposer sur la page publique « Galerie photos ».
+ * Page d'administration unifiée sous Médias : choix des dossiers exposés
+ * sur la page publique « Galerie photos » + réordonnancement drag & drop
+ * des photos d'un dossier.
  *
  * Stocke la sélection dans l'option `oli_gallery_folders` (liste de slugs).
  * Le {@see \OliTheme\Posts\PageController} lit cette liste pour déterminer
  * quels dossiers afficher, et le filtre « Tous » agrège leurs photos.
+ *
+ * Le réordonnancement est délégué à {@see MediaFoldersReorder} qui expose
+ * la grille drag-drop ({@see MediaFoldersReorder::renderGrid()}) et l'endpoint
+ * AJAX consommé par `assets/js/media-folders-reorder.js`.
  *
  * @package OliTheme\MediaFolders
  *
@@ -23,8 +28,10 @@ final class MediaFoldersGallerySettings
     public const NONCE_ACTION = 'oli_media_folders_gallery_save';
     public const POST_ACTION  = 'oli_media_folders_gallery_save';
 
-    public function __construct(private readonly ?MediaFolderQuery $query = null)
-    {
+    public function __construct(
+        private readonly ?MediaFolderQuery $query = null,
+        private readonly ?MediaFoldersReorder $reorder = null,
+    ) {
     }
 
     /**
@@ -34,6 +41,7 @@ final class MediaFoldersGallerySettings
     {
         add_action('admin_menu', [$this, 'registerMenu']);
         add_action('admin_post_' . self::POST_ACTION, [$this, 'handleSave']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
     }
 
     /**
@@ -49,6 +57,44 @@ final class MediaFoldersGallerySettings
             self::PAGE_SLUG,
             [$this, 'renderPage'],
         );
+    }
+
+    /**
+     * Enqueue le CSS + JS de la grille drag-drop uniquement sur la page
+     * unifiée.
+     *
+     * @param string $hookSuffix Suffixe de la page admin courante.
+     */
+    public function enqueueAssets(string $hookSuffix): void
+    {
+        if (!str_ends_with($hookSuffix, '_page_' . self::PAGE_SLUG)) {
+            return;
+        }
+        $themeUri = (string) get_template_directory_uri();
+        wp_enqueue_style(
+            'oli-media-folders-reorder',
+            $themeUri . '/assets/css/media-folders-reorder.css',
+            [],
+            '1.6.0',
+        );
+        wp_enqueue_script(
+            'oli-media-folders-reorder',
+            $themeUri . '/assets/js/media-folders-reorder.js',
+            [],
+            '1.6.0',
+            true,
+        );
+        wp_localize_script('oli-media-folders-reorder', 'oliReorder', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'action'  => MediaFoldersReorder::AJAX_ACTION,
+            'nonce'   => wp_create_nonce(MediaFoldersReorder::NONCE_ACTION),
+            'i18n'    => [
+                'saving' => __('Enregistrement…', 'oli-theme'),
+                'saved'  => __('Ordre enregistré.', 'oli-theme'),
+                'error'  => __('Erreur lors de l\'enregistrement.', 'oli-theme'),
+                'empty'  => __('Aucune photo dans ce dossier.', 'oli-theme'),
+            ],
+        ]);
     }
 
     /**
@@ -74,21 +120,23 @@ final class MediaFoldersGallerySettings
     }
 
     /**
-     * Rend la page d'admin : liste de cases à cocher (un dossier par case).
+     * Rend la page d'admin : cases à cocher des dossiers exposés + sélecteur
+     * de dossier à réordonner + grille drag-drop des photos.
      */
     public function renderPage(): void
     {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Action non autorisée.', 'oli-theme'), '', ['response' => 403]);
         }
-        $selected = $this->getConfiguredFolders();
-        $folders  = $this->query !== null ? $this->query->allFolders() : [];
-        $saved    = isset($_GET['saved']) && $_GET['saved'] === '1';
+        $selected     = $this->getConfiguredFolders();
+        $folders      = $this->query !== null ? $this->query->allFolders() : [];
+        $saved        = isset($_GET['saved']) && $_GET['saved'] === '1';
+        $reorderSlug  = isset($_GET['reorder']) ? sanitize_key((string) $_GET['reorder']) : '';
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Galerie photos — choix des dossiers', 'oli-theme'); ?></h1>
+            <h1><?php esc_html_e('Galerie photos', 'oli-theme'); ?></h1>
             <p class="description">
-                <?php esc_html_e('Coche les dossiers de la médiathèque à exposer sur la page publique « Galerie photos ». L\'ordre des photos dans chaque dossier se gère depuis « Ordonner les galeries ».', 'oli-theme'); ?>
+                <?php esc_html_e('Coche les dossiers de la médiathèque à exposer sur la page publique « Galerie photos », puis choisis un dossier ci-dessous pour réordonner ses photos par glisser-déposer.', 'oli-theme'); ?>
             </p>
 
             <?php if ($saved) : ?>
@@ -102,49 +150,83 @@ final class MediaFoldersGallerySettings
                         <?php esc_html_e('Créer un premier dossier', 'oli-theme'); ?>
                     </a>
                 </p>
-            <?php else : ?>
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <input type="hidden" name="action" value="<?php echo esc_attr(self::POST_ACTION); ?>">
-                    <?php wp_nonce_field(self::NONCE_ACTION); ?>
+                <?php
+                return;
+            endif;
+            ?>
 
-                    <table class="form-table" role="presentation">
-                        <tbody>
-                            <?php foreach ($folders as $folder) : ?>
-                                <tr>
-                                    <th scope="row">
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                name="folders[]"
-                                                value="<?php echo esc_attr($folder['slug']); ?>"
-                                                <?php checked(\in_array($folder['slug'], $selected, true)); ?>
-                                            >
-                                            <?php echo esc_html($folder['name']); ?>
-                                        </label>
-                                    </th>
-                                    <td>
-                                        <span class="description">
-                                            <?php
-                                            printf(
-                                                /* translators: %d = nombre de photos */
-                                                esc_html(_n('%d photo', '%d photos', (int) $folder['count'], 'oli-theme')),
-                                                (int) $folder['count'],
-                                            );
-                                            ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+            <h2><?php esc_html_e('Dossiers exposés', 'oli-theme'); ?></h2>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <input type="hidden" name="action" value="<?php echo esc_attr(self::POST_ACTION); ?>">
+                <?php wp_nonce_field(self::NONCE_ACTION); ?>
 
-                    <p class="submit">
-                        <button type="submit" class="button button-primary">
-                            <?php esc_html_e('Enregistrer la sélection', 'oli-theme'); ?>
-                        </button>
-                    </p>
-                </form>
-            <?php endif; ?>
+                <table class="form-table" role="presentation">
+                    <tbody>
+                        <?php foreach ($folders as $folder) : ?>
+                            <tr>
+                                <th scope="row">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="folders[]"
+                                            value="<?php echo esc_attr($folder['slug']); ?>"
+                                            <?php checked(\in_array($folder['slug'], $selected, true)); ?>
+                                        >
+                                        <?php echo esc_html($folder['name']); ?>
+                                    </label>
+                                </th>
+                                <td>
+                                    <span class="description">
+                                        <?php
+                                        printf(
+                                            /* translators: %d = nombre de photos */
+                                            esc_html(_n('%d photo', '%d photos', (int) $folder['count'], 'oli-theme')),
+                                            (int) $folder['count'],
+                                        );
+                                        ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+                <p class="submit">
+                    <button type="submit" class="button button-primary">
+                        <?php esc_html_e('Enregistrer la sélection', 'oli-theme'); ?>
+                    </button>
+                </p>
+            </form>
+
+            <hr>
+
+            <h2><?php esc_html_e('Ordonner les photos d\'un dossier', 'oli-theme'); ?></h2>
+            <form method="get" action="" class="oli-reorder__picker">
+                <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
+                <label for="oli-reorder-folder"><strong><?php esc_html_e('Dossier :', 'oli-theme'); ?></strong></label>
+                <?php
+                wp_dropdown_categories([
+                    'taxonomy'          => MediaFoldersTaxonomy::TAXONOMY,
+                    'name'              => 'reorder',
+                    'id'                => 'oli-reorder-folder',
+                    'value_field'       => 'slug',
+                    'selected'          => $reorderSlug,
+                    'show_option_none'  => __('— Choisir un dossier —', 'oli-theme'),
+                    'option_none_value' => '',
+                    'hide_empty'        => false,
+                    'hierarchical'      => true,
+                    'depth'             => 5,
+                    'orderby'           => 'name',
+                ]);
+                ?>
+                <button type="submit" class="button"><?php esc_html_e('Afficher', 'oli-theme'); ?></button>
+            </form>
+
+            <?php
+            if ($reorderSlug !== '' && $this->reorder !== null) {
+                $this->reorder->renderGrid($reorderSlug);
+            }
+            ?>
         </div>
         <?php
     }

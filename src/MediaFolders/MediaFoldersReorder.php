@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace OliTheme\MediaFolders;
 
 /**
- * Page d'admin + endpoint AJAX pour réordonner par drag & drop les photos
- * d'un dossier de la médiathèque (mise à jour de `menu_order` sur les
- * attachments concernés).
+ * Service de réordonnancement par drag & drop des photos d'un dossier.
+ *
+ * Expose :
+ *  - l'endpoint AJAX `oli_media_folder_reorder_save` qui persiste un nouvel
+ *    ordre `menu_order` sur les attachments d'un dossier ;
+ *  - un helper {@see renderGrid()} qui rend la grille triable (toolbar +
+ *    vignettes draggables) — réutilisé par {@see MediaFoldersGallerySettings}
+ *    qui fournit la page admin unifiée.
  *
  * Le tri est ensuite reflété en frontend par
  * {@see MediaFolderQuery::photosInFolder()} qui ordonne par `menu_order ASC`.
@@ -18,7 +23,6 @@ namespace OliTheme\MediaFolders;
  */
 final class MediaFoldersReorder
 {
-    public const PAGE_SLUG    = 'oli-media-folders-reorder';
     public const AJAX_ACTION  = 'oli_media_folder_reorder_save';
     public const NONCE_ACTION = 'oli_media_folder_reorder';
 
@@ -27,144 +31,65 @@ final class MediaFoldersReorder
     }
 
     /**
-     * Hooks WordPress : menu admin, endpoint AJAX, enqueue conditionnel.
+     * Hooks WordPress : enregistre uniquement l'endpoint AJAX. La page admin
+     * et l'enqueue des assets sont gérés par {@see MediaFoldersGallerySettings}
+     * (page unifiée Médias → Galerie photos).
      */
     public function register(): void
     {
-        add_action('admin_menu', [$this, 'registerMenu']);
         add_action('wp_ajax_' . self::AJAX_ACTION, [$this, 'handleSave']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
     }
 
     /**
-     * Sous-menu sous Médias.
+     * Rend la grille triable d'un dossier (toolbar « Enregistrer » + liste de
+     * vignettes draggables). À appeler depuis une page admin qui a enqueue
+     * `media-folders-reorder.css` et `media-folders-reorder.js`.
      */
-    public function registerMenu(): void
+    public function renderGrid(string $folderSlug): void
     {
-        add_submenu_page(
-            'upload.php',
-            __('Ordonner les galeries', 'oli-theme'),
-            __('Ordonner les galeries', 'oli-theme'),
-            'upload_files',
-            self::PAGE_SLUG,
-            [$this, 'renderPage'],
-        );
-    }
+        $photos = $folderSlug !== '' ? $this->query->photosInFolder($folderSlug, false, -1) : [];
 
-    /**
-     * Enqueue JS + CSS uniquement sur la page de réordonnancement.
-     *
-     * @param string $hookSuffix Suffixe de la page admin courante.
-     */
-    public function enqueueAssets(string $hookSuffix): void
-    {
-        if (!str_ends_with($hookSuffix, '_page_' . self::PAGE_SLUG)) {
+        if ($folderSlug === '') {
             return;
         }
-        $themeUri = (string) get_template_directory_uri();
-        wp_enqueue_style(
-            'oli-media-folders-reorder',
-            $themeUri . '/assets/css/media-folders-reorder.css',
-            [],
-            '1.6.0',
-        );
-        wp_enqueue_script(
-            'oli-media-folders-reorder',
-            $themeUri . '/assets/js/media-folders-reorder.js',
-            [],
-            '1.6.0',
-            true,
-        );
-        wp_localize_script('oli-media-folders-reorder', 'oliReorder', [
-            'ajaxUrl' => admin_url('admin-ajax.php'),
-            'action'  => self::AJAX_ACTION,
-            'nonce'   => wp_create_nonce(self::NONCE_ACTION),
-            'i18n'    => [
-                'saving'  => __('Enregistrement…', 'oli-theme'),
-                'saved'   => __('Ordre enregistré.', 'oli-theme'),
-                'error'   => __('Erreur lors de l\'enregistrement.', 'oli-theme'),
-                'empty'   => __('Aucune photo dans ce dossier.', 'oli-theme'),
-            ],
-        ]);
-    }
-
-    /**
-     * Rend la page admin : sélecteur de dossier + grille triable des photos
-     * du dossier sélectionné.
-     */
-    public function renderPage(): void
-    {
-        if (!current_user_can('upload_files')) {
-            wp_die(esc_html__('Action non autorisée.', 'oli-theme'), '', ['response' => 403]);
+        if ($photos === []) {
+            ?>
+            <p><em><?php esc_html_e('Aucune photo dans ce dossier.', 'oli-theme'); ?></em></p>
+            <?php
+            return;
         }
-        $selected = isset($_GET['folder']) ? sanitize_key((string) $_GET['folder']) : '';
-        $photos = $selected !== '' ? $this->query->photosInFolder($selected, false, -1) : [];
         ?>
-        <div class="wrap oli-reorder">
-            <h1><?php esc_html_e('Ordonner les galeries', 'oli-theme'); ?></h1>
-            <p class="description">
-                <?php esc_html_e('Choisis un dossier puis glisse les vignettes pour les réordonner. L\'ordre est appliqué à la galerie publique correspondante.', 'oli-theme'); ?>
-            </p>
-
-            <form method="get" action="" class="oli-reorder__picker">
-                <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
-                <label for="oli-reorder-folder"><strong><?php esc_html_e('Dossier :', 'oli-theme'); ?></strong></label>
-                <?php
-                wp_dropdown_categories([
-                    'taxonomy'         => MediaFoldersTaxonomy::TAXONOMY,
-                    'name'             => 'folder',
-                    'id'               => 'oli-reorder-folder',
-                    'value_field'      => 'slug',
-                    'selected'         => $selected,
-                    'show_option_none' => __('— Choisir un dossier —', 'oli-theme'),
-                    'option_none_value' => '',
-                    'hide_empty'       => false,
-                    'hierarchical'     => true,
-                    'depth'            => 5,
-                    'orderby'          => 'name',
-                ]);
-                ?>
-                <button type="submit" class="button"><?php esc_html_e('Afficher', 'oli-theme'); ?></button>
-            </form>
-
-            <?php if ($selected === '') : ?>
-                <p><em><?php esc_html_e('Aucun dossier sélectionné.', 'oli-theme'); ?></em></p>
-            <?php elseif ($photos === []) : ?>
-                <p><em><?php esc_html_e('Aucune photo dans ce dossier.', 'oli-theme'); ?></em></p>
-            <?php else : ?>
-                <div class="oli-reorder__toolbar">
-                    <button
-                        type="button"
-                        class="button button-primary"
-                        id="oli-reorder-save"
-                        data-folder="<?php echo esc_attr($selected); ?>"
-                    >
-                        <?php esc_html_e('Enregistrer l\'ordre', 'oli-theme'); ?>
-                    </button>
-                    <span class="oli-reorder__status" id="oli-reorder-status" aria-live="polite"></span>
-                </div>
-                <ul class="oli-reorder__grid" id="oli-reorder-grid">
-                    <?php foreach ($photos as $photo) : ?>
-                        <li
-                            class="oli-reorder__item"
-                            draggable="true"
-                            data-id="<?php echo (int) $photo['id']; ?>"
-                        >
-                            <img
-                                src="<?php echo esc_url($photo['thumb']); ?>"
-                                alt="<?php echo esc_attr($photo['alt']); ?>"
-                                loading="lazy"
-                                width="150"
-                                height="150"
-                            >
-                            <span class="oli-reorder__caption">
-                                <?php echo esc_html($photo['title'] !== '' ? $photo['title'] : (string) $photo['id']); ?>
-                            </span>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
+        <div class="oli-reorder__toolbar">
+            <button
+                type="button"
+                class="button button-primary"
+                id="oli-reorder-save"
+                data-folder="<?php echo esc_attr($folderSlug); ?>"
+            >
+                <?php esc_html_e('Enregistrer l\'ordre des photos', 'oli-theme'); ?>
+            </button>
+            <span class="oli-reorder__status" id="oli-reorder-status" aria-live="polite"></span>
         </div>
+        <ul class="oli-reorder__grid" id="oli-reorder-grid">
+            <?php foreach ($photos as $photo) : ?>
+                <li
+                    class="oli-reorder__item"
+                    draggable="true"
+                    data-id="<?php echo (int) $photo['id']; ?>"
+                >
+                    <img
+                        src="<?php echo esc_url($photo['thumb']); ?>"
+                        alt="<?php echo esc_attr($photo['alt']); ?>"
+                        loading="lazy"
+                        width="150"
+                        height="150"
+                    >
+                    <span class="oli-reorder__caption">
+                        <?php echo esc_html($photo['title'] !== '' ? $photo['title'] : (string) $photo['id']); ?>
+                    </span>
+                </li>
+            <?php endforeach; ?>
+        </ul>
         <?php
     }
 

@@ -310,7 +310,7 @@ final class PageControllerTest extends TestCase
         });
         Functions\when('taxonomy_exists')->justReturn(true);
         Functions\when('get_terms')->justReturn([
-            (object) ['slug' => 'test', 'name' => 'Test', 'parent' => 0, 'term_id' => 9, 'count' => 1],
+            new \WP_Term((object) ['slug' => 'test', 'name' => 'Test', 'parent' => 0, 'term_id' => 9, 'count' => 1]),
         ]);
         Functions\when('get_posts')->justReturn([
             (object) ['ID' => 2, 'post_excerpt' => '', 'post_title' => ''],
@@ -409,8 +409,8 @@ final class PageControllerTest extends TestCase
         });
         Functions\when('taxonomy_exists')->justReturn(true);
         Functions\when('get_terms')->justReturn([
-            (object) ['slug' => 'voyage', 'name' => 'Voyage', 'parent' => 0, 'term_id' => 1, 'count' => 1],
-            (object) ['slug' => 'archives', 'name' => 'Archives', 'parent' => 0, 'term_id' => 2, 'count' => 1],
+            new \WP_Term((object) ['slug' => 'voyage', 'name' => 'Voyage', 'parent' => 0, 'term_id' => 1, 'count' => 1]),
+            new \WP_Term((object) ['slug' => 'archives', 'name' => 'Archives', 'parent' => 0, 'term_id' => 2, 'count' => 1]),
         ]);
         Functions\when('get_posts')->justReturn([
             (object) ['ID' => 10, 'post_excerpt' => '', 'post_title' => ''],

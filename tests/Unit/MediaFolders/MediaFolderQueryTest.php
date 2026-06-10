@@ -31,15 +31,69 @@ final class MediaFolderQueryTest extends TestCase
     public function test_all_folders_returns_terms(): void
     {
         Functions\when('get_terms')->justReturn([
-            (object) ['slug' => 'stages-2026', 'name' => 'Stages 2026', 'parent' => 0, 'term_id' => 1, 'count' => 12],
-            (object) ['slug' => 'ete', 'name' => 'Été', 'parent' => 1, 'term_id' => 2, 'count' => 3],
+            $this->makeTerm('stages-2026', 'Stages 2026', 0, 1, 0),
+            $this->makeTerm('ete', 'Été', 1, 2, 0),
         ]);
+        // Recompte par slug : 12 pour stages-2026, 3 pour ete.
+        Functions\when('get_posts')->alias(static function (array $args): array {
+            if (($args['fields'] ?? null) !== 'ids') {
+                return [];
+            }
+            $slug = (string) ($args['tax_query'][0]['terms'] ?? '');
+
+            return match ($slug) {
+                'stages-2026' => range(1, 12),
+                'ete'         => [101, 102, 103],
+                default       => [],
+            };
+        });
+
         $folders = (new MediaFolderQuery())->allFolders();
         self::assertCount(2, $folders);
         self::assertSame('stages-2026', $folders[0]['slug']);
         self::assertSame(0, $folders[0]['parent']);
         self::assertSame(1, $folders[1]['parent']);
         self::assertSame(12, $folders[0]['count']);
+        self::assertSame(3, $folders[1]['count']);
+    }
+
+    /**
+     * Le champ `count` natif de WP_Term n'est pas fiable pour les attachments :
+     * `_update_post_term_count` ne compte que les posts `post_status = publish`,
+     * or les attachments sont en `inherit`. Notre allFolders() doit recompter.
+     */
+    public function test_all_folders_recomputes_count_from_attachments(): void
+    {
+        Functions\when('get_terms')->justReturn([
+            $this->makeTerm('voyage', 'Voyage', 0, 1, 0),
+        ]);
+        Functions\when('get_posts')->alias(static function (array $args): array {
+            return ($args['fields'] ?? null) === 'ids' ? [101, 102, 103] : [];
+        });
+
+        $folders = (new MediaFolderQuery())->allFolders();
+
+        self::assertCount(1, $folders);
+        self::assertSame(3, $folders[0]['count']);
+    }
+
+    /**
+     * Construit un \WP_Term minimal pour les stubs `get_terms` (les tests
+     * d'origine utilisaient stdClass, désormais incompatible avec le filtre
+     * `instanceof WP_Term` introduit pour satisfaire PHPStan).
+     */
+    private function makeTerm(string $slug, string $name, int $parent, int $termId, int $count): \WP_Term
+    {
+        $term = new \WP_Term((object) [
+            'term_id'  => $termId,
+            'slug'     => $slug,
+            'name'     => $name,
+            'parent'   => $parent,
+            'count'    => $count,
+            'taxonomy' => 'oli_media_folder',
+        ]);
+
+        return $term;
     }
 
     public function test_all_folders_empty_when_taxonomy_missing(): void
