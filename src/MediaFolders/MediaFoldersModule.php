@@ -86,10 +86,19 @@ final class MediaFoldersModule implements ModuleInterface
             $c->get(FolderGalleryShortcode::class)->register();
         });
 
-        // CSS du shortcode/bloc en frontend (uniquement quand le contenu en a besoin).
+        // CSS + JS du shortcode/bloc en frontend (lightbox au clic sur une
+        // vignette). Enqueue inconditionnel : léger et activé seulement si
+        // une `.oli-folder-gallery` est présente dans le DOM.
         add_action('wp_enqueue_scripts', static function (): void {
             $themeUri = \function_exists('get_template_directory_uri') ? (string) get_template_directory_uri() : '';
-            wp_enqueue_style('oli-folder-gallery', $themeUri . '/assets/css/folder-gallery.css', [], '1.5.0');
+            wp_enqueue_style('oli-folder-gallery', $themeUri . '/assets/css/folder-gallery.css', [], '1.6.0');
+            wp_enqueue_script(
+                'oli-folder-gallery',
+                $themeUri . '/assets/js/folder-gallery.js',
+                [],
+                '1.6.0',
+                true,
+            );
         });
     }
 }
