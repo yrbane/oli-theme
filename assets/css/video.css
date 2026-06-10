@@ -1,0 +1,39 @@
+/**
+ * Shortcode/bloc `oli/video` : wrapper YouTube responsive avec
+ * aspect-ratio configurable et iframe pleine largeur.
+ */
+.oli-video {
+    margin: 1.5rem auto;
+    max-width: 960px;
+    width: 100%;
+    position: relative;
+    background: #000;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.oli-video__iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.oli-video__caption {
+    background: transparent;
+    color: inherit;
+    padding: 0.5rem 0 0;
+    font-size: 0.9em;
+    text-align: center;
+    margin: 0;
+}
+
+.oli-video--empty {
+    color: #b32d2e;
+    font-style: italic;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    background: #fef4f4;
+    border: 1px dashed #d9b3b3;
+    border-radius: 4px;
+}

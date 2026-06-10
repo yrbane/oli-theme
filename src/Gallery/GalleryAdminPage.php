@@ -99,6 +99,74 @@ final class GalleryAdminPage implements AdminTabInterface
             </ul>
         </div>
 
+        <details class="card" style="max-width:none;margin:1rem 0;padding:0.5rem 1.25rem 1rem;">
+            <summary style="cursor:pointer;font-weight:600;padding:0.5rem 0;font-size:1.05em;">
+                <?php esc_html_e('Insérer une vidéo ailleurs avec un shortcode', 'oli-theme'); ?>
+            </summary>
+
+            <p>
+                <?php esc_html_e('Pour insérer une vidéo YouTube responsive dans n\'importe quel article, page ou événement, deux options équivalentes :', 'oli-theme'); ?>
+            </p>
+
+            <p><strong><?php esc_html_e('1. Bloc Gutenberg', 'oli-theme'); ?></strong></p>
+            <p>
+                <?php esc_html_e('Dans l\'éditeur de bloc, clique sur « + », cherche « Vidéo Oli » et saisis l\'ID ou l\'URL YouTube dans les réglages du bloc.', 'oli-theme'); ?>
+            </p>
+
+            <p><strong><?php esc_html_e('2. Shortcode (éditeur classique ou bloc « Shortcode »)', 'oli-theme'); ?></strong></p>
+            <p>
+                <?php esc_html_e('Colle le shortcode dans le contenu :', 'oli-theme'); ?>
+            </p>
+            <pre style="background:#f6f7f7;padding:0.6rem 0.8rem;border:1px solid #dcdcde;border-radius:4px;overflow-x:auto;"><code>[oli_video id="<?php echo esc_html(__('M85A64fB4Yo', 'oli-theme')); ?>"]</code></pre>
+
+            <p><strong><?php esc_html_e('Attributs disponibles', 'oli-theme'); ?></strong></p>
+            <table class="widefat striped" style="max-width:760px;margin:0.5rem 0 1rem;">
+                <thead>
+                    <tr>
+                        <th style="width:120px;"><?php esc_html_e('Attribut', 'oli-theme'); ?></th>
+                        <th><?php esc_html_e('Rôle', 'oli-theme'); ?></th>
+                        <th><?php esc_html_e('Exemple', 'oli-theme'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td><?php esc_html_e('ID YouTube (11 caractères) OU URL YouTube. Obligatoire.', 'oli-theme'); ?></td>
+                        <td><code>id="https://youtu.be/dYQUEd9Em38"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>caption</code></td>
+                        <td><?php esc_html_e('Légende affichée sous la vidéo (vide par défaut).', 'oli-theme'); ?></td>
+                        <td><code>caption="Démo Kalari"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>autoplay</code></td>
+                        <td><?php esc_html_e('« true » pour démarrer automatiquement (lecture silencieuse imposée par le navigateur).', 'oli-theme'); ?></td>
+                        <td><code>autoplay="true"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>aspect</code></td>
+                        <td><?php esc_html_e('Ratio largeur/hauteur (« 16/9 » par défaut). Pour vidéos verticales : « 9/16 ».', 'oli-theme'); ?></td>
+                        <td><code>aspect="9/16"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <em><?php esc_html_e('Exemple complet :', 'oli-theme'); ?></em>
+            </p>
+            <pre style="background:#f6f7f7;padding:0.6rem 0.8rem;border:1px solid #dcdcde;border-radius:4px;overflow-x:auto;"><code>[oli_video id="M85A64fB4Yo" caption="Kalari Body Forms" autoplay="false" aspect="16/9"]</code></pre>
+
+            <p>
+                <strong><?php esc_html_e('Notes :', 'oli-theme'); ?></strong>
+            </p>
+            <ul style="line-height:1.7;margin:0 0 0 1.25rem;list-style:disc;">
+                <li><?php esc_html_e('Le shortcode utilise youtube-nocookie.com — pas de cookie YouTube tant que la vidéo n\'est pas lue.', 'oli-theme'); ?></li>
+                <li><?php esc_html_e('L\'iframe est chargé en différé (loading="lazy") pour ne pas pénaliser le temps de chargement.', 'oli-theme'); ?></li>
+                <li><?php esc_html_e('Le shortcode est indépendant de la liste de vidéos ci-dessous — il accepte n\'importe quel ID YouTube.', 'oli-theme'); ?></li>
+            </ul>
+        </details>
+
         <?php $this->renderPagesStatus(); ?>
 
         <form method="post" action="">

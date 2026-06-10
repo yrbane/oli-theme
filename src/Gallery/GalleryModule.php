@@ -67,5 +67,24 @@ final class GalleryModule implements ModuleInterface
             \assert($page instanceof GalleryAdminPage);
             $registry->add($page);
         }, 10);
+
+        // Shortcode + bloc `[oli_video id="..."]` pour insérer une vidéo
+        // YouTube dans n'importe quelle page/post.
+        if (!$c->has(\OliTheme\Gallery\Frontend\VideoShortcode::class)) {
+            $c->factory(
+                \OliTheme\Gallery\Frontend\VideoShortcode::class,
+                static fn (Container $cc): \OliTheme\Gallery\Frontend\VideoShortcode
+                    => new \OliTheme\Gallery\Frontend\VideoShortcode($cc->get(GalleryRepository::class)),
+            );
+        }
+        add_action('init', static function () use ($c): void {
+            $c->get(\OliTheme\Gallery\Frontend\VideoShortcode::class)->register();
+        });
+
+        // CSS du shortcode/bloc vidéo en frontend (wrapper responsive).
+        add_action('wp_enqueue_scripts', static function (): void {
+            $themeUri = \function_exists('get_template_directory_uri') ? (string) get_template_directory_uri() : '';
+            wp_enqueue_style('oli-video', $themeUri . '/assets/css/video.css', [], '1.6.0');
+        });
     }
 }
