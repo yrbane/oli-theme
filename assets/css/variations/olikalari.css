@@ -71,14 +71,14 @@ p { margin: 0 0 1.25em; color: #111111; }
    conservé souligné pour l'accessibilité. Les contextes spécifiques
    (header, footer, breadcrumbs, cards) ré-overrident plus bas. */
 a {
-  color: #1e6fb8;
+  color: #ef7c33;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
   transition: color 120ms ease, opacity 150ms ease;
 }
-a:hover { color: #14507f; opacity: 1; }
-a:focus-visible { outline: 2px solid #1e6fb8; outline-offset: 2px; border-radius: 2px; }
+a:hover { color: #ef7c33; opacity: 1; }
+a:focus-visible { outline: 2px solid #ef7c33; outline-offset: 2px; border-radius: 2px; }
 
 em, i {
   font-style: italic;
