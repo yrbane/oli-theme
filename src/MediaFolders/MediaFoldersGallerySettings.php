@@ -143,6 +143,114 @@ final class MediaFoldersGallerySettings
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Sélection enregistrée.', 'oli-theme'); ?></p></div>
             <?php endif; ?>
 
+            <details class="card" style="max-width:none;margin:1rem 0;padding:0.5rem 1.25rem 1rem;">
+                <summary style="cursor:pointer;font-weight:600;padding:0.5rem 0;font-size:1.05em;">
+                    <?php esc_html_e('Comment fonctionnent les galeries photos ?', 'oli-theme'); ?>
+                </summary>
+
+                <h3><?php esc_html_e('Le flux complet', 'oli-theme'); ?></h3>
+                <ol style="line-height:1.7;">
+                    <li>
+                        <strong><?php esc_html_e('Créer un dossier', 'oli-theme'); ?></strong>
+                        — <?php
+                        printf(
+                            /* translators: %s = lien vers la page de gestion des dossiers */
+                            esc_html__('depuis %s, ajoute un dossier (ex. « voyages-2025 »). Les dossiers sont hiérarchiques : on peut imbriquer un dossier dans un autre.', 'oli-theme'),
+                            sprintf(
+                                '<a href="%s">%s</a>',
+                                esc_url(admin_url('edit-tags.php?taxonomy=oli_media_folder&post_type=attachment')),
+                                esc_html__('Médias → Dossiers', 'oli-theme'),
+                            ),
+                        );
+                        ?>
+                    </li>
+                    <li>
+                        <strong><?php esc_html_e('Ranger les photos', 'oli-theme'); ?></strong>
+                        — <?php
+                        printf(
+                            /* translators: %s = lien vers la médiathèque */
+                            esc_html__('depuis %s, sélectionne plusieurs photos puis utilise l\'action groupée « Ajouter au dossier… » (ou tague une photo directement depuis sa fiche).', 'oli-theme'),
+                            sprintf(
+                                '<a href="%s">%s</a>',
+                                esc_url(admin_url('upload.php')),
+                                esc_html__('Médias → Bibliothèque', 'oli-theme'),
+                            ),
+                        );
+                        ?>
+                    </li>
+                    <li>
+                        <strong><?php esc_html_e('Cocher le dossier sur cette page', 'oli-theme'); ?></strong>
+                        — <?php esc_html_e('les dossiers cochés s\'affichent sur la page publique /galerie/photos/, avec un filtre par dossier au-dessus de la galerie.', 'oli-theme'); ?>
+                    </li>
+                    <li>
+                        <strong><?php esc_html_e('Ordonner les photos', 'oli-theme'); ?></strong>
+                        — <?php esc_html_e('utilise la grille drag & drop en bas de cette page pour glisser-déposer les vignettes dans l\'ordre souhaité. L\'ordre est appliqué partout (galerie publique, shortcode, bloc).', 'oli-theme'); ?>
+                    </li>
+                </ol>
+
+                <h3><?php esc_html_e('Insérer une galerie dans une page ou un article', 'oli-theme'); ?></h3>
+                <p>
+                    <?php esc_html_e('Deux options équivalentes — choisis selon ton aisance avec l\'éditeur :', 'oli-theme'); ?>
+                </p>
+
+                <p><strong><?php esc_html_e('1. Bloc Gutenberg', 'oli-theme'); ?></strong></p>
+                <p>
+                    <?php esc_html_e('Dans l\'éditeur de bloc, clique sur « + », cherche « Galerie de dossier » et choisis le dossier dans les réglages du bloc.', 'oli-theme'); ?>
+                </p>
+
+                <p><strong><?php esc_html_e('2. Shortcode (éditeur classique ou bloc « Shortcode »)', 'oli-theme'); ?></strong></p>
+                <p>
+                    <?php esc_html_e('Colle le shortcode dans le contenu :', 'oli-theme'); ?>
+                </p>
+                <pre style="background:#f6f7f7;padding:0.6rem 0.8rem;border:1px solid #dcdcde;border-radius:4px;overflow-x:auto;"><code>[oli_folder_gallery folder="<?php echo esc_html(__('mon-dossier', 'oli-theme')); ?>"]</code></pre>
+
+                <p><strong><?php esc_html_e('Attributs disponibles', 'oli-theme'); ?></strong></p>
+                <table class="widefat striped" style="max-width:760px;margin:0.5rem 0 1rem;">
+                    <thead>
+                        <tr>
+                            <th style="width:130px;"><?php esc_html_e('Attribut', 'oli-theme'); ?></th>
+                            <th><?php esc_html_e('Rôle', 'oli-theme'); ?></th>
+                            <th><?php esc_html_e('Exemple', 'oli-theme'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>folder</code></td>
+                            <td><?php esc_html_e('Slug du dossier (obligatoire).', 'oli-theme'); ?></td>
+                            <td><code>folder="voyages-2025"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>children</code></td>
+                            <td><?php esc_html_e('Inclure les sous-dossiers (true par défaut). « false » pour limiter au dossier direct.', 'oli-theme'); ?></td>
+                            <td><code>children="false"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>limit</code></td>
+                            <td><?php esc_html_e('Nombre maximum de photos affichées (-1 par défaut = tout).', 'oli-theme'); ?></td>
+                            <td><code>limit="12"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>title</code></td>
+                            <td><?php esc_html_e('Titre H3 affiché au-dessus de la galerie (vide par défaut).', 'oli-theme'); ?></td>
+                            <td><code>title="Mes voyages"</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    <em><?php esc_html_e('Exemple complet :', 'oli-theme'); ?></em>
+                </p>
+                <pre style="background:#f6f7f7;padding:0.6rem 0.8rem;border:1px solid #dcdcde;border-radius:4px;overflow-x:auto;"><code>[oli_folder_gallery folder="voyages-2025" limit="12" title="Inde 2025"]</code></pre>
+
+                <h3><?php esc_html_e('Comportement front', 'oli-theme'); ?></h3>
+                <ul style="line-height:1.7;">
+                    <li><?php esc_html_e('Vignettes responsives (srcset/sizes), chargement différé (loading="lazy").', 'oli-theme'); ?></li>
+                    <li><?php esc_html_e('Au clic sur une vignette : ouverture en lightbox plein écran (navigation clavier ← → Escape).', 'oli-theme'); ?></li>
+                    <li><?php esc_html_e('L\'ordre des photos suit l\'ordre défini dans la grille drag & drop ci-dessous.', 'oli-theme'); ?></li>
+                    <li><?php esc_html_e('Les modifications d\'ordre ou de sélection sont visibles immédiatement (pas de cache à invalider).', 'oli-theme'); ?></li>
+                </ul>
+            </details>
+
             <?php if ($folders === []) : ?>
                 <p>
                     <em><?php esc_html_e('Aucun dossier n\'existe encore.', 'oli-theme'); ?></em>
