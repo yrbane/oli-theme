@@ -19,34 +19,32 @@ final class FooterSettingsTest extends TestCase
     public function testItExposesAllProperties(): void
     {
         $settings = new FooterSettings(
-            legalByLanguage: ['fr' => '<p>Mentions légales</p>', 'en' => '<p>Legal</p>'],
             copyrightTemplate: '© {year} {site}',
-            showLegal: true,
             showSocial: false,
             showMenu: true,
+            logoId: 42,
+            text: 'Texte libre',
         );
 
-        self::assertSame(['fr' => '<p>Mentions légales</p>', 'en' => '<p>Legal</p>'], $settings->legalByLanguage);
         self::assertSame('© {year} {site}', $settings->copyrightTemplate);
-        self::assertTrue($settings->showLegal);
         self::assertFalse($settings->showSocial);
         self::assertTrue($settings->showMenu);
+        self::assertSame(42, $settings->logoId);
+        self::assertSame('Texte libre', $settings->text);
     }
 
-    public function testItAcceptsEmptyLegal(): void
+    public function testItAcceptsMinimalConstructorArguments(): void
     {
         $settings = new FooterSettings(
-            legalByLanguage: [],
             copyrightTemplate: '',
-            showLegal: false,
             showSocial: false,
             showMenu: false,
         );
 
-        self::assertSame([], $settings->legalByLanguage);
         self::assertSame('', $settings->copyrightTemplate);
-        self::assertFalse($settings->showLegal);
         self::assertFalse($settings->showSocial);
         self::assertFalse($settings->showMenu);
+        self::assertNull($settings->logoId);
+        self::assertSame('', $settings->text);
     }
 }

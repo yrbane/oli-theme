@@ -97,9 +97,7 @@ final class ThemeSettingsModelTest extends TestCase
                 'altByLanguage'   => ['fr' => 'Bannière', 'en' => 'Banner'],
             ],
             'footer' => [
-                'legalByLanguage'   => ['fr' => '<p>Mentions</p>'],
                 'copyrightTemplate' => '© {year} Oli',
-                'showLegal'         => true,
                 'showSocial'        => false,
                 'showMenu'          => true,
             ],
@@ -141,9 +139,7 @@ final class ThemeSettingsModelTest extends TestCase
         self::assertSame(['fr' => 'Bannière', 'en' => 'Banner'], $bag->banner->altByLanguage);
 
         // Footer
-        self::assertSame(['fr' => '<p>Mentions</p>'], $bag->footer->legalByLanguage);
         self::assertSame('© {year} Oli', $bag->footer->copyrightTemplate);
-        self::assertTrue($bag->footer->showLegal);
         self::assertFalse($bag->footer->showSocial);
         self::assertTrue($bag->footer->showMenu);
 

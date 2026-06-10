@@ -25,7 +25,7 @@ final class SettingsBagTest extends TestCase
     public function testItExposesAllSubBags(): void
     {
         $banner = new BannerSettings(1, 2, 3, ['fr' => 'Alt']);
-        $footer = new FooterSettings(['fr' => '<p>Legal</p>'], '© {year}', true, false, true);
+        $footer = new FooterSettings('© {year}', false, true);
         $social = new SocialSettings('https://fb.com', null, null, null, null);
         $languages = new LanguagesSettings(['fr', 'en'], 'fr', LanguagesSettings::FALLBACK_HOME);
         $contact = new ContactSettings('test@example.com', null, false, true);
@@ -59,9 +59,7 @@ final class SettingsBagTest extends TestCase
         self::assertSame([], $bag->banner->altByLanguage);
 
         // Footer
-        self::assertSame([], $bag->footer->legalByLanguage);
         self::assertSame('© {year} {site}', $bag->footer->copyrightTemplate);
-        self::assertTrue($bag->footer->showLegal);
         self::assertTrue($bag->footer->showSocial);
         self::assertTrue($bag->footer->showMenu);
 

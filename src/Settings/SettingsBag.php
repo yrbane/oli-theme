@@ -44,7 +44,7 @@ final readonly class SettingsBag
     {
         return new self(
             banner: new BannerSettings(null, null, null, []),
-            footer: new FooterSettings([], '© {year} {site}', true, true, true),
+            footer: new FooterSettings('© {year} {site}', true, true),
             social: new SocialSettings(null, null, null, null, null),
             languages: new LanguagesSettings(['fr'], 'fr', LanguagesSettings::FALLBACK_HOME),
             contact: new ContactSettings(null, null, false, false),

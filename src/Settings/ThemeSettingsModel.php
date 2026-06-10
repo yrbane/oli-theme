@@ -77,9 +77,7 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
                 altByLanguage: \is_array($banner['altByLanguage'] ?? null) ? $banner['altByLanguage'] : [],
             ),
             footer: new FooterSettings(
-                legalByLanguage: \is_array($footer['legalByLanguage'] ?? null) ? $footer['legalByLanguage'] : [],
                 copyrightTemplate: (string) ($footer['copyrightTemplate'] ?? $defaults->footer->copyrightTemplate),
-                showLegal: (bool) ($footer['showLegal'] ?? $defaults->footer->showLegal),
                 showSocial: (bool) ($footer['showSocial'] ?? $defaults->footer->showSocial),
                 showMenu: (bool) ($footer['showMenu'] ?? $defaults->footer->showMenu),
                 logoId: isset($footer['logoId']) && $footer['logoId'] !== null ? (int) $footer['logoId'] : null,

@@ -367,45 +367,14 @@ final class ThemeSettingsPage
     {
         $helpFooter = self::helpBubble('footer');
         add_settings_field(
-            'oli_footer_legal_fr',
-            __('Mentions légales (FR)', 'oli-theme') . $helpFooter,
-            fn () => $this->renderTextarea(
-                'footer',
-                'legalByLanguage[fr]',
-                (string) ($current->footer->legalByLanguage['fr'] ?? ''),
-                __('HTML autorisé (liens, gras, paragraphes).', 'oli-theme'),
-            ),
-            $page,
-            $section,
-        );
-        add_settings_field(
-            'oli_footer_legal_en',
-            __('Mentions légales (EN)', 'oli-theme') . $helpFooter,
-            fn () => $this->renderTextarea(
-                'footer',
-                'legalByLanguage[en]',
-                (string) ($current->footer->legalByLanguage['en'] ?? ''),
-                '',
-            ),
-            $page,
-            $section,
-        );
-        add_settings_field(
             'oli_footer_copyright',
-            __('Modèle de copyright', 'oli-theme'),
+            __('Modèle de copyright', 'oli-theme') . $helpFooter,
             fn () => $this->renderTextField(
                 'footer',
                 'copyrightTemplate',
                 $current->footer->copyrightTemplate,
                 __('Placeholders disponibles : {year}, {site}.', 'oli-theme'),
             ),
-            $page,
-            $section,
-        );
-        add_settings_field(
-            'oli_footer_show_legal',
-            __('Afficher les mentions légales', 'oli-theme'),
-            fn () => $this->renderCheckbox('footer', 'showLegal', $current->footer->showLegal),
             $page,
             $section,
         );
@@ -451,20 +420,11 @@ final class ThemeSettingsPage
      */
     private function sanitizeFooter(array $input): array
     {
-        $legal = [];
-        if (isset($input['legalByLanguage']) && \is_array($input['legalByLanguage'])) {
-            foreach ($input['legalByLanguage'] as $lang => $html) {
-                $legal[sanitize_key((string) $lang)] = wp_kses_post((string) $html);
-            }
-        }
-
         $logoIdRaw = $input['logoId'] ?? null;
         $logoId    = ($logoIdRaw !== null && $logoIdRaw !== '') ? absint((int) $logoIdRaw) : null;
 
         return [
-            'legalByLanguage'   => $legal,
             'copyrightTemplate' => sanitize_text_field((string) ($input['copyrightTemplate'] ?? '© {year} {site}')),
-            'showLegal'         => !empty($input['showLegal']),
             'showSocial'        => !empty($input['showSocial']),
             'showMenu'          => !empty($input['showMenu']),
             'logoId'            => $logoId,
