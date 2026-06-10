@@ -50,11 +50,11 @@ final class PostController implements ArchiveRendererInterface
         $viewModel['post'] = $entity;
         $viewModel['seo'] = $this->seo->buildForPost($entity);
         $viewModel['crumbs'] = $this->breadcrumbs->buildForPost($entity);
-        $viewModel['bodyClasses'] = \sprintf(
+        $viewModel['bodyClasses'] = \OliTheme\Theme::applyBodyClassesFilter(\sprintf(
             'single single-post post-id-%d lang-%s',
             $entity->id,
             $entity->language->code,
-        );
+        ));
 
         return $this->renderer->render('pages/single-post.html', $viewModel);
     }

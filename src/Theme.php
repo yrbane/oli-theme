@@ -125,6 +125,36 @@ final class Theme
     }
 
     /**
+     * Applique le filtre WordPress standard `body_class` sur la chaîne de
+     * classes construite par un controller (ex. PageController), pour que
+     * les modules tiers (Gabarits, etc.) qui hookent ce filtre puissent
+     * influencer l'attribut `<body class="...">`.
+     *
+     * Sans ce helper, le thème court-circuite `body_class()` natif et tout
+     * filtre branché dessus est silencieusement ignoré.
+     */
+    public static function applyBodyClassesFilter(string $raw): string
+    {
+        if (!\function_exists('apply_filters')) {
+            return $raw;
+        }
+        $classes = array_values(array_filter(explode(' ', $raw), static fn (string $c): bool => $c !== ''));
+        $filtered = apply_filters('body_class', $classes);
+        if (!\is_array($filtered)) {
+            return $raw;
+        }
+        $clean = [];
+        foreach ($filtered as $c) {
+            $str = (string) $c;
+            if ($str !== '' && !\in_array($str, $clean, true)) {
+                $clean[] = $str;
+            }
+        }
+
+        return implode(' ', $clean);
+    }
+
+    /**
      * Mémorise l'erreur de cache pour qu'un admin_notice la remonte plus tard.
      */
     private static function recordCacheError(string $message): void

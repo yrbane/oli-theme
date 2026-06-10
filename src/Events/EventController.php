@@ -71,7 +71,7 @@ final class EventController implements EventControllerInterface
             'footerMenu' => $this->menus->buildFooter($current),
             'seo' => $this->seo->buildForEvent($entity),
             'crumbs' => $this->breadcrumbs->buildForEvent($entity),
-            'bodyClasses' => \sprintf('single single-event event-id-%d lang-%s', $entity->id, $entity->language->code),
+            'bodyClasses' => \OliTheme\Theme::applyBodyClassesFilter(\sprintf('single single-event event-id-%d lang-%s', $entity->id, $entity->language->code)),
         ]);
     }
 }

@@ -80,12 +80,12 @@ final class PageController implements PageRendererInterface
         // home (qui affiche déjà le carousel plein écran JS) via `body:not(.home)`
         // côté CSS. Le carousel d'accueil est rendu côté client par
         // assets/js/home-carousel.js (variation Olikalari) ; aucun rendu serveur.
-        $vm['bodyClasses'] = \sprintf(
+        $vm['bodyClasses'] = \OliTheme\Theme::applyBodyClassesFilter(\sprintf(
             '%spage page-id-%d lang-%s',
             $this->isFrontPage($entity->id) ? 'home ' : '',
             $entity->id,
             $entity->language->code,
-        );
+        ));
 
         $split = $this->coverExtractor->split($entity->content);
         $vm['coverHtml'] = $split['cover'];
