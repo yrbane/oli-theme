@@ -86,9 +86,11 @@ final class ThemeSettingsPage
             $tab = self::DEFAULT_TAB;
         }
 
-        // Les onglets contenant des champs média ont besoin de wp.media (sélecteur
-        // de médiathèque). Enqueue ici car la page hôte n'a pas de hook dédié.
-        if (\in_array($tab, ['banner', 'seo'], true) && \function_exists('wp_enqueue_media')) {
+        // wp.media est requis dès qu'un onglet expose un picker média (logo
+        // bannière, logo footer, image SEO, etc.). Enqueue inconditionnel
+        // pour éviter qu'un nouvel onglet à champ média soit oublié ici —
+        // le surcoût (~30 KB) est négligeable côté admin.
+        if (\function_exists('wp_enqueue_media')) {
             wp_enqueue_media();
         }
 

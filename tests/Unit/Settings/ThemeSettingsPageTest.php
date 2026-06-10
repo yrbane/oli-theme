@@ -39,6 +39,37 @@ final class ThemeSettingsPageTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Régression : l'onglet `footer` contient un picker média (logo footer)
+     * via `oli_media_picker`. Sans `wp_enqueue_media()`, le JS du picker tombe
+     * sur le message « Médiathèque indisponible ». On garantit ici que tout
+     * onglet rendu déclenche le chargement de la médiathèque (whitelist
+     * fragile remplacée par un enqueue inconditionnel).
+     */
+    public function testRenderPanelForFooterTabEnqueuesMediaLibrary(): void
+    {
+        Functions\when('__')->returnArg(1);
+        Functions\when('settings_fields')->justReturn(null);
+        Functions\when('do_settings_sections')->justReturn(null);
+        Functions\when('submit_button')->justReturn(null);
+        Functions\when('esc_attr')->returnArg(1);
+
+        $enqueued = false;
+        Functions\when('wp_enqueue_media')->alias(static function () use (&$enqueued): void {
+            $enqueued = true;
+        });
+
+        $model = $this->createMock(ThemeSettingsModelInterface::class);
+        $model->method('all')->willReturn(SettingsBag::default());
+
+        $page = new ThemeSettingsPage($model);
+        ob_start();
+        $page->renderPanelFor('footer');
+        ob_end_clean();
+
+        self::assertTrue($enqueued, 'wp_enqueue_media doit être appelé pour l\'onglet footer (picker du logo).');
+    }
+
     public function testRegisterSettingsCallsRegisterSettingAndAddsSections(): void
     {
         Functions\when('__')->returnArg(1);
