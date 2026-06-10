@@ -91,28 +91,6 @@ final class GalleryRepositoryTest extends TestCase
         self::assertSame('https://www.youtube.com/watch?v=dQw4w9WgXcQ', $videos[0]['watch_url']);
     }
 
-    public function testGetPhotosResolvesAttachmentUrlsAndAlt(): void
-    {
-        Functions\when('get_option')->alias(static function (string $k) {
-            if ($k === GalleryRepository::OPTION_PHOTOS) {
-                return json_encode([
-                    ['attachment_id' => 42, 'caption' => 'A photo'],
-                    ['attachment_id' => 43, 'caption' => ''],
-                ]);
-            }
-            return '';
-        });
-
-        $photos = (new GalleryRepository())->getPhotos();
-
-        self::assertCount(2, $photos);
-        self::assertSame(42, $photos[0]['id']);
-        self::assertSame('A photo', $photos[0]['caption']);
-        self::assertSame('https://example.test/wp-content/uploads/img-42-large.jpg', $photos[0]['url']);
-        self::assertSame('https://example.test/wp-content/uploads/img-42-medium.jpg', $photos[0]['thumb']);
-        self::assertSame('alt-42', $photos[0]['alt']);
-    }
-
     public function testGetYoutubeChannelReturnsDefaultWhenEmpty(): void
     {
         Functions\when('get_option')->justReturn('');
@@ -125,26 +103,4 @@ final class GalleryRepositoryTest extends TestCase
         self::assertSame('https://youtube.com/@AnotherChannel', (new GalleryRepository())->getYoutubeChannel());
     }
 
-    public function testSetPhotosFiltersInvalidEntries(): void
-    {
-        /** @var list<string> $writes */
-        $writes = [];
-        Functions\when('update_option')->alias(static function (string $k, $v) use (&$writes): bool {
-            $writes[$k] = $v;
-            return true;
-        });
-
-        (new GalleryRepository())->setPhotos([
-            ['attachment_id' => 1, 'caption' => 'OK'],
-            ['attachment_id' => 0, 'caption' => 'invalid'],
-            ['caption' => 'no id'],
-            ['attachment_id' => 5, 'caption' => 'OK 2'],
-        ]);
-
-        self::assertArrayHasKey(GalleryRepository::OPTION_PHOTOS, $writes);
-        $decoded = json_decode((string) $writes[GalleryRepository::OPTION_PHOTOS], true);
-        self::assertCount(2, $decoded);
-        self::assertSame(1, $decoded[0]['attachment_id']);
-        self::assertSame(5, $decoded[1]['attachment_id']);
-    }
 }

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace OliTheme\Gallery;
 
 /**
- * Lecture/écriture des données de la galerie (photos + vidéos YouTube).
+ * Lecture/écriture des données vidéos YouTube de la galerie.
  *
- * Les données sont stockées dans 3 options WordPress autonomes :
- *   - `oli_gallery_photos` : JSON `[{attachment_id, caption}, ...]`
+ * Les données sont stockées dans 2 options WordPress autonomes :
  *   - `oli_gallery_youtube_channel` : URL de la chaîne YouTube (string)
  *   - `oli_gallery_videos` : JSON `[{video_id, caption}, ...]`
+ *
+ * Les photos sont désormais gérées par dossiers via
+ * {@see \OliTheme\MediaFolders\MediaFoldersGallerySettings}.
  *
  * @package OliTheme\Gallery
  *
@@ -18,7 +20,6 @@ namespace OliTheme\Gallery;
  */
 final class GalleryRepository
 {
-    public const OPTION_PHOTOS  = 'oli_gallery_photos';
     public const OPTION_CHANNEL = 'oli_gallery_youtube_channel';
     public const OPTION_VIDEOS  = 'oli_gallery_videos';
 
@@ -39,73 +40,6 @@ final class GalleryRepository
 
     public function __construct(private readonly ?YoutubeChannelFetcher $fetcher = null)
     {
-    }
-
-    /**
-     * Retourne les photos enrichies (URL + alt + srcset résolus depuis WP).
-     *
-     * @return list<array{id: int, caption: string, url: string, thumb: string, alt: string, srcset: string}>
-     */
-    public function getPhotos(): array
-    {
-        $raw = $this->readJson(self::OPTION_PHOTOS);
-        $out = [];
-        foreach ($raw as $entry) {
-            if (!\is_array($entry) || empty($entry['attachment_id'])) {
-                continue;
-            }
-            $id  = (int) $entry['attachment_id'];
-            $url = \function_exists('wp_get_attachment_image_url') ? wp_get_attachment_image_url($id, 'large') : '';
-            $thb = \function_exists('wp_get_attachment_image_url') ? wp_get_attachment_image_url($id, 'medium') : '';
-            if (!\is_string($url) || $url === '') {
-                continue;
-            }
-            $alt = '';
-            if (\function_exists('get_post_meta')) {
-                $alt = (string) get_post_meta($id, '_wp_attachment_image_alt', true);
-            }
-            // Jeu de sources responsives (toutes tailles WP), commun à l'image
-            // principale et aux vignettes — seul `sizes` diffère côté template.
-            $srcset = \function_exists('wp_get_attachment_image_srcset')
-                ? wp_get_attachment_image_srcset($id, 'large')
-                : false;
-            $out[] = [
-                'id'      => $id,
-                'caption' => (string) ($entry['caption'] ?? ''),
-                'url'     => $url,
-                'thumb'   => \is_string($thb) && $thb !== '' ? $thb : $url,
-                'alt'     => $alt,
-                'srcset'  => \is_string($srcset) ? $srcset : '',
-            ];
-        }
-        return $out;
-    }
-
-    /**
-     * Stocke la liste de photos.
-     *
-     * @param list<array<string, mixed>> $photos
-     */
-    public function setPhotos(array $photos): void
-    {
-        $clean = [];
-        foreach ($photos as $entry) {
-            if (!\is_array($entry) || empty($entry['attachment_id'])) {
-                continue;
-            }
-            $id = (int) $entry['attachment_id'];
-            if ($id <= 0) {
-                continue;
-            }
-            $caption = isset($entry['caption']) && \is_string($entry['caption'])
-                ? $this->sanitizeCaption($entry['caption'])
-                : '';
-            $clean[] = [
-                'attachment_id' => $id,
-                'caption'       => $caption,
-            ];
-        }
-        update_option(self::OPTION_PHOTOS, wp_json_encode($clean));
     }
 
     public function getYoutubeChannel(): string
