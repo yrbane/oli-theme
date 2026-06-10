@@ -80,12 +80,14 @@ final class GabaritMetabox
         echo '<option value="">' . esc_html__('— Défaut du thème —', 'oli-theme') . '</option>';
         foreach ($available as $g) {
             \assert($g instanceof Gabarit);
-            $selected = $current === $g->id ? ' selected' : '';
-            $marker   = $g->isZonal() ? ' ◆' : '';
+            $selectedAttr = $current === $g->id ? ' selected' : '';
+            $zonalAttr    = $g->isZonal() ? ' data-zonal="1"' : '';
+            $marker       = $g->isZonal() ? ' ◆' : '';
             printf(
-                '<option value="%s"%s>%s%s</option>',
+                '<option value="%s"%s%s>%s%s</option>',
                 esc_attr($g->id),
-                $selected,
+                $selectedAttr,
+                $zonalAttr,
                 esc_html($g->name),
                 esc_html($marker),
             );
@@ -98,6 +100,15 @@ final class GabaritMetabox
             echo '<p style="margin-top:0.5rem;color:#50575e;">' . esc_html($selected->description) . '</p>';
         }
 
+        // Hint UX : affiché par le JS quand l'utilisateur sélectionne un
+        // gabarit zonal différent du courant (donc les zones du nouveau
+        // gabarit ne sont pas encore rendues côté serveur — il faut
+        // sauvegarder pour les voir).
+        echo '<div id="oli-gabarit-save-hint" style="display:none;margin:1rem 0;padding:0.75rem 1rem;background:#fff8e1;border-left:4px solid #ffba00;">';
+        echo '<strong>' . esc_html__('Ce gabarit a des zones à renseigner.', 'oli-theme') . '</strong> ';
+        echo esc_html__('Enregistrez la page pour faire apparaître les champs des zones (Introduction, Image héros, etc.) ci-dessous.', 'oli-theme');
+        echo '</div>';
+
         // Édition des zones du gabarit sélectionné.
         if ($selected !== null && $selected->isZonal()) {
             $contents = $this->zones->load($post->ID);
@@ -109,6 +120,8 @@ final class GabaritMetabox
                 $this->renderZone($zone, $content);
             }
         }
+
+        $this->printSelectChangeHintScriptOnce($current);
 
         echo '<p style="margin-top:1rem;font-size:0.85em;"><a href="' . esc_url(add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'apparence', 'sub' => 'gabarits'], admin_url('themes.php'))) . '">' . esc_html__('Voir la galerie complète des gabarits →', 'oli-theme') . '</a></p>';
     }
@@ -195,6 +208,41 @@ final class GabaritMetabox
             esc_html__('Vider', 'oli-theme'),
         );
         $this->printPickerScriptOnce();
+    }
+
+    /**
+     * Affiche une notice « Enregistre pour configurer les zones » dès que
+     * l'utilisateur sélectionne un gabarit zonal différent du courant.
+     *
+     * Sans rechargement / AJAX, on ne peut pas faire apparaître les champs
+     * de zones dynamiquement (ils dépendent du manifest serveur). Cette
+     * notice rend le comportement explicite.
+     */
+    private function printSelectChangeHintScriptOnce(string $currentId): void
+    {
+        static $printed = false;
+        if ($printed) {
+            return;
+        }
+        $printed = true;
+        ?>
+        <script>
+        (function () {
+            const select = document.getElementById('oli-gabarit-select');
+            const hint   = document.getElementById('oli-gabarit-save-hint');
+            if (!select || !hint) return;
+            const initial = <?php echo wp_json_encode($currentId); ?>;
+            function refresh() {
+                const opt = select.options[select.selectedIndex];
+                const isZonal = opt && opt.dataset && opt.dataset.zonal === '1';
+                const changedFromCurrent = select.value !== initial;
+                hint.style.display = (isZonal && changedFromCurrent) ? '' : 'none';
+            }
+            select.addEventListener('change', refresh);
+            refresh();
+        })();
+        </script>
+        <?php
     }
 
     private function printPickerScriptOnce(): void
