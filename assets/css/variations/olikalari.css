@@ -2168,3 +2168,291 @@ sub, sup { font-size: 0.72em; }
   .post-card__meta,
   .post-card__excerpt { color: #a8a8a5; }
 }
+
+/* ==========================================================================
+   MENU MOBILE — Refonte from scratch (2026-06-11).
+   Placé en fin de variation pour gagner la cascade contre toutes les
+   règles `.site-header .nav__*` plus haut dans le fichier. Désactive
+   `nav--desktop` sous 68 rem et impose un drawer slide-in moderne.
+   ========================================================================== */
+@media (max-width: 67.99rem) {
+
+    /* Disparition du menu desktop. Préfixé `.site-header` pour battre
+       `.site-header nav.nav--desktop` (0,0,2,1). */
+    .site-header .nav--desktop,
+    .site-header nav.nav--desktop { display: none; }
+
+    /* Header : burger + branding à gauche, langues poussées à droite. */
+    .site-header {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        padding: 0.5rem 0.75rem;
+    }
+    .site-header .language-switcher,
+    .site-header ul.lang-switcher { margin-left: auto; }
+
+    /* ------------------ Burger ------------------
+       Pastille orange marque, ombre marquée, animation X au clic.
+       Plus gros (52×52) pour pouce. */
+    .site-header .nav-toggle,
+    .nav-toggle {
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 52px;
+        height: 52px;
+        padding: 0;
+        background: #ef7c33;
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(239, 124, 51, 0.35);
+        color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        z-index: 1010;
+        transition: background 180ms ease, transform 180ms ease, box-shadow 200ms ease;
+        margin: 0;
+    }
+    .site-header .nav-toggle:hover,
+    .nav-toggle:hover {
+        background: #d96820;
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(239, 124, 51, 0.45);
+    }
+    .site-header .nav-toggle:focus-visible,
+    .nav-toggle:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 2px;
+    }
+    .nav-toggle__bar {
+        display: block;
+        width: 26px;
+        height: 3px;
+        background: #ffffff;
+        border-radius: 3px;
+        transition: transform 280ms cubic-bezier(0.65, 0, 0.35, 1), opacity 180ms ease;
+        transform-origin: center;
+    }
+    .nav-toggle__label {
+        position: absolute;
+        width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0);
+        white-space: nowrap; border: 0;
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    /* ------------------ Drawer ------------------
+       Slide depuis la droite, fond sombre éditorial, scroll interne. */
+    .site-header .nav--mobile,
+    nav.nav--mobile {
+        display: flex !important;
+        flex-direction: column;
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        left: auto;
+        width: min(90vw, 440px);
+        max-width: none;
+        background:
+            radial-gradient(ellipse 600px 400px at 100% 0%, rgba(239, 124, 51, 0.12), transparent 60%),
+            #0d0d0e;
+        color: #f1f1ef;
+        padding: 6rem 1.5rem 2.5rem;
+        margin: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        z-index: 1000;
+        box-shadow: -24px 0 60px -12px rgba(0, 0, 0, 0.55);
+        border-left: 1px solid rgba(239, 124, 51, 0.25);
+        font-family: 'Manrope', system-ui, sans-serif;
+        font-size: 1rem;
+        transform: translateX(100%);
+        transition: transform 320ms cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .site-header .nav--mobile[hidden],
+    nav.nav--mobile[hidden] {
+        display: flex !important;          /* on garde le flex pour la transition */
+        transform: translateX(100%);
+        pointer-events: none;
+    }
+    body.has-mobile-menu-open .site-header .nav--mobile,
+    body.has-mobile-menu-open nav.nav--mobile {
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    /* Backdrop sombre flou cliquable. */
+    body.has-mobile-menu-open::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 990;
+        animation: oli-mobile-fade-in 200ms ease forwards;
+    }
+    @keyframes oli-mobile-fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    body.has-mobile-menu-open { overflow: hidden; }
+
+    /* ------------------ Liste des items ------------------ */
+    .site-header .nav--mobile .nav__list,
+    .site-header .nav--mobile ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        flex-wrap: nowrap;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        list-style: none;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+    .site-header .nav--mobile .nav__list--root > .nav__item + .nav__item {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .site-header .nav--mobile .nav__item,
+    .site-header .nav--mobile li {
+        width: 100%;
+        margin: 0;
+        position: static;
+        list-style: none;
+    }
+
+    /* Items du niveau racine — typo serif élégante, grande respiration. */
+    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link,
+    .site-header .nav--mobile .nav__list--root > li > a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.1rem 0.5rem;
+        font-family: 'ADLaM Display', 'Manrope', system-ui, serif;
+        font-size: 1.5rem;
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: #f1f1ef;
+        text-decoration: none;
+        background: transparent;
+        background-image: none;
+        border-radius: 0;
+        white-space: normal;
+        transition: color 160ms ease, padding-left 220ms ease, letter-spacing 220ms ease;
+    }
+    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link:hover,
+    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link:focus-visible,
+    .site-header .nav--mobile .nav__list--root > li > a:hover,
+    .site-header .nav--mobile .nav__list--root > li > a:focus-visible {
+        color: #ef7c33;
+        padding-left: 1rem;
+        background-image: none;
+        background-size: auto;
+        opacity: 1;
+    }
+    .site-header .nav--mobile .nav__item--current > .nav__link,
+    .site-header .nav--mobile .nav__item--ancestor > .nav__link {
+        color: #ef7c33;
+        background: transparent;
+        background-image: none;
+        font-weight: 500;
+    }
+    .site-header .nav--mobile .nav__item--current > .nav__link::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #ef7c33;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    /* Chevron sur les items avec sous-menu. */
+    .site-header .nav--mobile .nav__item--has-children > .nav__link::after {
+        content: "";
+        margin-left: auto;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg);
+        transition: transform 250ms ease;
+        opacity: 0.6;
+    }
+    .site-header .nav--mobile .nav__item--has-children.is-open > .nav__link::after {
+        transform: rotate(-135deg);
+        opacity: 1;
+    }
+
+    /* ------------------ Sous-menu (accordéon) ------------------
+       Caché par défaut (max-height: 0), s'ouvre quand le parent
+       `.nav__item--has-children` reçoit la classe `.is-open` (JS). */
+    .site-header .nav--mobile .nav__sublist,
+    .site-header .nav--mobile ul.nav__sublist {
+        display: block;
+        position: static;
+        list-style: none;
+        margin: 0;
+        padding: 0 0 0 1rem;
+        border: 0;
+        border-left: 2px solid rgba(239, 124, 51, 0.5);
+        margin-left: 0.5rem;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        min-width: 0;
+        max-width: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 320ms cubic-bezier(0.65, 0, 0.35, 1),
+                    padding 280ms ease;
+    }
+    .site-header .nav--mobile .nav__item--has-children.is-open > .nav__sublist {
+        max-height: 1200px;        /* assez large pour tout contenu raisonnable */
+        padding-top: 0.5rem;
+        padding-bottom: 1rem;
+    }
+    .site-header .nav--mobile .nav__sublist > .nav__item {
+        border-top: 0;
+    }
+    .site-header .nav--mobile .nav__sublist .nav__link,
+    .site-header .nav--mobile .nav__link--child {
+        display: block;
+        padding: 0.75rem 0.5rem;
+        font-family: 'Manrope', system-ui, sans-serif;
+        font-size: 1.05rem;
+        font-weight: 500;
+        line-height: 1.35;
+        color: #cfcfcc;
+        background: transparent;
+        background-image: none;
+        border-radius: 8px;
+        text-decoration: none;
+        white-space: normal;
+        transition: color 150ms ease, background 150ms ease, padding-left 200ms ease;
+    }
+    .site-header .nav--mobile .nav__sublist .nav__link:hover,
+    .site-header .nav--mobile .nav__sublist .nav__link:focus-visible,
+    .site-header .nav--mobile .nav__link--child:hover,
+    .site-header .nav--mobile .nav__link--child:focus-visible {
+        color: #ffffff;
+        background: rgba(239, 124, 51, 0.15);
+        padding-left: 0.85rem;
+    }
+}

@@ -41,10 +41,32 @@ export function initMobileMenu() {
         }
     });
 
-    // Fermeture automatique quand on suit un lien interne du menu.
+    // Accordéon des items à sous-menu : on intercepte le tap sur le lien
+    // parent pour ouvrir/fermer le sous-menu plutôt que de naviguer
+    // directement. Premier tap = ouvre, second tap = navigue (URL réelle).
+    // Les autres items ouverts se ferment (un seul ouvert à la fois).
     drawer.addEventListener('click', (event) => {
-        const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
-        if (link) {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+        const parentLink = event.target.closest('.nav__item--has-children > .nav__link');
+        if (parentLink) {
+            const item = parentLink.parentElement;
+            if (item && !item.classList.contains('is-open')) {
+                event.preventDefault();
+                drawer.querySelectorAll('.nav__item--has-children.is-open').forEach((el) => {
+                    if (el !== item) {
+                        el.classList.remove('is-open');
+                    }
+                });
+                item.classList.add('is-open');
+                return;
+            }
+        }
+        // Si on clique sur un lien enfant (pas un parent à sous-menu),
+        // on ferme le drawer après la navigation.
+        const link = event.target.closest('a[href]');
+        if (link && !link.matches('.nav__item--has-children > .nav__link')) {
             setOpen(false);
         }
     });
