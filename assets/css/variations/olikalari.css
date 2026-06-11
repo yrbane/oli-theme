@@ -23,9 +23,9 @@
   --ff-serif: 'Manrope', system-ui, sans-serif;
   --ff-sans:  'Manrope', system-ui, sans-serif;
   --ff-mono:  'Manrope', ui-monospace, monospace;
-  --maxw-prose:   60ch;
-  --maxw-content: 720px;
-  --maxw-wide:    1200px;
+  --maxw-prose:   72ch;
+  --maxw-content: 1080px;
+  --maxw-wide:    1320px;
 }
 
 body::before, body::after { display: none !important; content: none !important; }
@@ -427,7 +427,7 @@ article, .post, .page {
   background: transparent;
 }
 .page__header, .entry-header, .post__header {
-  max-width: 720px;
+  max-width: var(--maxw-content);
   margin: 0 auto;
   padding: 0 2rem 2rem;
 }
