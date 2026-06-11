@@ -1502,6 +1502,14 @@ a.btn:focus-visible,
   .site-header .nav--desktop .nav__sublist .nav__item:hover { background: #262627; }
   .site-header .nav--desktop .nav__sublist .nav__item:hover .nav__link { color: #ffffff; }
 
+  /* Header sur la home (carousel plein écran) — override clair forcé hors
+     dark mode → repassage en sombre pour rester lisible avec le texte
+     clair défini plus haut. */
+  body.has-fullscreen-hero .site-header {
+    background: rgba(18, 18, 19, 0.92);
+    border-bottom-color: #ffffff1f;
+  }
+
   /* Cartes de contenu */
   .feature-card__title { color: #f1f1ef; }
   .feature-card__desc { color: #b9b9b6; }
