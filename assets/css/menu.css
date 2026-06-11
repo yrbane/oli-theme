@@ -36,31 +36,171 @@
 .nav-toggle { display: none; }
 .nav--mobile { display: none; }
 
-/* Bascule en menu burger à 67.99rem (~1088 px) — sous cette taille, même
-   avec des libellés courts, on n'arrive pas à tenir 6-10 items sur une
-   seule ligne sans rendu écrasé. Le burger reprend le relais. */
+/* ============================================================
+   Bascule en menu burger à 67.99rem (~1088 px).
+   Refonte 2026-06 : bouton burger orange marque + drawer
+   slide-in droite avec backdrop, items aérés, hover orange.
+   La version desktop (≥ 68 rem) reste intouchée.
+   ============================================================ */
 @media (max-width: 67.99rem) {
     .nav--desktop { display: none; }
+
+    /* ---- Bouton burger : pastille orange marque, 3 barres blanches
+       qui s'animent en X quand le drawer est ouvert. ---- */
     .nav-toggle {
-        display: inline-flex; align-items: center; gap: var(--space-2);
-        background: transparent; border: 1px solid var(--color-border);
-        padding: var(--space-2) var(--space-3); border-radius: 0.25rem;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        background: #ef7c33;
+        border: 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(239, 124, 51, 0.25);
         cursor: pointer;
+        transition: background 180ms ease, box-shadow 200ms ease, transform 180ms ease;
+        position: relative;
+        z-index: 110; /* au-dessus du drawer pour rester cliquable */
     }
-    .nav-toggle__bar { display: block; width: 1rem; height: 2px; background: var(--color-text); }
-    .nav--mobile {
+    .nav-toggle:hover {
+        background: #d96820;
+        box-shadow: 0 6px 16px rgba(239, 124, 51, 0.4);
+        transform: translateY(-1px);
+    }
+    .nav-toggle:focus-visible {
+        outline: 2px solid #ef7c33;
+        outline-offset: 3px;
+    }
+    .nav-toggle__bar {
         display: block;
-        position: fixed; inset: 0;
-        background: var(--color-bg);
-        padding: var(--space-6) var(--space-4);
+        width: 20px;
+        height: 2px;
+        background: #ffffff;
+        border-radius: 2px;
+        transition: transform 220ms ease, opacity 180ms ease;
+        transform-origin: center;
+    }
+    .nav-toggle__label {
+        /* Le libellé textuel "Menu" reste accessible aux lecteurs d'écran
+           mais n'est plus affiché — la pastille parle d'elle-même. */
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    /* État ouvert : les 3 barres se transforment en croix. */
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
+    /* ---- Drawer : panneau plein écran à droite avec backdrop sombre.
+       Le drawer est `hidden` par défaut, révélé par le JS qui retire
+       l'attribut et bascule `aria-expanded`. ---- */
+    .nav--mobile {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(86vw, 360px);
+        background: #0f0f10;
+        color: #e8e8e6;
+        padding: 4.5rem 1.5rem 2rem;
         overflow-y: auto;
-        z-index: 100;
+        z-index: 105;
+        box-shadow: -16px 0 40px -8px rgba(0, 0, 0, 0.45);
+        border-left: 1px solid rgba(239, 124, 51, 0.18);
     }
     .nav--mobile[hidden] { display: none; }
-    /* Override : dans le drawer mobile, on revient à une pile verticale qui
-       peut wrap si besoin (impossible en pratique avec column). */
-    .nav--mobile .nav__list { flex-direction: column; gap: 0; flex-wrap: wrap; }
-    .nav--mobile .nav__sublist { list-style: none; margin: 0; padding-left: var(--space-5); }
+
+    /* Backdrop opaque cliquable derrière le drawer, ajouté via le body
+       quand le menu est ouvert (`has-mobile-menu-open` posée par le JS). */
+    body.has-mobile-menu-open::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 100;
+        animation: oli-mobile-menu-fade 180ms ease forwards;
+    }
+    @keyframes oli-mobile-menu-fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    body.has-mobile-menu-open { overflow: hidden; }
+
+    /* ---- Liste verticale pleine largeur, séparateurs subtils. ---- */
+    .nav--mobile .nav__list {
+        flex-direction: column;
+        gap: 0;
+        flex-wrap: nowrap;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    .nav--mobile .nav__item {
+        width: 100%;
+        position: static;
+    }
+    .nav--mobile .nav__item + .nav__item {
+        border-top: 1px solid #ffffff10;
+    }
+    .nav--mobile .nav__link {
+        display: block;
+        padding: 0.9rem 0.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: #f1f1ef;
+        white-space: normal;
+        border-radius: 8px;
+        transition: background 150ms ease, color 150ms ease, padding-left 200ms ease;
+    }
+    .nav--mobile .nav__link:hover,
+    .nav--mobile .nav__link:focus-visible {
+        background: rgba(239, 124, 51, 0.12);
+        color: #ef7c33;
+        text-decoration: none;
+        padding-left: 1rem;
+    }
+    /* Item courant : barre orange à gauche pour le repérer immédiatement. */
+    .nav--mobile .nav__item--current > .nav__link,
+    .nav--mobile .nav__link[aria-current="page"] {
+        color: #ef7c33;
+        box-shadow: inset 3px 0 0 #ef7c33;
+    }
+
+    /* ---- Sous-menus : indentés, typographie plus légère. ---- */
+    .nav--mobile .nav__sublist {
+        list-style: none;
+        margin: 0 0 0.25rem 0;
+        padding: 0.25rem 0 0.5rem 1rem;
+        border-left: 2px solid rgba(239, 124, 51, 0.35);
+        margin-left: 0.5rem;
+    }
+    .nav--mobile .nav__sublist .nav__link {
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 0.55rem 0.5rem;
+        color: #cfcfcc;
+    }
+    .nav--mobile .nav__sublist .nav__link:hover,
+    .nav--mobile .nav__sublist .nav__link:focus-visible { color: #ef7c33; }
 }
 
 /* Menu pied de page (footer) — toujours horizontal sur desktop, vertical en mobile. */

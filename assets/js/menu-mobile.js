@@ -26,4 +26,26 @@ export function initMobileMenu() {
             toggle.focus();
         }
     });
+
+    // Clique en dehors du drawer (sur le backdrop sombre) → ferme.
+    // Le backdrop est rendu en pseudo-élément `body::after` donc non
+    // cliquable directement ; on écoute le `click` sur document et on
+    // ferme dès que la cible n'est ni le drawer ni le bouton.
+    document.addEventListener('click', (event) => {
+        if (drawer.hidden) {
+            return;
+        }
+        const target = event.target;
+        if (target instanceof Node && !drawer.contains(target) && !toggle.contains(target)) {
+            setOpen(false);
+        }
+    });
+
+    // Fermeture automatique quand on suit un lien interne du menu.
+    drawer.addEventListener('click', (event) => {
+        const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+        if (link) {
+            setOpen(false);
+        }
+    });
 }
