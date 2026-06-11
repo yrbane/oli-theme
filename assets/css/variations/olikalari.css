@@ -2135,3 +2135,36 @@ sub, sup { font-size: 0.72em; }
     border-bottom-color: #ffffff28 !important;
   }
 }
+
+/* ==========================================================================
+   Mode sombre — overrides des tokens globaux (--color-bg / text / border /
+   muted / accent) utilisés par les composants définis dans `base.css`,
+   notamment `.post-card` (cards d'archive d'articles). Sans ce repli, les
+   cards apparaissaient toutes blanches sur fond noir.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:               #181819;
+    --color-text:             #e8e8e6;
+    --color-muted:            #a8a8a5;
+    --color-border:           #ffffff14;
+    --color-accent:           #ef7c33;
+    --color-accent-contrast:  #ffffff;
+  }
+  .post-card {
+    background: #181819;
+    border-color: #ffffff14;
+  }
+  .post-card:hover,
+  .post-card:focus-within {
+    border-color: #ef7c33;
+    box-shadow: 0 14px 32px -12px rgba(0, 0, 0, 0.55);
+  }
+  .post-card__thumb,
+  .post-card__thumb--empty {
+    background: #1c1c1d;
+  }
+  .post-card__title { color: #f1f1ef; }
+  .post-card__meta,
+  .post-card__excerpt { color: #a8a8a5; }
+}
