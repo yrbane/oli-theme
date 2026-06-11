@@ -23,9 +23,9 @@
   --ff-serif: 'Manrope', system-ui, sans-serif;
   --ff-sans:  'Manrope', system-ui, sans-serif;
   --ff-mono:  'Manrope', ui-monospace, monospace;
-  --maxw-prose:   72ch;
-  --maxw-content: 1080px;
-  --maxw-wide:    1320px;
+  --maxw-prose:   75ch;
+  --maxw-content: 1280px;
+  --maxw-wide:    1480px;
 }
 
 body::before, body::after { display: none !important; content: none !important; }
@@ -1470,10 +1470,12 @@ a.btn:focus-visible,
   }
   h1, h2, h3, h4, h5, h6,
   p, em, i { color: #f1f1ef; }
-  /* Liens en bleu clair sur fond sombre (contraste AA conservé). */
+  /* Liens en bleu clair sur fond sombre (contraste AA conservé), hover
+     en orange de marque pour rester cohérent avec le light mode. */
   a { color: #7fb6e6; }
-  a:hover { color: #b8d4ef; }
-  a:focus-visible { outline-color: #7fb6e6; }
+  a:hover,
+  a:focus-visible { color: #ef7c33; }
+  a:focus-visible { outline-color: #ef7c33; }
 
   /* Header / bandeau */
   .site-header,
@@ -1489,7 +1491,7 @@ a.btn:focus-visible,
   }
   .site-header .banner__tagline { color: #9a9a97; }
   .site-header .nav__link:hover,
-  .site-header nav a:not(.banner__home):not([class*="language-switcher"]):hover { color: #ffffff; }
+  .site-header nav a:not(.banner__home):not([class*="language-switcher"]):hover { color: #ef7c33; }
   .site-header .nav__item--current > .nav__link,
   .site-header nav a[aria-current] { color: #ffffff; }
 
