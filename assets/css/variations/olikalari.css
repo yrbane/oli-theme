@@ -1510,6 +1510,37 @@ a.btn:focus-visible,
     border-bottom-color: #ffffff1f;
   }
 
+  /* Zone de contenu principale — `.site-main` portait `background: #fff`
+     hors dark, ce qui couvrait le body sombre et rendait les titres clairs
+     (#f1f1ef) illisibles sur fond blanc. On repasse le fond en sombre. */
+  .site-main,
+  main {
+    background: #0f0f10;
+  }
+  .gallery__main {
+    background: #1a1a1b;
+  }
+  /* Bannière header des pages internes (rectangle sous le menu) — aussi
+     forcé en blanc hors dark mode. */
+  body:not(.home)::before {
+    background-color: #0f0f10;
+  }
+  /* Titres secondaires (h5/h6) avec leurs propres couleurs grisées en
+     light mode — on les rattrape pour qu'ils restent lisibles en dark. */
+  h5 { color: #d1d1cd; }
+  h6 { color: #b9b9b6; }
+  /* Titres hero des pages/posts/entries : sélecteur plus spécifique
+     que `h1` donc échappe au override générique des dark mode plus haut. */
+  .page__title,
+  .entry-title,
+  .post__title { color: #f1f1ef; }
+  /* Paragraphe : la règle générique `p { color: #111111 }` (poids
+     équivalent à la règle dark `p { color: #f1f1ef }`) gagne par cascade
+     (dark vient plus tard), mais on précise ici pour les cas où une
+     règle plus spécifique aurait été ajoutée plus haut. */
+  .page__content p,
+  .post__content p { color: inherit; }
+
   /* Cartes de contenu */
   .feature-card__title { color: #f1f1ef; }
   .feature-card__desc { color: #b9b9b6; }
