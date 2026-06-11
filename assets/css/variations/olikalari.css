@@ -2034,3 +2034,53 @@ sub, sup { font-size: 0.72em; }
     border-top-color: #ffffff14;
   }
 }
+
+/* ==========================================================================
+   Mode sombre — citations / verse / pullquote scopés au contenu éditorial.
+   Les sélecteurs `.page__content blockquote` et `.wp-block-pullquote p`
+   forcent des couleurs foncées (var(--c-ink-soft) = #333, #111…) qui
+   écrasent les règles génériques du bloc dark — on les rattrape ici avec
+   assez de spécificité pour passer devant.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  .page__content blockquote,
+  .entry-content blockquote,
+  .post__content blockquote,
+  .page__content .wp-block-quote,
+  .entry-content .wp-block-quote,
+  .post__content .wp-block-quote {
+    color: #d6d6d3;
+  }
+  .page__content .wp-block-quote p,
+  .entry-content .wp-block-quote p,
+  .post__content .wp-block-quote p,
+  .page__content blockquote p,
+  .entry-content blockquote p,
+  .post__content blockquote p {
+    color: #e8e8e6;
+  }
+
+  /* Pullquote : grande citation centrée. */
+  .wp-block-pullquote p,
+  .page__content .wp-block-pullquote p,
+  .entry-content .wp-block-pullquote p,
+  .post__content .wp-block-pullquote p {
+    color: #f1f1ef;
+  }
+  .wp-block-pullquote cite,
+  .page__content .wp-block-pullquote cite,
+  .entry-content .wp-block-pullquote cite,
+  .post__content .wp-block-pullquote cite {
+    color: #a8a8a5;
+  }
+
+  /* Bloc verse (poème) : italique aérien sur dégradé orange ténu. */
+  .wp-block-verse,
+  .page__content .wp-block-verse,
+  .entry-content .wp-block-verse,
+  .post__content .wp-block-verse {
+    color: #e8e8e6;
+    background: linear-gradient(180deg, transparent, rgba(239, 124, 51, 0.08));
+    border-left-color: #ef7c33b3;
+  }
+}
