@@ -43,7 +43,24 @@
    La version desktop (≥ 68 rem) reste intouchée.
    ============================================================ */
 @media (max-width: 67.99rem) {
-    .nav--desktop { display: none; }
+    /* Cache la navigation desktop en mobile. La règle desktop
+       `.site-header nav.nav--desktop` (0,0,2,1) écrasait le simple
+       `.nav--desktop { display: none }`, le menu desktop restait
+       visible sous le burger. */
+    .nav--desktop,
+    .site-header .nav--desktop,
+    .site-header nav.nav--desktop { display: none; }
+
+    /* Header : caler le burger et le branding à gauche, garder le
+       sélecteur de langue à droite. `justify-content: flex-start` +
+       `margin-left: auto` sur le bloc langues = layout typique drawer. */
+    .site-header,
+    header.site-header {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+    }
+    .site-header .language-switcher,
+    .site-header ul.lang-switcher { margin-left: auto; }
 
     /* ---- Bouton burger : pastille orange marque, 3 barres blanches
        qui s'animent en X quand le drawer est ouvert. ---- */
