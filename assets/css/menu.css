@@ -109,24 +109,29 @@
 
     /* ---- Drawer : panneau plein écran à droite avec backdrop sombre.
        Le drawer est `hidden` par défaut, révélé par le JS qui retire
-       l'attribut et bascule `aria-expanded`. ---- */
-    .nav--mobile {
+       l'attribut et bascule `aria-expanded`. Sélecteurs préfixés
+       `.site-header` pour gagner les règles desktop plus spécifiques. ---- */
+    .site-header .nav--mobile,
+    nav.nav--mobile {
         display: flex;
         flex-direction: column;
         position: fixed;
         top: 0;
         right: 0;
         bottom: 0;
+        left: auto;
         width: min(86vw, 360px);
         background: #0f0f10;
         color: #e8e8e6;
         padding: 4.5rem 1.5rem 2rem;
+        margin: 0;
         overflow-y: auto;
         z-index: 105;
         box-shadow: -16px 0 40px -8px rgba(0, 0, 0, 0.45);
         border-left: 1px solid rgba(239, 124, 51, 0.18);
     }
-    .nav--mobile[hidden] { display: none; }
+    .site-header .nav--mobile[hidden],
+    nav.nav--mobile[hidden] { display: none; }
 
     /* Backdrop opaque cliquable derrière le drawer, ajouté via le body
        quand le menu est ouvert (`has-mobile-menu-open` posée par le JS). */
@@ -144,23 +149,35 @@
     }
     body.has-mobile-menu-open { overflow: hidden; }
 
-    /* ---- Liste verticale pleine largeur, séparateurs subtils. ---- */
-    .nav--mobile .nav__list {
+    /* ---- Liste verticale pleine largeur, séparateurs subtils.
+       Override des règles `.site-header .nav__list` (flex-wrap: wrap,
+       justify-content: flex-end) qui s'appliquent en desktop. ---- */
+    .site-header .nav--mobile .nav__list,
+    .site-header .nav--mobile ul {
+        display: flex;
         flex-direction: column;
         gap: 0;
         flex-wrap: nowrap;
         padding: 0;
         margin: 0;
         width: 100%;
+        justify-content: flex-start;
+        align-items: stretch;
     }
-    .nav--mobile .nav__item {
+    .site-header .nav--mobile .nav__item,
+    .site-header .nav--mobile li {
         width: 100%;
         position: static;
+        margin: 0;
     }
-    .nav--mobile .nav__item + .nav__item {
+    .site-header .nav--mobile .nav__item + .nav__item {
         border-top: 1px solid #ffffff10;
     }
-    .nav--mobile .nav__link {
+
+    /* Liens : on annule les overrides desktop (soulignement glissant,
+       padding pill, font-size très petit) et on impose un style drawer. */
+    .site-header .nav--mobile .nav__link,
+    .site-header .nav--mobile nav a:not(.banner__home):not([class*="language-switcher"]) {
         display: block;
         padding: 0.9rem 0.5rem;
         font-size: 1.05rem;
@@ -169,38 +186,58 @@
         color: #f1f1ef;
         white-space: normal;
         border-radius: 8px;
+        background: transparent;
+        background-image: none;
+        text-decoration: none;
         transition: background 150ms ease, color 150ms ease, padding-left 200ms ease;
     }
-    .nav--mobile .nav__link:hover,
-    .nav--mobile .nav__link:focus-visible {
+    .site-header .nav--mobile .nav__link:hover,
+    .site-header .nav--mobile .nav__link:focus-visible,
+    .site-header .nav--mobile a:hover,
+    .site-header .nav--mobile a:focus-visible {
         background: rgba(239, 124, 51, 0.12);
+        background-image: none;
+        background-size: auto;
         color: #ef7c33;
         text-decoration: none;
         padding-left: 1rem;
+        opacity: 1;
     }
     /* Item courant : barre orange à gauche pour le repérer immédiatement. */
-    .nav--mobile .nav__item--current > .nav__link,
-    .nav--mobile .nav__link[aria-current="page"] {
+    .site-header .nav--mobile .nav__item--current > .nav__link,
+    .site-header .nav--mobile .nav__item--ancestor > .nav__link,
+    .site-header .nav--mobile .nav__link[aria-current="page"] {
         color: #ef7c33;
         box-shadow: inset 3px 0 0 #ef7c33;
+        font-weight: 700;
+        background: transparent;
+        background-image: none;
     }
 
     /* ---- Sous-menus : indentés, typographie plus légère. ---- */
-    .nav--mobile .nav__sublist {
+    .site-header .nav--mobile .nav__sublist {
+        display: block;
         list-style: none;
-        margin: 0 0 0.25rem 0;
+        margin: 0 0 0.25rem 0.5rem;
         padding: 0.25rem 0 0.5rem 1rem;
         border-left: 2px solid rgba(239, 124, 51, 0.35);
-        margin-left: 0.5rem;
+        background: transparent;
+        border-top: 0;
+        border-right: 0;
+        border-bottom: 0;
+        border-radius: 0;
+        box-shadow: none;
+        min-width: 0;
+        position: static;
     }
-    .nav--mobile .nav__sublist .nav__link {
+    .site-header .nav--mobile .nav__sublist .nav__link {
         font-size: 0.95rem;
         font-weight: 500;
         padding: 0.55rem 0.5rem;
         color: #cfcfcc;
     }
-    .nav--mobile .nav__sublist .nav__link:hover,
-    .nav--mobile .nav__sublist .nav__link:focus-visible { color: #ef7c33; }
+    .site-header .nav--mobile .nav__sublist .nav__link:hover,
+    .site-header .nav--mobile .nav__sublist .nav__link:focus-visible { color: #ef7c33; }
 }
 
 /* Menu pied de page (footer) — toujours horizontal sur desktop, vertical en mobile. */
