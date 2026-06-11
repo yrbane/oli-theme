@@ -9,6 +9,17 @@ export function initMobileMenu() {
         return;
     }
 
+    // Le drawer est rendu dans `.site-header`, mais celui-ci a un
+    // `backdrop-filter: blur(20px)` qui crée un containing block pour
+    // les descendants `position: fixed` (CSS spec). Conséquence : le
+    // drawer se positionne par rapport au header (qui est en bas du
+    // hero sur la home), pas par rapport au viewport. On le déplace
+    // donc directement sous `<body>` au boot pour rester en pleine
+    // hauteur viewport.
+    if (drawer.parentElement !== document.body) {
+        document.body.appendChild(drawer);
+    }
+
     const setOpen = (isOpen) => {
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         drawer.hidden = !isOpen;

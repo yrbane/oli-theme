@@ -2182,14 +2182,25 @@ sub, sup { font-size: 0.72em; }
     .site-header .nav--desktop,
     .site-header nav.nav--desktop { display: none; }
 
-    /* Header : burger + branding à gauche, langues poussées à droite. */
-    .site-header {
+    /* Header : burger + branding à gauche, langues poussées à droite.
+       `flex-direction: row` explicite pour battre l'override `@media
+       (max-width: 720px)` plus haut qui passe en `column`. */
+    .site-header,
+    header.site-header {
+        flex-direction: row;
+        align-items: center;
         justify-content: flex-start;
         flex-wrap: nowrap;
+        gap: 0.75rem;
         padding: 0.5rem 0.75rem;
     }
     .site-header .language-switcher,
     .site-header ul.lang-switcher { margin-left: auto; }
+
+    /* Évite la barre de scroll horizontale due au drawer translaté en
+       dehors du viewport (`transform: translateX(100%)` + `right: 0`). */
+    html,
+    body { overflow-x: hidden; }
 
     /* ------------------ Burger ------------------
        Pastille orange marque, ombre marquée, animation X au clic.
@@ -2254,14 +2265,16 @@ sub, sup { font-size: 0.72em; }
 
     /* ------------------ Drawer ------------------
        Slide depuis la droite, fond sombre éditorial, scroll interne. */
-    .site-header .nav--mobile,
-    nav.nav--mobile {
+    body .nav--mobile,
+    body nav.nav--mobile {
         display: flex !important;
         flex-direction: column;
         position: fixed;
         top: 0; right: 0; bottom: 0;
         left: auto;
         width: min(90vw, 440px);
+        height: 100vh;
+        height: 100dvh; /* dynamic vh : tient compte de la barre URL mobile */
         max-width: none;
         background:
             radial-gradient(ellipse 600px 400px at 100% 0%, rgba(239, 124, 51, 0.12), transparent 60%),
@@ -2279,13 +2292,13 @@ sub, sup { font-size: 0.72em; }
         transform: translateX(100%);
         transition: transform 320ms cubic-bezier(0.65, 0, 0.35, 1);
     }
-    .site-header .nav--mobile[hidden],
-    nav.nav--mobile[hidden] {
+    body .nav--mobile[hidden],
+    body nav.nav--mobile[hidden] {
         display: flex !important;          /* on garde le flex pour la transition */
         transform: translateX(100%);
         pointer-events: none;
     }
-    body.has-mobile-menu-open .site-header .nav--mobile,
+    body.has-mobile-menu-open .nav--mobile,
     body.has-mobile-menu-open nav.nav--mobile {
         transform: translateX(0);
         pointer-events: auto;
@@ -2309,8 +2322,8 @@ sub, sup { font-size: 0.72em; }
     body.has-mobile-menu-open { overflow: hidden; }
 
     /* ------------------ Liste des items ------------------ */
-    .site-header .nav--mobile .nav__list,
-    .site-header .nav--mobile ul {
+    body .nav--mobile .nav__list,
+    body .nav--mobile ul {
         display: flex;
         flex-direction: column;
         gap: 0;
@@ -2322,11 +2335,11 @@ sub, sup { font-size: 0.72em; }
         justify-content: flex-start;
         align-items: stretch;
     }
-    .site-header .nav--mobile .nav__list--root > .nav__item + .nav__item {
+    body .nav--mobile .nav__list--root > .nav__item + .nav__item {
         border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .site-header .nav--mobile .nav__item,
-    .site-header .nav--mobile li {
+    body .nav--mobile .nav__item,
+    body .nav--mobile li {
         width: 100%;
         margin: 0;
         position: static;
@@ -2334,8 +2347,8 @@ sub, sup { font-size: 0.72em; }
     }
 
     /* Items du niveau racine — typo serif élégante, grande respiration. */
-    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link,
-    .site-header .nav--mobile .nav__list--root > li > a {
+    body .nav--mobile .nav__list--root > .nav__item > .nav__link,
+    body .nav--mobile .nav__list--root > li > a {
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -2353,24 +2366,24 @@ sub, sup { font-size: 0.72em; }
         white-space: normal;
         transition: color 160ms ease, padding-left 220ms ease, letter-spacing 220ms ease;
     }
-    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link:hover,
-    .site-header .nav--mobile .nav__list--root > .nav__item > .nav__link:focus-visible,
-    .site-header .nav--mobile .nav__list--root > li > a:hover,
-    .site-header .nav--mobile .nav__list--root > li > a:focus-visible {
+    body .nav--mobile .nav__list--root > .nav__item > .nav__link:hover,
+    body .nav--mobile .nav__list--root > .nav__item > .nav__link:focus-visible,
+    body .nav--mobile .nav__list--root > li > a:hover,
+    body .nav--mobile .nav__list--root > li > a:focus-visible {
         color: #ef7c33;
         padding-left: 1rem;
         background-image: none;
         background-size: auto;
         opacity: 1;
     }
-    .site-header .nav--mobile .nav__item--current > .nav__link,
-    .site-header .nav--mobile .nav__item--ancestor > .nav__link {
+    body .nav--mobile .nav__item--current > .nav__link,
+    body .nav--mobile .nav__item--ancestor > .nav__link {
         color: #ef7c33;
         background: transparent;
         background-image: none;
         font-weight: 500;
     }
-    .site-header .nav--mobile .nav__item--current > .nav__link::before {
+    body .nav--mobile .nav__item--current > .nav__link::before {
         content: "";
         display: inline-block;
         width: 6px;
@@ -2381,7 +2394,7 @@ sub, sup { font-size: 0.72em; }
     }
 
     /* Chevron sur les items avec sous-menu. */
-    .site-header .nav--mobile .nav__item--has-children > .nav__link::after {
+    body .nav--mobile .nav__item--has-children > .nav__link::after {
         content: "";
         margin-left: auto;
         width: 10px;
@@ -2392,7 +2405,7 @@ sub, sup { font-size: 0.72em; }
         transition: transform 250ms ease;
         opacity: 0.6;
     }
-    .site-header .nav--mobile .nav__item--has-children.is-open > .nav__link::after {
+    body .nav--mobile .nav__item--has-children.is-open > .nav__link::after {
         transform: rotate(-135deg);
         opacity: 1;
     }
@@ -2400,8 +2413,8 @@ sub, sup { font-size: 0.72em; }
     /* ------------------ Sous-menu (accordéon) ------------------
        Caché par défaut (max-height: 0), s'ouvre quand le parent
        `.nav__item--has-children` reçoit la classe `.is-open` (JS). */
-    .site-header .nav--mobile .nav__sublist,
-    .site-header .nav--mobile ul.nav__sublist {
+    body .nav--mobile .nav__sublist,
+    body .nav--mobile ul.nav__sublist {
         display: block;
         position: static;
         list-style: none;
@@ -2423,16 +2436,16 @@ sub, sup { font-size: 0.72em; }
         transition: max-height 320ms cubic-bezier(0.65, 0, 0.35, 1),
                     padding 280ms ease;
     }
-    .site-header .nav--mobile .nav__item--has-children.is-open > .nav__sublist {
+    body .nav--mobile .nav__item--has-children.is-open > .nav__sublist {
         max-height: 1200px;        /* assez large pour tout contenu raisonnable */
         padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
-    .site-header .nav--mobile .nav__sublist > .nav__item {
+    body .nav--mobile .nav__sublist > .nav__item {
         border-top: 0;
     }
-    .site-header .nav--mobile .nav__sublist .nav__link,
-    .site-header .nav--mobile .nav__link--child {
+    body .nav--mobile .nav__sublist .nav__link,
+    body .nav--mobile .nav__link--child {
         display: block;
         padding: 0.75rem 0.5rem;
         font-family: 'Manrope', system-ui, sans-serif;
@@ -2447,10 +2460,10 @@ sub, sup { font-size: 0.72em; }
         white-space: normal;
         transition: color 150ms ease, background 150ms ease, padding-left 200ms ease;
     }
-    .site-header .nav--mobile .nav__sublist .nav__link:hover,
-    .site-header .nav--mobile .nav__sublist .nav__link:focus-visible,
-    .site-header .nav--mobile .nav__link--child:hover,
-    .site-header .nav--mobile .nav__link--child:focus-visible {
+    body .nav--mobile .nav__sublist .nav__link:hover,
+    body .nav--mobile .nav__sublist .nav__link:focus-visible,
+    body .nav--mobile .nav__link--child:hover,
+    body .nav--mobile .nav__link--child:focus-visible {
         color: #ffffff;
         background: rgba(239, 124, 51, 0.15);
         padding-left: 0.85rem;
