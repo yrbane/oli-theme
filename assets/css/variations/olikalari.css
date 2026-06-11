@@ -506,30 +506,67 @@ article, .post, .page {
   flex-wrap: wrap;
 }
 
-/* Boutons */
+/* Boutons — style marque, orange + lift, ombre douce */
 .btn, button, .wp-block-button__link, input[type="submit"] {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.5rem;
+  padding: 0.85rem 2rem;
   font-family: 'Manrope', system-ui, sans-serif;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   border-radius: 999px;
-  border: 1px solid #111111;
-  background: #ffffff;
-  color: #111111;
+  border: 0;
+  background: #ef7c33;
+  color: #ffffff;
   cursor: pointer;
   text-decoration: none;
   text-shadow: none;
-  box-shadow: none;
-  transition: background 150ms ease, color 150ms ease;
+  box-shadow: 0 2px 6px rgba(239, 124, 51, 0.18);
+  transition: background 180ms ease, color 180ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 .btn:hover, button:hover, .wp-block-button__link:hover, input[type="submit"]:hover {
-  background: #111111; color: #ffffff; border-color: #111111;
+  background: #d96820;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(239, 124, 51, 0.32);
 }
-.btn--primary, .btn-primary { background: #111111; color: #ffffff; border-color: #111111; box-shadow: none; }
-.btn--primary:hover, .btn-primary:hover { background: #ffffff; color: #111111; }
+.btn:active, button:active, .wp-block-button__link:active, input[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(239, 124, 51, 0.18);
+}
+.btn:focus-visible, button:focus-visible, .wp-block-button__link:focus-visible, input[type="submit"]:focus-visible {
+  outline: 2px solid #ef7c33;
+  outline-offset: 3px;
+}
+
+/* Variante secondaire — outline orange. Utilisée via `.btn--secondary`
+   ou via le bloc Gutenberg « Bouton » avec le style « Contour ». */
+.btn--secondary,
+.btn--outline,
+.wp-block-button.is-style-outline > .wp-block-button__link {
+  background: transparent;
+  color: #ef7c33;
+  border: 1.5px solid #ef7c33;
+  box-shadow: none;
+}
+.btn--secondary:hover,
+.btn--outline:hover,
+.wp-block-button.is-style-outline > .wp-block-button__link:hover {
+  background: #ef7c33;
+  color: #ffffff;
+  border-color: #ef7c33;
+  box-shadow: 0 10px 22px rgba(239, 124, 51, 0.32);
+}
+
+/* Compat ancien naming `.btn--primary` (= valeur par défaut désormais). */
+.btn--primary, .btn-primary {
+  background: #ef7c33;
+  color: #ffffff;
+  border: 0;
+}
 
 /* Grille features */
 .features-grid {
@@ -1718,35 +1755,15 @@ pre.wp-block-code,
 }
 .wp-block-button__link,
 .wp-element-button {
+  /* L'apparence par défaut (orange marque, ombre douce, lift au hover)
+     est déjà définie sur le sélecteur générique `.btn, button,
+     .wp-block-button__link, …` plus haut dans la feuille. On garde ici
+     uniquement les marges/structure spécifiques au bloc Gutenberg. */
   display: inline-block;
-  padding: 0.7rem 1.5rem;
-  font-family: 'Manrope', system-ui, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: #111111;
-  color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background 180ms ease, color 180ms ease, transform 200ms ease;
-  cursor: pointer;
+  padding: 0.85rem 2rem;
 }
-.wp-block-button__link:hover,
-.wp-element-button:hover {
-  background: #ef7c33;
-  border-color: #ef7c33;
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-.wp-block-button.is-style-outline .wp-block-button__link {
-  background: transparent;
-  color: #111111;
-}
-.wp-block-button.is-style-outline .wp-block-button__link:hover {
-  background: #111111;
-  color: #ffffff;
-}
+/* Variante « Contour » : style secondaire défini plus haut via le
+   sélecteur `.wp-block-button.is-style-outline > .wp-block-button__link`. */
 
 /* --- Colonnes ---------------------------------------------------------- */
 .wp-block-columns {
