@@ -382,13 +382,34 @@ final class AssetManager
     }
 
     /**
-     * Calcule la version d'un fichier à partir de son mtime
-     * pour invalider le cache navigateur lors d'une modification.
+     * Calcule la version d'un fichier à partir de son mtime, en prenant
+     * aussi en compte la mtime des `@import url('./xxx.css')` du fichier
+     * si présent. Sans cette extension, modifier un fichier importé (ex.
+     * `menu.css`) ne bumpait pas la version du parent (`main.css`) → le
+     * navigateur servait l'ancien import depuis son cache HTTP.
      */
     private function version(string $relativePath): string
     {
         $absolute = $this->themePath . '/' . $relativePath;
+        if (!file_exists($absolute)) {
+            return '1.0.0';
+        }
+        $mtime = (int) filemtime($absolute);
 
-        return file_exists($absolute) ? (string) filemtime($absolute) : '1.0.0';
+        // CSS uniquement : scan des @import et prend la mtime max.
+        if (str_ends_with($relativePath, '.css')) {
+            $content = (string) @file_get_contents($absolute);
+            if (preg_match_all('~@import\s+url\(\s*[\'"]?\.?/?([^\'")]+)[\'"]?\s*\)~', $content, $m) > 0) {
+                $dir = \dirname($absolute);
+                foreach ($m[1] as $importPath) {
+                    $importAbs = $dir . '/' . ltrim($importPath, './');
+                    if (file_exists($importAbs)) {
+                        $mtime = max($mtime, (int) filemtime($importAbs));
+                    }
+                }
+            }
+        }
+
+        return (string) $mtime;
     }
 }
