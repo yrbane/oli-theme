@@ -1950,3 +1950,87 @@ sub, sup { font-size: 0.72em; }
   outline: 2px solid #ef7c33;
   outline-offset: 2px;
 }
+
+/* ==========================================================================
+   Mode sombre — overrides des blocs Gutenberg / éléments éditoriaux.
+   Ce second bloc dark vient APRÈS les définitions Gutenberg pour gagner
+   par cascade les fonds/couleurs clairs forcés plus haut (sélecteurs
+   `.wp-block-*` plus spécifiques que la version générique des éléments).
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  /* --- Code inline : passe le fond clair en gris foncé ------------------ */
+  code,
+  kbd,
+  samp,
+  .wp-block-code code {
+    background: #1c1c1d;
+    color: #e8e8e6;
+    border-color: #ffffff1a;
+  }
+
+  /* --- Blocs <pre>, code, préformaté ----------------------------------- */
+  .wp-block-code,
+  pre.wp-block-code {
+    background: #161617;
+    color: #e8e8e6;
+    border: 1px solid #ffffff14;
+  }
+  .wp-block-preformatted {
+    background: #1c1c1d;
+    color: #e8e8e6;
+    border-left-color: #ffffff28;
+  }
+
+  /* --- Citations -------------------------------------------------------- */
+  .wp-block-quote,
+  blockquote {
+    border-left-color: #ef7c33;
+    color: #cfcfcc;
+    background: #181819;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-right: 1rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .wp-block-quote cite,
+  blockquote cite { color: #9a9a97; }
+
+  /* --- Pullquote ------------------------------------------------------- */
+  .wp-block-pullquote {
+    border-top-color: #ffffff28;
+    border-bottom-color: #ffffff28;
+  }
+
+  /* --- Tableaux -------------------------------------------------------- */
+  table th,
+  table td,
+  .wp-block-table th,
+  .wp-block-table td {
+    border-bottom-color: #ffffff14;
+  }
+  .wp-block-table thead th {
+    background: #1c1c1d;
+    color: #cfcfcc;
+    border-bottom-color: #ffffff28;
+  }
+  tbody tr:hover,
+  .wp-block-table tbody tr:hover { background: #1f1f20; }
+
+  /* --- Details / accordéon --------------------------------------------- */
+  .wp-block-details {
+    background: #181819;
+    border-color: #ffffff14;
+    color: #e8e8e6;
+  }
+  .wp-block-details:hover {
+    background: #1c1c1d;
+    border-color: #ffffff28;
+  }
+  .wp-block-details[open] {
+    background: #1a1a1b;
+    border-color: #ef7c33b3;
+  }
+  .wp-block-details > *:not(summary) {
+    border-top-color: #ffffff14;
+  }
+}
