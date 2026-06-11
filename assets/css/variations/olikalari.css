@@ -2084,3 +2084,35 @@ sub, sup { font-size: 0.72em; }
     border-left-color: #ef7c33b3;
   }
 }
+
+/* ==========================================================================
+   Mode sombre — séparateurs (hr) et bordures de tables Gutenberg.
+   Le séparateur WP est dessiné via `background` (pas un border), donc le
+   fix générique `hr { border-color: … }` n'a aucun effet. Les bordures
+   inline-stylées de tables Gutenberg sont aussi en clair par défaut.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  .wp-block-separator,
+  hr.wp-block-separator {
+    background: #ffffff28;
+  }
+  .wp-block-separator.is-style-dots,
+  hr.wp-block-separator.is-style-dots {
+    background: none;
+  }
+  .wp-block-separator.is-style-dots::before,
+  hr.wp-block-separator.is-style-dots::before {
+    color: #ffffff66;
+  }
+
+  /* Tables : on rattrape toutes les bordures (Gutenberg pose souvent des
+     border-right/left inline-style en clair quand l'utilisateur active
+     les bordures de cellule via l'éditeur). */
+  .wp-block-table th,
+  .wp-block-table td {
+    border-color: #ffffff14 !important;
+  }
+  .wp-block-table thead th {
+    border-bottom-color: #ffffff28 !important;
+  }
+}
