@@ -305,6 +305,21 @@ final class Theme
         // Variables globales et macros WP injectées dans le moteur de templates.
         self::bootstrapViewRenderer($container);
 
+        // Workaround d'un bug WP 6.6+ : `block-style-variation-styles` est
+        // automatiquement enqueued avec `global-styles` comme dépendance,
+        // mais `global-styles` n'est enregistré que par les thèmes FSE.
+        // Sans cet enregistrement-tampon, chaque page produit une notice
+        // `_doing_it_wrong` dans WP_Styles::add. On expose un handle vide
+        // pour satisfaire la dépendance sans charger de CSS supplémentaire.
+        add_action('wp_enqueue_scripts', static function (): void {
+            if (\function_exists('wp_register_style')
+                && \function_exists('wp_style_is')
+                && !wp_style_is('global-styles', 'registered')
+            ) {
+                wp_register_style('global-styles', false);
+            }
+        }, 1);
+
         // Enqueue hooks enregistrés directement pour satisfaire la signature
         // à 2 arguments attendue dans les tests Brain Monkey.
         add_action('wp_enqueue_scripts', static function () use ($container): void {
