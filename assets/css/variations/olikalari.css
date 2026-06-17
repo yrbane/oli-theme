@@ -450,6 +450,11 @@ article, .post, .page {
   padding: 0 2rem;
 }
 
+.page__content .wp-block-paragraph, .page__content p{
+  width:100%;
+  text-align:justify;
+}
+
 /* ==========================================================================
    Hero / sections — neutralise les effets Lunar
    ========================================================================== */
@@ -1451,7 +1456,7 @@ a.btn:focus-visible,
 .post__content > h4,
 .post__content > blockquote,
 .post__content > pre {
-  max-width: var(--maxw-prose);
+  text-align:justify;
   /* Alignement à gauche du conteneur : avec `auto/auto`, chaque enfant
      se centrait sur sa propre max-width — qui varie selon la police
      (60ch en ADLaM ≫ 60ch en Manrope), créant des décalages visuels
