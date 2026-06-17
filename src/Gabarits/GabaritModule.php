@@ -127,5 +127,26 @@ final class GabaritModule implements ModuleInterface
                 wp_enqueue_script_module($handle, $gabarit->jsPath, [], '1.4.0');
             }
         }, 20);
+
+        // Gabarit zonal → éditeur classique (requis pour wp_editor par zone).
+        add_filter('use_block_editor_for_post', function ($use, $post) use ($c): bool {
+            $gabarit = ($post instanceof \WP_Post)
+                ? $c->get(GabaritResolver::class)->forPost((int) $post->ID)
+                : null;
+            return $this->decideBlockEditor((bool) $use, $gabarit);
+        }, 10, 2);
+    }
+
+    /**
+     * Décide si l'éditeur de blocs (Gutenberg) reste actif pour un post.
+     * Un gabarit zonal impose l'éditeur classique, seul contexte où
+     * `wp_editor()` s'initialise correctement.
+     */
+    public function decideBlockEditor(bool $useBlockEditor, ?Gabarit $gabarit): bool
+    {
+        if ($gabarit !== null && $gabarit->isZonal()) {
+            return false;
+        }
+        return $useBlockEditor;
     }
 }
