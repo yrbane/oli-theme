@@ -59,7 +59,6 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
             return SettingsBag::default();
         }
 
-        $banner     = $raw['banner'] ?? [];
         $footer     = $raw['footer'] ?? [];
         $social     = $raw['social'] ?? [];
         $languages  = $raw['languages'] ?? [];
@@ -70,11 +69,6 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
         $defaults = SettingsBag::default();
 
         return new SettingsBag(
-            banner: new BannerSettings(
-                bannerDesktopId: isset($banner['bannerDesktopId']) ? (int) $banner['bannerDesktopId'] : $defaults->banner->bannerDesktopId,
-                bannerMobileId: isset($banner['bannerMobileId']) ? (int) $banner['bannerMobileId'] : $defaults->banner->bannerMobileId,
-                altByLanguage: \is_array($banner['altByLanguage'] ?? null) ? $banner['altByLanguage'] : [],
-            ),
             footer: new FooterSettings(
                 copyrightTemplate: (string) ($footer['copyrightTemplate'] ?? $defaults->footer->copyrightTemplate),
                 showSocial: (bool) ($footer['showSocial'] ?? $defaults->footer->showSocial),

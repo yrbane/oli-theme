@@ -99,7 +99,7 @@ final class ThemeSettingsPageTest extends TestCase
 
         self::assertSame('oli_theme_settings_group', $capturedGroup);
         self::assertSame('oli_theme_settings', $capturedOptionKey);
-        self::assertSame(6, $addSectionCount);
+        self::assertSame(5, $addSectionCount);
     }
 
     /**
@@ -128,7 +128,6 @@ final class ThemeSettingsPageTest extends TestCase
         (new ThemeSettingsPage($settings))->registerSettings();
 
         // Une page distincte par onglet pour que do_settings_sections puisse filtrer par tab.
-        self::assertArrayHasKey('oli-theme-settings-banner', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-languages', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-footer', $fieldsPerPage);
         self::assertArrayHasKey('oli-theme-settings-contact', $fieldsPerPage);

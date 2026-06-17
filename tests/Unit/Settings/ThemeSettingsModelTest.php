@@ -81,7 +81,6 @@ final class ThemeSettingsModelTest extends TestCase
         $bag   = $model->all();
 
         self::assertInstanceOf(SettingsBag::class, $bag);
-        self::assertNull($bag->banner->bannerDesktopId);
         self::assertSame('© {year} {site}', $bag->footer->copyrightTemplate);
         self::assertSame(['fr'], $bag->languages->enabled);
         self::assertTrue($bag->seo->sitemapEnabled);
@@ -90,11 +89,6 @@ final class ThemeSettingsModelTest extends TestCase
     public function testAllHydratesFromRaw(): void
     {
         Functions\when('get_option')->justReturn([
-            'banner' => [
-                'bannerDesktopId' => '20',
-                'bannerMobileId'  => '30',
-                'altByLanguage'   => ['fr' => 'Bannière', 'en' => 'Banner'],
-            ],
             'footer' => [
                 'copyrightTemplate' => '© {year} Oli',
                 'showSocial'        => false,
@@ -130,11 +124,6 @@ final class ThemeSettingsModelTest extends TestCase
 
         $model = new ThemeSettingsModel();
         $bag   = $model->all();
-
-        // Banner
-        self::assertSame(20, $bag->banner->bannerDesktopId);
-        self::assertSame(30, $bag->banner->bannerMobileId);
-        self::assertSame(['fr' => 'Bannière', 'en' => 'Banner'], $bag->banner->altByLanguage);
 
         // Footer
         self::assertSame('© {year} Oli', $bag->footer->copyrightTemplate);

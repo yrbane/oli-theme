@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OliTheme\Tests\Unit\Settings;
 
-use OliTheme\Settings\BannerSettings;
 use OliTheme\Settings\ContactSettings;
 use OliTheme\Settings\FooterSettings;
 use OliTheme\Settings\LanguagesSettings;
@@ -24,7 +23,6 @@ final class SettingsBagTest extends TestCase
 {
     public function testItExposesAllSubBags(): void
     {
-        $banner = new BannerSettings(2, 3, ['fr' => 'Alt']);
         $footer = new FooterSettings('© {year}', false, true);
         $social = new SocialSettings('https://fb.com', null, null, null, null);
         $languages = new LanguagesSettings(['fr', 'en'], 'fr', LanguagesSettings::FALLBACK_HOME);
@@ -32,7 +30,6 @@ final class SettingsBagTest extends TestCase
         $seo = new SeoSettings(5, 'handle', 'Org', 'https://logo.png', true, null);
 
         $bag = new SettingsBag(
-            banner: $banner,
             footer: $footer,
             social: $social,
             languages: $languages,
@@ -40,7 +37,6 @@ final class SettingsBagTest extends TestCase
             seo: $seo,
         );
 
-        self::assertSame($banner, $bag->banner);
         self::assertSame($footer, $bag->footer);
         self::assertSame($social, $bag->social);
         self::assertSame($languages, $bag->languages);
@@ -51,11 +47,6 @@ final class SettingsBagTest extends TestCase
     public function testDefaultProducesNeutralBag(): void
     {
         $bag = SettingsBag::default();
-
-        // Banner
-        self::assertNull($bag->banner->bannerDesktopId);
-        self::assertNull($bag->banner->bannerMobileId);
-        self::assertSame([], $bag->banner->altByLanguage);
 
         // Footer
         self::assertSame('© {year} {site}', $bag->footer->copyrightTemplate);

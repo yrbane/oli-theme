@@ -33,7 +33,7 @@ final class ThemeSettingsPage
     public const PAGE_SLUG = 'oli-theme-settings';
 
     /** Onglet actif par défaut quand `?tab=` est absent. */
-    public const DEFAULT_TAB = 'banner';
+    public const DEFAULT_TAB = 'languages';
 
     /** Garde : le script du sélecteur de médiathèque n'est imprimé qu'une fois. */
     private bool $mediaScriptPrinted = false;
@@ -116,9 +116,6 @@ final class ThemeSettingsPage
         $existing = (array) get_option(self::OPTION, []);
         $clean    = [];
 
-        if (isset($input['banner']) && \is_array($input['banner'])) {
-            $clean['banner'] = $this->sanitizeBanner($input['banner']);
-        }
         if (isset($input['languages']) && \is_array($input['languages'])) {
             $clean['languages'] = $this->sanitizeLanguages($input['languages']);
         }
@@ -136,53 +133,6 @@ final class ThemeSettingsPage
         }
 
         return array_replace($existing, $clean);
-    }
-
-    // ---------------------------------------------------------------------
-    // Section 1 : Identité visuelle (banner)
-    // ---------------------------------------------------------------------
-
-    private function registerBannerFields(string $page, string $section, SettingsBag $current): void
-    {
-        $helpBanner = self::helpBubble('banniere');
-        add_settings_field(
-            'oli_banner_desktop_id',
-            __('ID du média bannière desktop', 'oli-theme') . $helpBanner,
-            fn () => $this->renderMediaIdField('banner', 'bannerDesktopId', $current->banner->bannerDesktopId),
-            $page,
-            $section,
-        );
-        add_settings_field(
-            'oli_banner_mobile_id',
-            __('ID du média bannière mobile', 'oli-theme') . $helpBanner,
-            fn () => $this->renderMediaIdField('banner', 'bannerMobileId', $current->banner->bannerMobileId),
-            $page,
-            $section,
-        );
-        add_settings_field(
-            'oli_banner_alt_fr',
-            __('Texte alternatif (FR)', 'oli-theme') . $helpBanner,
-            fn () => $this->renderTextField(
-                'banner',
-                'altByLanguage[fr]',
-                (string) ($current->banner->altByLanguage['fr'] ?? ''),
-                __('Texte alternatif affiché si l\'image ne se charge pas.', 'oli-theme'),
-            ),
-            $page,
-            $section,
-        );
-        add_settings_field(
-            'oli_banner_alt_en',
-            __('Texte alternatif (EN)', 'oli-theme') . $helpBanner,
-            fn () => $this->renderTextField(
-                'banner',
-                'altByLanguage[en]',
-                (string) ($current->banner->altByLanguage['en'] ?? ''),
-                '',
-            ),
-            $page,
-            $section,
-        );
     }
 
     /**
@@ -209,27 +159,6 @@ final class ThemeSettingsPage
 
         return ' <a class="oli-help-bubble" href="' . $urlAttr
             . '" title="' . $label . '" aria-label="' . $label . '">?</a>';
-    }
-
-    /**
-     * @param array<string, mixed> $input
-     *
-     * @return array<string, mixed>
-     */
-    private function sanitizeBanner(array $input): array
-    {
-        $alt = [];
-        if (isset($input['altByLanguage']) && \is_array($input['altByLanguage'])) {
-            foreach ($input['altByLanguage'] as $lang => $value) {
-                $alt[sanitize_key((string) $lang)] = sanitize_text_field((string) $value);
-            }
-        }
-
-        return [
-            'bannerDesktopId' => $this->intOrNull($input['bannerDesktopId'] ?? null),
-            'bannerMobileId'  => $this->intOrNull($input['bannerMobileId'] ?? null),
-            'altByLanguage'   => $alt,
-        ];
     }
 
     // ---------------------------------------------------------------------
@@ -857,7 +786,6 @@ final class ThemeSettingsPage
     private function tabDefinitions(): array
     {
         return [
-            ['id' => 'banner',     'title' => __('Identité visuelle', 'oli-theme')],
             ['id' => 'languages',  'title' => __('Langues', 'oli-theme')],
             ['id' => 'footer',     'title' => __('Pied de page', 'oli-theme')],
             ['id' => 'contact',    'title' => __('Contact', 'oli-theme')],
@@ -871,7 +799,7 @@ final class ThemeSettingsPage
      */
     private function tabIds(): array
     {
-        return ['banner', 'languages', 'footer', 'contact', 'seo', 'typography'];
+        return ['languages', 'footer', 'contact', 'seo', 'typography'];
     }
 
     private function registerTypographyFields(string $page, string $section, SettingsBag $current): void

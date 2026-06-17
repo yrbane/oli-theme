@@ -17,7 +17,6 @@ namespace OliTheme\Settings;
 final readonly class SettingsBag
 {
     /**
-     * @param BannerSettings $banner Paramètres de la bannière et du logo.
      * @param FooterSettings $footer Paramètres du pied de page.
      * @param SocialSettings $social Paramètres des réseaux sociaux.
      * @param LanguagesSettings $languages Paramètres multilingues.
@@ -26,7 +25,6 @@ final readonly class SettingsBag
      * @param TypographySettings $typography Paramètres typographiques globaux.
      */
     public function __construct(
-        public BannerSettings $banner,
         public FooterSettings $footer,
         public SocialSettings $social,
         public LanguagesSettings $languages,
@@ -43,7 +41,6 @@ final readonly class SettingsBag
     public static function default(): self
     {
         return new self(
-            banner: new BannerSettings(null, null, []),
             footer: new FooterSettings('© {year} {site}', true, true),
             social: new SocialSettings(null, null, null, null, null),
             languages: new LanguagesSettings(['fr'], 'fr', LanguagesSettings::FALLBACK_HOME),
