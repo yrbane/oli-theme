@@ -48,3 +48,16 @@ if (!class_exists('WP_Term')) {
         }
     }
 }
+
+/**
+ * Stub minimaliste de \WP_Post pour les tests unitaires. Plusieurs classes du
+ * thème typent leurs paramètres avec `\WP_Post` (metabox, contrôleurs) ; ce
+ * stub permet de les instancier sans charger le cœur WordPress.
+ */
+if (!class_exists('WP_Post')) {
+    class WP_Post // phpcs:ignore
+    {
+        public int $ID = 0;
+        public string $post_type = 'post';
+    }
+}

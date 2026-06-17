@@ -38,6 +38,7 @@ final class GabaritMetabox
         add_action('add_meta_boxes', [$this, 'addMetabox']);
         add_action('save_post',       [$this, 'handleSave'], 10, 2);
         add_action('admin_enqueue_scripts', [$this, 'enqueueMedia']);
+        add_action('edit_form_after_title', [$this, 'renderZoneForm']);
     }
 
     public function addMetabox(): void
@@ -109,21 +110,39 @@ final class GabaritMetabox
         echo esc_html__('Enregistrez la page pour faire apparaître les champs des zones (Introduction, Image héros, etc.) ci-dessous.', 'oli-theme');
         echo '</div>';
 
-        // Édition des zones du gabarit sélectionné.
-        if ($selected !== null && $selected->isZonal()) {
-            $contents = $this->zones->load($post->ID);
-            echo '<hr style="margin:1rem 0;">';
-            echo '<h3 style="margin:0 0 0.5rem;font-size:1rem;">' . esc_html__('Zones du gabarit', 'oli-theme') . '</h3>';
-            echo '<p style="color:#50575e;margin:0 0 1rem;">' . esc_html__('Renseignez chaque zone. Les zones vides ne seront pas affichées.', 'oli-theme') . '</p>';
-            foreach ($selected->zones as $zone) {
-                $content = $contents[$zone->id] ?? new ZoneContent($zone->type);
-                $this->renderZone($zone, $content);
-            }
-        }
+        // Le formulaire d'édition des zones est rendu dans la colonne
+        // principale (hook `edit_form_after_title`), pas ici en sidebar :
+        // cf. renderZoneForm().
 
         $this->printSelectChangeHintScriptOnce($current);
 
         echo '<p style="margin-top:1rem;font-size:0.85em;"><a href="' . esc_url(add_query_arg(['page' => 'oli-theme-settings', 'tab' => 'apparence', 'sub' => 'gabarits'], admin_url('themes.php'))) . '">' . esc_html__('Voir la galerie complète des gabarits →', 'oli-theme') . '</a></p>';
+    }
+
+    /**
+     * Rend le formulaire d'édition des zones dans la colonne principale
+     * (hook `edit_form_after_title`). N'émet rien si le gabarit du post
+     * n'est pas zonal. Masque le champ de contenu natif : pour un gabarit
+     * zonal, ce sont les zones qui constituent la surface d'édition.
+     */
+    public function renderZoneForm(\WP_Post $post): void
+    {
+        $current  = (string) get_post_meta($post->ID, GabaritResolver::POSTMETA, true);
+        $selected = $current !== '' ? $this->registry->byId($current) : null;
+        if ($selected === null || !$selected->isZonal()) {
+            return;
+        }
+
+        echo '<style>#postdivrich{display:none;}</style>';
+        $contents = $this->zones->load($post->ID);
+        echo '<div class="oli-zone-form" style="margin:1.5rem 0;">';
+        echo '<h2 style="margin:0 0 0.25rem;">' . esc_html($selected->name) . '</h2>';
+        echo '<p style="color:#50575e;margin:0 0 1rem;">' . esc_html__('Renseignez chaque zone. Les zones vides ne seront pas affichées.', 'oli-theme') . '</p>';
+        foreach ($selected->zones as $zone) {
+            $content = $contents[$zone->id] ?? new ZoneContent($zone->type);
+            $this->renderZone($zone, $content);
+        }
+        echo '</div>';
     }
 
     private function renderZone(Zone $zone, ZoneContent $content): void
