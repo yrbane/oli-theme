@@ -1176,6 +1176,9 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
   }
 }
 
+.wp-block-image img{
+  width:100%;
+}
 /* ==========================================================================
    Lightbox photo : overlay plein écran avec navigation prev/next.
    Tous les boutons sont isolés (appearance:none + reset font) pour ne pas
