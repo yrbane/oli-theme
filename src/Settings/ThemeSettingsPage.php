@@ -145,14 +145,6 @@ final class ThemeSettingsPage
     private function registerBannerFields(string $page, string $section, SettingsBag $current): void
     {
         $helpBanner = self::helpBubble('banniere');
-        $helpIdent  = self::helpBubble('identite');
-        add_settings_field(
-            'oli_banner_logo_id',
-            __('ID du média logo', 'oli-theme') . $helpIdent,
-            fn () => $this->renderMediaIdField('banner', 'logoId', $current->banner->logoId),
-            $page,
-            $section,
-        );
         add_settings_field(
             'oli_banner_desktop_id',
             __('ID du média bannière desktop', 'oli-theme') . $helpBanner,
@@ -234,7 +226,6 @@ final class ThemeSettingsPage
         }
 
         return [
-            'logoId'          => $this->intOrNull($input['logoId'] ?? null),
             'bannerDesktopId' => $this->intOrNull($input['bannerDesktopId'] ?? null),
             'bannerMobileId'  => $this->intOrNull($input['bannerMobileId'] ?? null),
             'altByLanguage'   => $alt,

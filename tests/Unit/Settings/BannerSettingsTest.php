@@ -19,13 +19,11 @@ final class BannerSettingsTest extends TestCase
     public function testItExposesAllProperties(): void
     {
         $settings = new BannerSettings(
-            logoId: 10,
             bannerDesktopId: 20,
             bannerMobileId: 30,
             altByLanguage: ['fr' => 'Bannière', 'en' => 'Banner'],
         );
 
-        self::assertSame(10, $settings->logoId);
         self::assertSame(20, $settings->bannerDesktopId);
         self::assertSame(30, $settings->bannerMobileId);
         self::assertSame(['fr' => 'Bannière', 'en' => 'Banner'], $settings->altByLanguage);
@@ -34,13 +32,11 @@ final class BannerSettingsTest extends TestCase
     public function testItAcceptsNullValues(): void
     {
         $settings = new BannerSettings(
-            logoId: null,
             bannerDesktopId: null,
             bannerMobileId: null,
             altByLanguage: [],
         );
 
-        self::assertNull($settings->logoId);
         self::assertNull($settings->bannerDesktopId);
         self::assertNull($settings->bannerMobileId);
         self::assertSame([], $settings->altByLanguage);

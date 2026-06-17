@@ -142,7 +142,7 @@ final class ThemeSettingsPageTest extends TestCase
 
     public function testSanitizeMergesWithExisting(): void
     {
-        Functions\when('get_option')->justReturn(['banner' => ['logoId' => 7]]);
+        Functions\when('get_option')->justReturn(['banner' => ['bannerDesktopId' => 7]]);
         Functions\when('sanitize_text_field')->returnArg(1);
         Functions\when('sanitize_email')->returnArg(1);
         Functions\when('esc_url_raw')->returnArg(1);
@@ -154,7 +154,7 @@ final class ThemeSettingsPageTest extends TestCase
         $result = $page->sanitize(['contact' => ['email' => 'hello@example.com']]);
 
         // La section banner non soumise est préservée par le merge de premier niveau.
-        self::assertSame(['logoId' => 7], $result['banner']);
+        self::assertSame(['bannerDesktopId' => 7], $result['banner']);
         self::assertSame('hello@example.com', $result['contact']['email']);
     }
 

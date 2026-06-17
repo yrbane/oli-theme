@@ -71,7 +71,6 @@ final class ThemeSettingsModel implements ThemeSettingsModelInterface
 
         return new SettingsBag(
             banner: new BannerSettings(
-                logoId: isset($banner['logoId']) ? (int) $banner['logoId'] : $defaults->banner->logoId,
                 bannerDesktopId: isset($banner['bannerDesktopId']) ? (int) $banner['bannerDesktopId'] : $defaults->banner->bannerDesktopId,
                 bannerMobileId: isset($banner['bannerMobileId']) ? (int) $banner['bannerMobileId'] : $defaults->banner->bannerMobileId,
                 altByLanguage: \is_array($banner['altByLanguage'] ?? null) ? $banner['altByLanguage'] : [],

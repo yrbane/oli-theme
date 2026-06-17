@@ -43,7 +43,7 @@ final readonly class SettingsBag
     public static function default(): self
     {
         return new self(
-            banner: new BannerSettings(null, null, null, []),
+            banner: new BannerSettings(null, null, []),
             footer: new FooterSettings('© {year} {site}', true, true),
             social: new SocialSettings(null, null, null, null, null),
             languages: new LanguagesSettings(['fr'], 'fr', LanguagesSettings::FALLBACK_HOME),

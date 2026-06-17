@@ -24,7 +24,7 @@ final class SettingsBagTest extends TestCase
 {
     public function testItExposesAllSubBags(): void
     {
-        $banner = new BannerSettings(1, 2, 3, ['fr' => 'Alt']);
+        $banner = new BannerSettings(2, 3, ['fr' => 'Alt']);
         $footer = new FooterSettings('© {year}', false, true);
         $social = new SocialSettings('https://fb.com', null, null, null, null);
         $languages = new LanguagesSettings(['fr', 'en'], 'fr', LanguagesSettings::FALLBACK_HOME);
@@ -53,7 +53,6 @@ final class SettingsBagTest extends TestCase
         $bag = SettingsBag::default();
 
         // Banner
-        self::assertNull($bag->banner->logoId);
         self::assertNull($bag->banner->bannerDesktopId);
         self::assertNull($bag->banner->bannerMobileId);
         self::assertSame([], $bag->banner->altByLanguage);

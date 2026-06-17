@@ -43,11 +43,11 @@ final class ThemeSettingsModelTest extends TestCase
 
     public function testGetReturnsExistingValue(): void
     {
-        Functions\when('get_option')->justReturn(['banner' => ['logoId' => 7]]);
+        Functions\when('get_option')->justReturn(['banner' => ['bannerDesktopId' => 7]]);
 
         $model = new ThemeSettingsModel();
 
-        self::assertSame(['logoId' => 7], $model->get('banner'));
+        self::assertSame(['bannerDesktopId' => 7], $model->get('banner'));
     }
 
     public function testSetPersistsValue(): void
@@ -55,7 +55,7 @@ final class ThemeSettingsModelTest extends TestCase
         $capturedKey   = null;
         $capturedValue = null;
 
-        Functions\when('get_option')->justReturn(['banner' => ['logoId' => 7]]);
+        Functions\when('get_option')->justReturn(['banner' => ['bannerDesktopId' => 7]]);
         Functions\when('update_option')->alias(
             static function (string $key, mixed $value) use (&$capturedKey, &$capturedValue): bool {
                 $capturedKey   = $key;
@@ -70,7 +70,7 @@ final class ThemeSettingsModelTest extends TestCase
 
         self::assertTrue($result);
         self::assertSame('oli_theme_settings', $capturedKey);
-        self::assertSame(['banner' => ['logoId' => 7], 'social' => ['facebook' => 'https://fb.com']], $capturedValue);
+        self::assertSame(['banner' => ['bannerDesktopId' => 7], 'social' => ['facebook' => 'https://fb.com']], $capturedValue);
     }
 
     public function testAllReturnsDefaultsWhenEmpty(): void
@@ -81,7 +81,7 @@ final class ThemeSettingsModelTest extends TestCase
         $bag   = $model->all();
 
         self::assertInstanceOf(SettingsBag::class, $bag);
-        self::assertNull($bag->banner->logoId);
+        self::assertNull($bag->banner->bannerDesktopId);
         self::assertSame('© {year} {site}', $bag->footer->copyrightTemplate);
         self::assertSame(['fr'], $bag->languages->enabled);
         self::assertTrue($bag->seo->sitemapEnabled);
@@ -91,7 +91,6 @@ final class ThemeSettingsModelTest extends TestCase
     {
         Functions\when('get_option')->justReturn([
             'banner' => [
-                'logoId'          => '10',
                 'bannerDesktopId' => '20',
                 'bannerMobileId'  => '30',
                 'altByLanguage'   => ['fr' => 'Bannière', 'en' => 'Banner'],
@@ -133,7 +132,6 @@ final class ThemeSettingsModelTest extends TestCase
         $bag   = $model->all();
 
         // Banner
-        self::assertSame(10, $bag->banner->logoId);
         self::assertSame(20, $bag->banner->bannerDesktopId);
         self::assertSame(30, $bag->banner->bannerMobileId);
         self::assertSame(['fr' => 'Bannière', 'en' => 'Banner'], $bag->banner->altByLanguage);
