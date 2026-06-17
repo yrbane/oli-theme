@@ -1175,8 +1175,8 @@ body.has-fullscreen-hero article.page--accueil > .page__content {
     max-height: none;
   }
 
-  img{
-    float:none;
+ .wp-block-image figure img{
+    float:none !important;
     width:auto;
   }
 }
