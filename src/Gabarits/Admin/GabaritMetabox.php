@@ -159,11 +159,18 @@ final class GabaritMetabox
         }
         switch ($zone->type) {
             case ZoneType::Text:
-                printf(
-                    '<textarea name="%s[text]" rows="5" style="width:100%%;">%s</textarea>',
-                    esc_attr($name),
-                    esc_textarea($content->text),
-                );
+                // `oli_gabarit_zone[{id}]` → identifiant TinyMCE valide.
+                $editorId = 'oli_zone_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($zone->id));
+                wp_editor($content->text, $editorId, [
+                    'textarea_name' => $name . '[text]',
+                    'media_buttons' => false,
+                    'quicktags'     => false,
+                    'textarea_rows' => 8,
+                    'tinymce'       => [
+                        'toolbar1' => 'bold,italic,bullist,numlist,link,unlink',
+                        'toolbar2' => '',
+                    ],
+                ]);
                 break;
             case ZoneType::Image:
                 $this->renderImagePicker($name, $content->imageId);
