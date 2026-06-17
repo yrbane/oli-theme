@@ -389,6 +389,10 @@ final class Theme
         // Style de bloc « Hiérarchique » sur core/list pour numérotation
         // 1, 1.1, 1.1.1 (rendu CSS uniquement, voir olikalari.css).
         (new \OliTheme\Editor\HierarchicalListStyle())->register();
+
+        // Style de bloc « Justifié » sur paragraph/heading (rendu CSS via
+        // .is-style-justified, voir base.css et editor-style.css).
+        (new \OliTheme\Editor\JustifyBlockStyle())->register();
     }
 
     /**

@@ -99,7 +99,7 @@ final class GabaritMetaboxTest extends TestCase
                 return ($s['media_buttons'] ?? null) === false
                     && ($s['quicktags'] ?? null) === false
                     && ($s['textarea_name'] ?? '') === 'oli_gabarit_zone[intro][text]'
-                    && ($s['tinymce']['toolbar1'] ?? '') === 'bold,italic,bullist,numlist,link,unlink';
+                    && ($s['tinymce']['toolbar1'] ?? '') === 'bold,italic,alignjustify,bullist,numlist,link,unlink';
             }),
         );
 

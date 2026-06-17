@@ -148,6 +148,10 @@ h6 { font-size: var(--font-size-h6, 1rem); }
    OliTheme\Editor\JustifyAlignment via block_type_metadata). */
 .has-text-align-justify { text-align: justify; hyphens: auto; }
 
+/* Style de bloc « Justifié » (panneau Styles, via OliTheme\Editor\JustifyBlockStyle)
+   sur paragraph/heading : classe `.is-style-justified` posée par Gutenberg. */
+.is-style-justified { text-align: justify; hyphens: auto; }
+
 /* Cartes d'article (archive home, archives blog) en grille responsive
    auto-fill : le navigateur fait tenir autant de cartes que la largeur
    le permet, chaque carte ayant une largeur minimale lisible.

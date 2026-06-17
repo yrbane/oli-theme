@@ -167,7 +167,7 @@ final class GabaritMetabox
                     'quicktags'     => false,
                     'textarea_rows' => 8,
                     'tinymce'       => [
-                        'toolbar1' => 'bold,italic,bullist,numlist,link,unlink',
+                        'toolbar1' => 'bold,italic,alignjustify,bullist,numlist,link,unlink',
                         'toolbar2' => '',
                     ],
                 ]);

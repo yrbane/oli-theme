@@ -40,6 +40,9 @@
 /* Aperçu de l'alignement Justifié dans l'éditeur (toolbar Gutenberg). */
 .editor-styles-wrapper .has-text-align-justify { text-align: justify; hyphens: auto; }
 
+/* Aperçu du style de bloc « Justifié » (panneau Styles) dans l'éditeur. */
+.editor-styles-wrapper .is-style-justified { text-align: justify; hyphens: auto; }
+
 .editor-styles-wrapper a {
   color: #111111;
   text-decoration: underline;
